@@ -1,9 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  // apps name
-  head: {
-    title: 'Gointerling',
-  },
   devtools: { enabled: true },
   css: ['~/assets/css/global.css'],
   modules: ['nuxt-icons', '@nuxtjs/google-fonts'],

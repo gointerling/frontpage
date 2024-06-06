@@ -6,7 +6,7 @@
       </h6>
       <div class="flex gap-8 justify-center">
         <div v-for="logo in partnerLogos" :key="logo.id" class="col-span-1">
-          <div class="p-4 bg-white rounded-lg shadow-md">
+          <div class="p-4 bg-white rounded-lg shadow-md cursor-pointer">
             <img :src="logo.src" :alt="logo.alt" class="w-full h-auto" />
           </div>
         </div>

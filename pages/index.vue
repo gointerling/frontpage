@@ -1,18 +1,24 @@
 <template>
   <div>
-    <Navbar />
-    <HeroSection />
-    <StatsSection />
-    <TranslatorSearchSection />
-    <WelcomeSection />
-    <PartnerLogosSection />
-    <FacilitatorsSection />
-    <TestimonialsSection />
-    <FooterSection />
+    <div v-show="!isPageLoading">
+      <Navbar />
+      <HeroSection />
+      <StatsSection />
+      <TranslatorSearchSection />
+      <WelcomeSection />
+      <PartnerLogosSection />
+      <FacilitatorsSection />
+      <TestimonialsSection />
+      <FooterSection />
+    </div>
+
+    <!-- Loader -->
+    <PageLoader v-if="isPageLoading" />
   </div>
 </template>
 
 <script>
+import PageLoader from "~/components/PageLoader.vue";
 import Navbar from "~/components/Navbar.vue";
 import HeroSection from "~/components/HeroSection.vue";
 import StatsSection from "~/components/StatsSection.vue";
@@ -25,6 +31,7 @@ import FooterSection from "~/components/FooterSection.vue";
 
 export default {
   components: {
+    PageLoader,
     Navbar,
     HeroSection,
     StatsSection,
@@ -40,6 +47,22 @@ export default {
     return {
       title: "Gointerling",
     };
+  },
+  data() {
+    return {
+      isPageLoading: true,
+    };
+  },
+  mounted() {
+    setTimeout(() => {
+      this.isPageLoading = false;
+
+      // scroll to top
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }, 2000);
   },
 };
 </script>

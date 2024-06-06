@@ -43,13 +43,13 @@
           <h3 class="text-lg text-primary font-bold mb-4">Customer Care</h3>
           <ul>
             <li class="flex flex-col mb-2">
-              <span>Phone Number</span>
+              <span class="font-semibold">Phone Number</span>
               <a href="#" class="text-gray-500 hover:text-primary">
                 081568277818
               </a>
             </li>
             <li class="flex flex-col">
-              <span>Email</span>
+              <span class="font-semibold">Email</span>
               <a href="#" class="text-gray-500 hover:text-primary">
                 gointerling@gmail.com
               </a>
@@ -61,10 +61,16 @@
             <h3 class="text-lg text-primary font-bold mb-4">Social Medias</h3>
             <div class="flex gap-3">
               <a href="#">
-                <nuxt-icon name="instagram" class="text-2xl" filled />
+                <nuxt-icon
+                  name="instagram"
+                  class="text-2xl text-[#64748B] hover:text-primary"
+                />
               </a>
               <a href="#">
-                <nuxt-icon name="facebook" class="text-2xl" filled />
+                <nuxt-icon
+                  name="facebook"
+                  class="text-2xl text-[#64748B] hover:text-primary"
+                />
               </a>
             </div>
           </div>

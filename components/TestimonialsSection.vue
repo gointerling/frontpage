@@ -5,7 +5,7 @@
         <div
           v-for="(testimonial, index) in testimonials"
           :key="testimonial.id"
-          class="rounded-2xl shadow-md p-8"
+          class="rounded-2xl shadow-md p-8 cursor-pointer"
           :class="index === 0 ? 'bg-[#E4F1F7]' : 'bg-white'"
         >
           <nuxt-icon name="quotation" class="text-2xl" filled />
