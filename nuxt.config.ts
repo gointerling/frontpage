@@ -15,4 +15,8 @@ export default defineNuxtConfig({
       Poppins: [400, 500, 600, 700], // Define the font weights you need
     },
   },
+
+  plugins: [
+    '~/plugins/axios.js'
+  ]
 })
