@@ -43,13 +43,13 @@
           <h3 class="text-lg text-primary font-bold mb-4">Customer Care</h3>
           <ul>
             <li class="flex flex-col mb-2">
-              <span class="font-semibold">Phone Number</span>
+              <span class="text-gray-900 font-semibold">Phone Number</span>
               <a href="#" class="text-gray-500 hover:text-primary">
                 081568277818
               </a>
             </li>
             <li class="flex flex-col">
-              <span class="font-semibold">Email</span>
+              <span class="text-gray-900 font-semibold">Email</span>
               <a href="#" class="text-gray-500 hover:text-primary">
                 gointerling@gmail.com
               </a>
@@ -89,13 +89,13 @@
 </template>
 
 <script>
-import logo from "@/assets/images/logo.svg";
+import logo from '@/assets/images/logo.svg'
 
 export default {
   data() {
     return {
       logo,
-    };
+    }
   },
-};
+}
 </script>

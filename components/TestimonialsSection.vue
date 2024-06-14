@@ -1,5 +1,5 @@
 <template>
-  <div class="py-16">
+  <div class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div
@@ -38,11 +38,11 @@ export default {
   data() {
     return {
       testimonials: [],
-    };
+    }
   },
   async mounted() {
     // fetch random user picture from https://randomuser.me/api/?nat=us&randomapi=
-    await fetch("https://randomuser.me/api/?nat=id&randomapi=&results=3")
+    await fetch('https://randomuser.me/api/?nat=id&randomapi=&results=3')
       .then((response) => response.json())
       .then((data) => {
         this.testimonials = data.results.map((user) => {
@@ -50,12 +50,12 @@ export default {
             id: user.login.uuid,
             avatar: user.picture.large,
             name: `${user.name.first} ${user.name.last}`,
-            role: "CEO, Company Name",
-            icon: "quotation",
-            text: "Gointerling offers high-quality professional translators for seamless communication in any language. Their professional translators are certified and recognized as experts in their specific fields, ensuring top-quality services and reliable results.",
-          };
-        });
-      });
+            role: 'CEO, Company Name',
+            icon: 'quotation',
+            text: 'Gointerling offers high-quality professional translators for seamless communication in any language. Their professional translators are certified and recognized as experts in their specific fields, ensuring top-quality services and reliable results.',
+          }
+        })
+      })
   },
-};
+}
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="py-16">
+  <div class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <h6 class="py-4 text-primary text-3xl font-semibold pb-8">
         Partner Collaboration
@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import companyLogo from "~/assets/images/partners/company-1.png";
+import companyLogo from '~/assets/images/partners/company-1.png'
 export default {
   data() {
     return {
@@ -24,48 +24,48 @@ export default {
         {
           id: 1,
           src: companyLogo,
-          alt: "Partner Logo 1",
+          alt: 'Partner Logo 1',
         },
         {
           id: 2,
           src: companyLogo,
-          alt: "Partner Logo 2",
+          alt: 'Partner Logo 2',
         },
         {
           id: 3,
           src: companyLogo,
-          alt: "Partner Logo 3",
+          alt: 'Partner Logo 3',
         },
         {
           id: 4,
           src: companyLogo,
-          alt: "Partner Logo 4",
+          alt: 'Partner Logo 4',
         },
         {
           id: 5,
           src: companyLogo,
-          alt: "Partner Logo 5",
+          alt: 'Partner Logo 5',
         },
         {
           id: 5,
           src: companyLogo,
-          alt: "Partner Logo 5",
+          alt: 'Partner Logo 5',
         },
         {
           id: 5,
           src: companyLogo,
-          alt: "Partner Logo 5",
+          alt: 'Partner Logo 5',
         },
         {
           id: 5,
           src: companyLogo,
-          alt: "Partner Logo 5",
+          alt: 'Partner Logo 5',
         },
         // Add more partner logos here
       ],
-    };
+    }
   },
-};
+}
 </script>
 
 <style scoped>
