@@ -37,8 +37,18 @@ export default defineNuxtPlugin((nuxtApp) => {
       if (error.response) {
         if (error.response.status === 401) {
           // Handle unauthorized error
-          console.log('Unauthorized, logging out ...')
+          console.error('Unauthorized, logging out ...')
           // Perform logout or token refresh
+        }
+
+        if (error.response.status === 404) {
+          // Handle not found error
+          console.error('Resource not found')
+        }
+
+        if (error.response.status === 500) {
+          // Handle internal server error
+          console.error('Internal server error')
         }
       }
       return Promise.reject(error)

@@ -11,7 +11,7 @@
           <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
             <a
               href="#"
-              class="inline-flex items-center px-1 pt-1 border-b-2 font-semibold border-primary text-sm leading-5 text-gray-900 focus:outline-none focus:border-blue-900 transition duration-150 ease-in-out"
+              class="inline-flex items-center px-1 pt-1 font-semibold border-primary text-sm leading-5 text-gray-900 focus:outline-none focus:border-blue-900 transition duration-150 ease-in-out"
             >
               Facilitators List
             </a>
@@ -19,11 +19,18 @@
         </div>
 
         <!-- Button -->
-        <div v-if="!user" class="hidden sm:ml-6 sm:flex sm:items-center">
+        <div v-if="!user" class="hidden sm:ml-6 sm:flex sm:items-center gap-2">
           <button
-            class="px-4 py-2 text-sm font-medium text-white bg-accent rounded-full hover:bg-accent-700 focus:outline-none focus:bg-accent-500 transition duration-150 ease-in-out"
+            class="px-4 py-2 text-sm font-medium text-white bg-accent rounded-lg hover:bg-accent-700 focus:outline-none focus:bg-accent-500 transition duration-150 ease-in-out"
+            @click="navigateTo('/auth/login?as=user')"
           >
-            Sign in
+            Sign in as User
+          </button>
+          <button
+            class="px-4 py-2 text-sm font-medium text-accent border border-accent rounded-lg hover:bg-accent-700 focus:outline-none focus:bg-accent-500 transition duration-150 ease-in-out"
+            @click="navigateTo('/auth/login?as=facilitator')"
+          >
+            Sign in as Facilitator
           </button>
         </div>
 
@@ -41,19 +48,14 @@
                   <nuxt-icon name="order" class="text-2xl" filled />
                   <nuxt-icon name="notification" class="text-2xl" filled />
                 </div>
-                <img
-                  :src="user.photo"
-                  alt="avatar"
-                  class="w-8 h-8 mx-2 rounded-full"
-                />
-                <span class="mx-2">{{ user.name }}</span>
+                <UAvatar :alt="user.fullname" :src="user.photo" size="sm" />
+                <span class="mx-2">{{ user.fullname }}</span>
                 <nuxt-icon name="chevron-simple-down" class="mx-4" filled />
               </button>
 
               <!-- Dropdown -->
               <div
                 v-show="open"
-                @click.away="open = false"
                 class="absolute right-0 z-10 mt-4 w-48 py-1 bg-white rounded-lg shadow-lg"
               >
                 <a
@@ -71,13 +73,14 @@
 
                   Order History
                 </a>
-                <a
+                <button
+                  class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   href="#"
-                  class="flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  @click="signOut"
                 >
                   <nuxt-icon name="logout" class="text-2xl"></nuxt-icon>
                   Sign out
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -87,22 +90,51 @@
   </div>
 </template>
 
-<script>
-// const image url
-export default {
-  props: {
-    user: {
-      type: Object,
-      default: null,
-    },
+<script setup>
+// components
+const toast = useToast()
+
+// router
+const router = useRouter()
+
+// props
+const props = defineProps({
+  user: {
+    type: Object,
+    default: null,
   },
-  data() {
-    return {
-      logo: "https://fastly.picsum.photos/id/579/200/300.jpg?hmac=9MD8EV4Jl9EqKLkTj5kyNdBUKQWyHk2m4pE4UCBGc8Q",
-      open: false,
-    };
-  },
-};
+})
+
+// data
+const logo =
+  'https://fastly.picsum.photos/id/579/200/300.jpg?hmac=9MD8EV4Jl9EqKLkTj5kyNdBUKQWyHk2m4pE4UCBGc8Q'
+const open = ref(false)
+
+// emits
+const emit = defineEmits(['update'])
+
+// methods
+const navigateTo = (path) => {
+  router.push(path)
+}
+
+const signOut = () => {
+  const token = useCookie('token')
+  token.value = null
+
+  open.value = false
+
+  // rebuild the component by emitting an event
+  emit('logout')
+
+  // toast
+  toast.add({
+    title: 'Success!',
+    color: 'green',
+    icon: 'i-heroicons-check-circle',
+    description: 'Successfully signed out!',
+  })
+}
 </script>
 
 <style>

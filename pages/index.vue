@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-show="!isPageLoading">
-      <Navbar :user="user" />
+      <Navbar :user="user" @logout="logout" />
       <HeroSection />
       <StatsSection />
       <TranslatorSearchSection />
@@ -19,51 +19,51 @@
 
 <script setup>
 // components
-import PageLoader from "~/components/PageLoader.vue";
-import Navbar from "~/components/Navbar.vue";
-import HeroSection from "~/components/HeroSection.vue";
-import StatsSection from "~/components/StatsSection.vue";
-import TranslatorSearchSection from "~/components/TranslatorSearchSection.vue";
-import WelcomeSection from "~/components/WelcomeSection.vue";
-import PartnerLogosSection from "~/components/PartnerLogosSection.vue";
-import FacilitatorsSection from "~/components/FacilitatorsSection.vue";
-import TestimonialsSection from "~/components/TestimonialsSection.vue";
-import FooterSection from "~/components/FooterSection.vue";
+import PageLoader from '~/components/PageLoader.vue'
+import Navbar from '~/components/Navbar.vue'
+import HeroSection from '~/components/HeroSection.vue'
+import StatsSection from '~/components/StatsSection.vue'
+import TranslatorSearchSection from '~/components/TranslatorSearchSection.vue'
+import WelcomeSection from '~/components/WelcomeSection.vue'
+import PartnerLogosSection from '~/components/PartnerLogosSection.vue'
+import FacilitatorsSection from '~/components/FacilitatorsSection.vue'
+import TestimonialsSection from '~/components/TestimonialsSection.vue'
+import FooterSection from '~/components/FooterSection.vue'
 
 // imports
-import { ref, onMounted } from "vue";
-import { useAuthService } from "~/composables/useAuthService";
+import { ref, onMounted } from 'vue'
 
 // component setup
-const isPageLoading = ref(true);
-const user = ref(null);
-
-// useAuthService instance
-const authService = useAuthService();
+const isPageLoading = ref(true)
+const user = ref(null)
 
 // fetch user data on mount
 const fetchUser = async () => {
   try {
-    const response = await authService.getTestData();
-    user.value = response.data.data;
-
-    console.log("User data:", user.value);
+    user.value = useCookie('token').value.user || null
   } catch (error) {
-    console.error("Fetching user failed:", error);
+    console.error('Fetching user failed:', error)
   }
-};
+}
 
-onMounted(() => {
+const logout = () => {
+  useCookie('token').value = null
+  user.value = null
+}
+
+onMounted(async () => {
   // simulate a loading delay
 
   // fetch user data
-  fetchUser().then(() => {
-    isPageLoading.value = false;
+  if (useCookie('token').value) {
+    await fetchUser()
+  }
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  });
-});
+  isPageLoading.value = false
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  })
+})
 </script>

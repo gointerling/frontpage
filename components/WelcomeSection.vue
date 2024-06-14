@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center justify-center relative h-[500px]">
+  <div class="flex items-center justify-center relative h-[500px] bg-white">
     <!-- Welcome Card -->
     <div
       class="bg-white rounded-xl shadow-md p-8 max-w-3xl flex gap-4 justify-between z-30 relative-card h-full"
@@ -55,15 +55,15 @@
 </template>
 
 <script>
-import welcomeImage from "@/assets/images/welcome.svg";
+import welcomeImage from '@/assets/images/welcome.svg'
 
 export default {
   data() {
     return {
       welcomeImage,
-    };
+    }
   },
-};
+}
 </script>
 
 <style scoped>
