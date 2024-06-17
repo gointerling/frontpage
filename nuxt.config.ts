@@ -1,8 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   app: {
-    pageTransition: { name: 'fade', mode: 'out-in' },
-    layoutTransition: { name: 'slide', mode: 'out-in' },
+    // pageTransition: { name: 'fade', mode: 'out-in' },
   },
   colorMode: {
     preference: 'light',

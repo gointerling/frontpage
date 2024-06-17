@@ -9,6 +9,11 @@ export const useAuthService = () => {
     login(credentials) {
       return $axios.post('/auth/login', credentials)
     },
+    register(credentials) {
+      console.log(credentials)
+      
+      return $axios.post('/auth/register', credentials)
+    },
     logout() {
       return $axios.post('/auth/logout')
     },

@@ -15,7 +15,9 @@ export default defineNuxtPlugin((nuxtApp) => {
     (config) => {
       // Add authorization token or any other modifications
       // from local storage or cookies
-      const token = localStorage.getItem('token')
+      const token = useCookie('token').value ? useCookie('token').value.token : null
+
+      console.log('token', token) 
       
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
