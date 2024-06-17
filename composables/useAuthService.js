@@ -10,8 +10,6 @@ export const useAuthService = () => {
       return $axios.post('/auth/login', credentials)
     },
     register(credentials) {
-      console.log(credentials)
-      
       return $axios.post('/auth/register', credentials)
     },
     logout() {

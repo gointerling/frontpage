@@ -1,5 +1,5 @@
 // plugins/axios.js
-
+import {  useCookie, navigateTo } from 'nuxt/app'
 import axios from 'axios'
 
 // from env VITE_APP_API_URL
@@ -16,8 +16,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       // Add authorization token or any other modifications
       // from local storage or cookies
       const token = useCookie('token').value ? useCookie('token').value.token : null
-
-      console.log('token', token) 
       
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
@@ -40,7 +38,12 @@ export default defineNuxtPlugin((nuxtApp) => {
         if (error.response.status === 401) {
           // Handle unauthorized error
           console.error('Unauthorized, logging out ...')
-          // Perform logout or token refresh
+
+          // Clear local storage or cookies
+          useCookie('token').value = null
+
+          // Redirect to login page
+          navigateTo('/auth/login')
         }
 
         if (error.response.status === 404) {

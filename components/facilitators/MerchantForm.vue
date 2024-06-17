@@ -67,7 +67,11 @@
 
           <u-form-group name="bank" label="File CV (Max 6MB)" class="mb-2">
             <!-- max size 6MB -->
-            <FileUpload accept="application/pdf" max-size="6291456" />
+            <FileUpload
+              accept="application/pdf"
+              max-size="6291456"
+              @file-uploaded="setCV"
+            />
           </u-form-group>
         </div>
       </div>
@@ -180,8 +184,6 @@ const validationRules = {
 }
 
 const validateCurrentFlow = (flow) => {
-  console.log('flow', flow)
-
   const rules = validationRules[flow]
   if (!rules) return false
 
@@ -195,8 +197,6 @@ const validateCurrentFlow = (flow) => {
     }
   })
 
-  console.log('isValid', isValid)
-
   return isValid
 }
 
@@ -207,6 +207,10 @@ const showToast = (error) => {
     icon: 'i-heroicons-x-circle',
     description: error || 'Please fill in the form correctly!',
   })
+}
+
+const setCV = (value) => {
+  cv_url.value = value
 }
 
 // onMounted

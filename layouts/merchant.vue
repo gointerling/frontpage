@@ -117,6 +117,8 @@ const fetchUser = async () => {
     user.value = useCookie('token').value.user || null
   } catch (error) {
     console.error('Fetching user failed:', error)
+  } finally {
+    isPageLoading.value = false
   }
 }
 
@@ -145,15 +147,13 @@ onMounted(async () => {
   // sidebar size
   isSmallSize.value = localStorage.getItem('sidenav-closed') === 'true'
 
+  // check if the first time setup merchant
+  await checkFirstTimeSetup()
+
   // fetch user data
   if (useCookie('token').value) {
     await fetchUser()
   }
-
-  // check if the first time setup merchant
-  await checkFirstTimeSetup()
-
-  isPageLoading.value = false
 
   window.scrollTo({
     top: 0,

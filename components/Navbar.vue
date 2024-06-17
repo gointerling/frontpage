@@ -87,16 +87,15 @@
 
                   Order History
                 </a>
-                <a
+                <button
                   v-if="user.is_facilitator"
-                  href="#"
-                  class="flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   @click="navigateTo(`my/dashboard`)"
                 >
                   <nuxt-icon name="merchant" class="text-2xl"></nuxt-icon>
 
                   Facilitator
-                </a>
+                </button>
                 <button
                   class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   href="#"

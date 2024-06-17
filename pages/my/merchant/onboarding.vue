@@ -39,7 +39,10 @@ const isPageLoading = ref(true)
 
 // mounted
 onMounted(() => {
-  isPageLoading.value = false
+  // timeout
+  setTimeout(() => {
+    isPageLoading.value = false
+  }, 1000)
 })
 </script>
 

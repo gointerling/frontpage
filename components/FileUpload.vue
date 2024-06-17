@@ -7,33 +7,49 @@
       class="hidden"
       @change="handleFileChange"
     />
+
     <button
-      v-if="!fileName"
-      @click="triggerFileInput"
+      v-if="isUploadProgress"
       class="px-4 py-2 border border-primary rounded hover:bg-primary flex items-center gap-1 group transition duration-200"
     >
-      <nuxt-icon
-        name="file-upload"
-        class="text-primary group-hover:text-white transition duration-200"
-      />
       <span class="text-primary group-hover:text-white transition duration-200">
-        Upload File
+        Uploading...
       </span>
     </button>
 
-    <button
-      v-if="fileName"
-      @click="clearFile"
-      class="px-4 py-2 border border-red-800 rounded hover:bg-red-800 flex items-center gap-1 group transition duration-200"
-    >
-      <nuxt-icon
-        name="circle-x"
-        class="text-red-800 group-hover:text-white transition duration-200 mb-0 pb-0"
-      />
-      <span class="text-red-800 group-hover:text-white transition duration-200">
-        Cancel
-      </span>
-    </button>
+    <div v-else>
+      <button
+        v-if="!fileName"
+        @click="triggerFileInput"
+        class="px-4 py-2 border border-primary rounded hover:bg-primary flex items-center gap-1 group transition duration-200"
+      >
+        <nuxt-icon
+          name="file-upload"
+          class="text-primary group-hover:text-white transition duration-200"
+        />
+        <span
+          class="text-primary group-hover:text-white transition duration-200"
+        >
+          Upload File
+        </span>
+      </button>
+
+      <button
+        v-if="fileName"
+        @click="clearFile"
+        class="px-4 py-2 border border-red-800 rounded hover:bg-red-800 flex items-center gap-1 group transition duration-200"
+      >
+        <nuxt-icon
+          name="circle-x"
+          class="text-red-800 group-hover:text-white transition duration-200 mb-0 pb-0"
+        />
+        <span
+          class="text-red-800 group-hover:text-white transition duration-200"
+        >
+          Cancel
+        </span>
+      </button>
+    </div>
 
     <p v-if="fileName" class="mt-2 text-gray-700 text-xs">
       Selected file: {{ fileName }}
@@ -44,6 +60,9 @@
 
 <script setup>
 import { ref } from 'vue'
+
+import { useFileService } from '~/composables/useFileService'
+const { uploadFile, deleteFile } = useFileService()
 
 const props = defineProps({
   accept: {
@@ -56,9 +75,14 @@ const props = defineProps({
   },
 })
 
+const toast = useToast()
+const emit = defineEmits(['fileUploaded'])
+
 const fileInput = ref(null)
 const fileName = ref('')
 const fileError = ref('')
+const uploadedFile = ref(null)
+const isUploadProgress = ref(false)
 
 const triggerFileInput = () => {
   fileInput.value.click()
@@ -76,6 +100,7 @@ const handleFileChange = () => {
       fileName.value = ''
     } else {
       fileError.value = ''
+      handleUploadFile(file) // Call function to upload file
     }
   }
 }
@@ -84,10 +109,72 @@ const clearFile = () => {
   fileInput.value.value = null
   fileName.value = ''
   fileError.value = ''
+
+  handleDeleteFile(uploadedFile.value)
 }
 
 const round = (value, decimals) => {
   return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals)
+}
+
+const handleUploadFile = (file) => {
+  isUploadProgress.value = true
+
+  uploadFile(file)
+    .then((response) => {
+      isUploadProgress.value = false
+
+      uploadedFile.value = response.data.data.fileRecord
+      setFileUrl(response.data.data.fileRecord.url)
+
+      toast.add({
+        title: 'Success!',
+        color: 'green',
+        icon: 'i-heroicons-check-circle',
+        description: 'File uploaded successfully!',
+      })
+    })
+    .catch((err) => {
+      console.error(err)
+      toast.add({
+        title: 'Uh Oh!',
+        color: 'red',
+        icon: 'i-heroicons-exclamation-triangle',
+        description: getFirstErrorMessage(err.response.data.error),
+      })
+    })
+}
+const handleDeleteFile = (file) => {
+  deleteFile(file.id)
+    .then(() => {
+      setFileUrl('')
+      toast.add({
+        title: 'Success!',
+        color: 'green',
+        icon: 'i-heroicons-check-circle',
+        description: 'File deleted successfully!',
+      })
+    })
+    .catch((err) => {
+      console.error(err)
+      toast.add({
+        title: 'Uh Oh!',
+        color: 'red',
+        icon: 'i-heroicons-exclamation-triangle',
+        description: getFirstErrorMessage(err.response.data.error),
+      })
+    })
+}
+
+const setFileUrl = (url) => {
+  emit('fileUploaded', url)
+}
+
+const getFirstErrorMessage = (error) => {
+  if (error.errors) {
+    return error.errors[Object.keys(error.errors)[0]][0]
+  }
+  return error.message
 }
 </script>
 
