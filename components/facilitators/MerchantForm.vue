@@ -53,24 +53,54 @@
               type="number"
               v-model="bank_account"
               required
+              placeholder="Masukkan No Rekening"
               class="w-full"
               :color="isError ? 'red' : 'gray'"
             />
           </u-form-group>
         </div>
 
+        <!-- step 3 -->
         <div v-show="flow === 3">
           <p class="text-sm text-gray-700 pb-3">
             Please fill in the form below to get started <br />
             to be a Gointerling facilitator.
           </p>
 
-          <u-form-group name="bank" label="File CV (Max 6MB)" class="mb-2">
+          <u-form-group name="bank" label="File CV (Max 6MB)" class="mb-4">
             <!-- max size 6MB -->
             <FileUpload
               accept="application/pdf"
               max-size="6291456"
               @file-uploaded="setCV"
+            />
+          </u-form-group>
+        </div>
+
+        <!-- step 4 -->
+        <div v-show="flow === 4">
+          <p class="text-sm text-gray-700 pb-3">
+            Please fill in the form below to get started <br />
+            to be a Gointerling facilitator.
+          </p>
+
+          <u-form-group name="portfolios" label="Portfolio " class="mb-2">
+            <!-- max size 6MB -->
+            <MultipleFileUpload
+              file="Portfolio"
+              accept="application/pdf"
+              max-size="6291456"
+              @file-uploaded="setPortofolio"
+            />
+          </u-form-group>
+
+          <u-form-group name="certificates" label="Certificate " class="mb-2">
+            <!-- max size 6MB -->
+            <MultipleFileUpload
+              file="Certificate"
+              accept="application/pdf"
+              max-size="6291456"
+              @file-uploaded="setCertificate"
             />
           </u-form-group>
         </div>
@@ -84,10 +114,19 @@
             </div>
           </template>
         </UButton>
-        <UButton @click="navigateTo(1)">
+        <UButton v-if="flow < 4" @click="navigateTo(1)">
           <template #default>
             <div class="flex items-center gap-2">
               <span>Selanjutnya</span>
+              <nuxt-icon name="chevron-right" />
+            </div>
+          </template>
+        </UButton>
+
+        <UButton v-if="flow === 4" @click="navigateTo(1)">
+          <template #default>
+            <div class="flex items-center gap-2">
+              <span>Skip For Now</span>
               <nuxt-icon name="chevron-right" />
             </div>
           </template>
@@ -115,6 +154,7 @@ const validationSchema = yup.object({
 
 // state
 const flow = ref(1)
+const router = useRouter()
 
 // data references
 const toast = useToast()
@@ -150,6 +190,13 @@ const navigateTo = (to) => {
   } else if (validateCurrentFlow(flow.value)) {
     flow.value = flow.value + to
   }
+
+  // set route params
+  router.push({
+    query: {
+      step: flow.value,
+    },
+  })
 }
 
 const validationRules = {
@@ -211,6 +258,14 @@ const showToast = (error) => {
 
 const setCV = (value) => {
   cv_url.value = value
+}
+
+const setPortofolio = (value) => {
+  portfolios.value = value
+}
+
+const setCertificate = (value) => {
+  certificates.value = value
 }
 
 // onMounted
