@@ -37,17 +37,31 @@
         <!-- User -->
         <div v-else class="py-4">
           <div class="sm:ml-6 sm:flex sm:items-center">
-            <div class="relative" x-data="{ open: false }">
+            <div class="relative flex gap-1">
               <!-- Button -->
+              <div class="flex align-middle items-center gap-6 mr-4">
+                <button @click="navigateTo('admin/dashboard')">
+                  <nuxt-icon
+                    v-if="user.is_admin === 1"
+                    name="admin"
+                    class="text-2xl"
+                    filled
+                  />
+                </button>
+                <button @click="navigateTo('admin')">
+                  <nuxt-icon name="badge" class="text-2xl" filled />
+                </button>
+                <button @click="navigateTo('admin')">
+                  <nuxt-icon name="order" class="text-2xl" filled />
+                </button>
+                <button @click="navigateTo('admin')">
+                  <nuxt-icon name="notification" class="text-2xl" filled />
+                </button>
+              </div>
               <button
                 @click="open = !open"
                 class="flex items-center align-middle text-sm font-medium text-gray-900 rounded-full focus:outline-none focus:shadow-outline"
               >
-                <div class="flex align-middle items-center gap-6 mr-4">
-                  <nuxt-icon name="badge" class="text-2xl" filled />
-                  <nuxt-icon name="order" class="text-2xl" filled />
-                  <nuxt-icon name="notification" class="text-2xl" filled />
-                </div>
                 <UAvatar :alt="user.fullname" :src="user.photo" size="sm" />
                 <span class="mx-2">{{ user.fullname }}</span>
                 <nuxt-icon name="chevron-simple-down" class="mx-4" filled />
@@ -56,7 +70,7 @@
               <!-- Dropdown -->
               <div
                 v-show="open"
-                class="absolute right-0 z-10 mt-4 w-48 py-1 bg-white rounded-lg shadow-lg"
+                class="absolute right-0 z-10 mt-12 w-48 py-1 bg-white rounded-lg shadow-lg"
               >
                 <a
                   href="#"
@@ -73,6 +87,15 @@
 
                   Order History
                 </a>
+                <button
+                  v-if="user.is_facilitator"
+                  class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  @click="navigateTo(`my/dashboard`)"
+                >
+                  <nuxt-icon name="merchant" class="text-2xl"></nuxt-icon>
+
+                  Facilitator
+                </button>
                 <button
                   class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   href="#"

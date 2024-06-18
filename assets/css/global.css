@@ -11,4 +11,8 @@ body {
     margin-bottom: 0 !important;  
 }
 
+.nuxt-icon svg {
+  margin-bottom: 0 !important;
+}
+
   

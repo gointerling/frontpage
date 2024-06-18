@@ -151,12 +151,14 @@
                     </button>
                   </div>
                 </u-form-group>
-                <button
+                <UButton
                   type="submit"
-                  class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+                  :loading="loading"
+                  block
+                  class="w-full bg-blue-500 text-white text-center py-2 rounded-md hover:bg-blue-600"
                 >
                   Sign Up
-                </button>
+                </UButton>
               </u-form>
               <hr class="py-2 mt-4" />
               <button
@@ -201,13 +203,13 @@ const toast = useToast()
 // route
 const router = useRouter()
 const route = useRoute()
-const { as } = useRoute().query
+const { as, type } = useRoute().query
 
 // data
-const email = ref('john.doe@example.com')
+const email = ref('sir.alex@example.com')
 const password = ref('password123')
 const confirmPassword = ref('')
-const fullname = ref('')
+const fullname = ref('Sir Alex')
 const token = useCookie('token')
 
 // state data
@@ -238,6 +240,14 @@ const registerSchema = yup.object().shape({
 // methods
 const handleFlow = (value) => {
   flow.value = value
+
+  // set route query
+  router.push({
+    query: {
+      as: as,
+      type: value,
+    },
+  })
 }
 
 const handleLogin = async () => {
@@ -277,12 +287,48 @@ const handleLogin = async () => {
     })
 }
 
-const handleRegister = async (formData) => {
-  await register({
-    fullname: formData.fullname,
-    email: formData.email,
-    password: formData.password,
-  })
+const handleRegister = async () => {
+  loading.value = true
+
+  const credentials = {
+    fullname: fullname.value,
+    email: email.value,
+    password: password.value,
+    password_confirmation: confirmPassword.value,
+    as: as === 'facilitator' ? 'facilitator' : 'client',
+  }
+
+  await register(credentials)
+    .then((result) => {
+      toast.add({
+        title: 'Success!',
+        color: 'green',
+        icon: 'i-heroicons-check-circle',
+        description: 'You have successfully registered!',
+      })
+
+      handleLogin()
+    })
+    .catch((err) => {
+      loading.value = false
+
+      console.error(err)
+      toast.add({
+        title: 'Uh Oh!',
+        color: 'red',
+        icon: 'i-heroicons-exclamation-triangle',
+        description: getFirstErrorMessage(err.response.data.error),
+      })
+    })
+}
+
+const getFirstErrorMessage = (errors) => {
+  for (const field in errors) {
+    if (errors[field].length > 0) {
+      return errors[field][0]
+    }
+  }
+  return null
 }
 
 const navigateTo = (path) => {
@@ -292,6 +338,19 @@ const navigateTo = (path) => {
 const toggleShowPassword = () => {
   showPassword.value = !showPassword.value
 }
+
+// watch route type
+watch(
+  () => type,
+  (value) => {
+    if (value === 'register') {
+      flow.value = 'register'
+    } else {
+      flow.value = 'login'
+    }
+  },
+  { immediate: true }
+)
 
 // mounted
 onMounted(() => {

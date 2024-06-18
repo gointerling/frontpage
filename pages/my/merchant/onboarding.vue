@@ -1,0 +1,49 @@
+<template>
+  <div>
+    <!-- Loader -->
+    <PageLoader v-if="isPageLoading" />
+
+    <!-- onboarding -->
+    <div
+      v-else
+      class="w-full h-screen flex items-center justify-center bg-slate-200"
+    >
+      <UCard
+        :ui="{ body: { padding: 'p-0', base: 'h-full' } }"
+        class="min-w-[750px] min-h-[400px] flex items-center justify-center"
+      >
+        <div class="flex gap-4 p-4 h-full">
+          <div class="flex align-middle justify-center items-center">
+            <img :src="heroImage" width="300px" />
+          </div>
+          <div class="px-6 min-w-[400px]">
+            <MerchantForm />
+          </div>
+        </div>
+      </UCard>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import heroImage from '@/assets/images/facilitators-sm.svg'
+
+// import components
+import PageLoader from '~/components/PageLoader.vue'
+import MerchantForm from '~/components/facilitators/MerchantForm.vue'
+
+// import services
+
+// component setup
+const isPageLoading = ref(true)
+
+// mounted
+onMounted(() => {
+  // timeout
+  setTimeout(() => {
+    isPageLoading.value = false
+  }, 1000)
+})
+</script>
+
+<style></style>
