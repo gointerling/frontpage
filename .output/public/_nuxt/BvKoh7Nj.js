@@ -1,0 +1,1 @@
+import{P as r}from"./BOxkNff_.js";const n=()=>{const{$axios:e}=r();return{getMerchants(){return e.get("/users-merchants")},getMerchantDetails(t){return e.get(`/users-merchants/${t}`)},getMyMerchants(){return e.get("/my/merchant")}}};export{n as u};

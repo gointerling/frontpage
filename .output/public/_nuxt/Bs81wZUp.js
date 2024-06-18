@@ -1,0 +1,1 @@
+import{X as t,O as o,c as a,b as n,w as s,g as c,o as r,a as _}from"./BOxkNff_.js";const u=_("div",{class:"w-full p-2"},"content merchant",-1),h={__name:"dashboard",setup(d){return t().params.id,o(()=>{console.log("mounted")}),(m,p)=>{const e=c;return r(),a("div",null,[n(e,{name:"merchant"},{default:s(()=>[u]),_:1})])}}};export{h as default};
