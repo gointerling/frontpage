@@ -84,99 +84,130 @@
 
             <!-- Register Flow -->
             <div v-else key="register" class="px-10 py-8">
-              <img :src="logo" class="my-4 w-32" />
-              <h1 class="text-2xl font-bold my-6 text-primary">
-                Register {{ as === 'facilitator' ? 'as Facilitator' : '' }}
-              </h1>
-              <u-form
-                :validation-schema="registerSchema"
-                @submit="handleRegister"
-              >
-                <u-form-group name="fullname" label="Full Name" class="mb-2">
-                  <u-input v-model="fullname" required class="w-full" />
-                </u-form-group>
-                <u-form-group name="email" label="Email" class="mb-2">
-                  <u-input
-                    type="email"
-                    v-model="email"
-                    required
-                    class="w-full"
-                  />
-                </u-form-group>
-                <u-form-group name="password" label="Password" class="mb-2">
-                  <div class="relative">
+              <div>
+                <img :src="logo" class="my-4 w-32" />
+                <h1 class="text-2xl font-bold my-6 text-primary">
+                  Register {{ as === 'facilitator' ? 'as Facilitator' : '' }}
+                </h1>
+                <u-form
+                  :validation-schema="registerSchema"
+                  @submit="handleRegister"
+                >
+                  <u-form-group name="fullname" label="Full Name" class="mb-2">
+                    <u-input v-model="fullname" required class="w-full" />
+                  </u-form-group>
+                  <u-form-group name="email" label="Email" class="mb-2">
                     <u-input
-                      :type="showPassword ? 'text' : 'password'"
-                      v-model="password"
+                      type="email"
+                      v-model="email"
                       required
                       class="w-full"
                     />
-                    <button
-                      type="button"
-                      @click="toggleShowPassword"
-                      class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
-                    >
-                      <span v-if="showPassword" class="flex items-center gap-1">
-                        <nuxt-icon name="eye-off" filled class="text-lg" />
-                      </span>
-                      <span v-else class="flex items-center gap-1">
-                        <nuxt-icon name="eye" filled class="text-lg" />
-                      </span>
-                    </button>
-                  </div>
-                </u-form-group>
-                <u-form-group
-                  name="confirmPassword"
-                  label="Confirm Password"
-                  class="mb-2"
+                  </u-form-group>
+                  <u-form-group name="password" label="Password" class="mb-2">
+                    <div class="relative">
+                      <u-input
+                        :type="showPassword ? 'text' : 'password'"
+                        v-model="password"
+                        required
+                        class="w-full"
+                      />
+                      <button
+                        type="button"
+                        @click="toggleShowPassword"
+                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                      >
+                        <span
+                          v-if="showPassword"
+                          class="flex items-center gap-1"
+                        >
+                          <nuxt-icon name="eye-off" filled class="text-lg" />
+                        </span>
+                        <span v-else class="flex items-center gap-1">
+                          <nuxt-icon name="eye" filled class="text-lg" />
+                        </span>
+                      </button>
+                    </div>
+                  </u-form-group>
+                  <u-form-group
+                    name="confirmPassword"
+                    label="Confirm Password"
+                    class="mb-2"
+                  >
+                    <div class="relative">
+                      <u-input
+                        :type="showPassword ? 'text' : 'password'"
+                        v-model="confirmPassword"
+                        required
+                        class="w-full"
+                      />
+                      <button
+                        type="button"
+                        @click="toggleShowPassword"
+                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                      >
+                        <span
+                          v-if="showPassword"
+                          class="flex items-center gap-1"
+                        >
+                          <nuxt-icon name="eye-off" filled class="text-lg" />
+                        </span>
+                        <span v-else class="flex items-center gap-1">
+                          <nuxt-icon name="eye" filled class="text-lg" />
+                        </span>
+                      </button>
+                    </div>
+                  </u-form-group>
+                  <UButton
+                    type="submit"
+                    :loading="loading"
+                    block
+                    class="w-full bg-blue-500 text-white text-center py-2 rounded-md hover:bg-blue-600"
+                  >
+                    Sign Up
+                  </UButton>
+                </u-form>
+                <hr class="py-2 mt-4" />
+                <button
+                  class="w-full bg-white py-2 rounded-md flex gap-2 justify-center items-center border-2 border-gray-100"
                 >
-                  <div class="relative">
-                    <u-input
-                      :type="showPassword ? 'text' : 'password'"
-                      v-model="confirmPassword"
-                      required
-                      class="w-full"
-                    />
-                    <button
-                      type="button"
-                      @click="toggleShowPassword"
-                      class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
-                    >
-                      <span v-if="showPassword" class="flex items-center gap-1">
-                        <nuxt-icon name="eye-off" filled class="text-lg" />
-                      </span>
-                      <span v-else class="flex items-center gap-1">
-                        <nuxt-icon name="eye" filled class="text-lg" />
-                      </span>
-                    </button>
-                  </div>
-                </u-form-group>
-                <UButton
-                  type="submit"
-                  :loading="loading"
-                  block
-                  class="w-full bg-blue-500 text-white text-center py-2 rounded-md hover:bg-blue-600"
-                >
-                  Sign Up
-                </UButton>
-              </u-form>
-              <hr class="py-2 mt-4" />
-              <button
-                class="w-full bg-white py-2 rounded-md flex gap-2 justify-center items-center border-2 border-gray-100"
-              >
-                <nuxt-icon name="google" filled />
-                Continue with Google
-              </button>
-              <p class="mt-4 flex justify-between text-sm text-gray-600">
-                Already have an account?
-                <a
-                  href="#"
-                  @click.prevent="handleFlow('login')"
-                  class="text-blue-500 hover:underline"
-                >
-                  Login
-                </a>
-              </p>
+                  <nuxt-icon name="google" filled />
+                  Continue with Google
+                </button>
+                <p class="mt-4 flex justify-between text-sm text-gray-600">
+                  Already have an account?
+                  <a
+                    href="#"
+                    @click.prevent="handleFlow('login')"
+                    class="text-blue-500 hover:underline"
+                  >
+                    Login
+                  </a>
+                </p>
+              </div>
+
+              <!-- <div >
+                <img :src="logo" class="my-4 w-32" />
+                <h1 class="text-2xl font-bold my-2 text-primary">
+                  Register {{ as === 'facilitator' ? 'as Facilitator' : '' }}
+                </h1>
+                <span class=""> Create a new account </span>
+
+                <div class="flex flex-col gap-2 mt-4">
+                  <button
+                    class="w-full bg-white py-2 rounded-md flex gap-2 justify-center items-center border-2 border-gray-100"
+                    @click="setAs('user')"
+                  >
+                    As User
+                  </button>
+                  <button
+                    class="w-full bg-white py-2 rounded-md flex gap-2 justify-center items-center border-2 border-gray-100"
+                    @click="setAs('facilitator')"
+                  >
+                    As Facilitator
+                  </button>
+                </div>
+              </div> -->
             </div>
           </transition>
         </div>
@@ -246,6 +277,17 @@ const handleFlow = (value) => {
     query: {
       as: as,
       type: value,
+    },
+  })
+}
+
+const setAs = (value) => {
+  flow.value = 'register'
+
+  router.push({
+    query: {
+      as: value,
+      type: flow.value,
     },
   })
 }

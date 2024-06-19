@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-show="!isPageLoading" class="flex">
-      <SideDrawer :navs="navs" :isSmallSize="isSmallSize" />
+      <SideDrawer :navs="navs" :isSmallSize="isSmallSize" title="Dash" />
 
       <div class="flex flex-col w-full bg-slate-100">
         <nav class="p-6 w-full flex justify-between">
@@ -28,13 +28,20 @@
             v-show="open"
             class="absolute right-0 z-10 mt-10 w-48 py-1 bg-white rounded-lg shadow-lg"
           >
-            <a
-              href="#"
-              class="flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            <button
+              class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              @click="navigateTo({ name: 'profile' })"
             >
               <nuxt-icon name="user-circle" class="text-2xl"></nuxt-icon>
               Profile
-            </a>
+            </button>
+            <button
+              class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              @click="navigateTo({ name: 'index' })"
+            >
+              <nuxt-icon name="home" class="text-2xl"></nuxt-icon>
+              Home
+            </button>
             <button
               class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               href="#"
@@ -115,6 +122,10 @@ const fetchUser = async () => {
   } finally {
     isPageLoading.value = false
   }
+}
+
+const navigateTo = (to) => {
+  router.push(to)
 }
 
 const signOut = () => {

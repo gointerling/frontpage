@@ -12,6 +12,7 @@
         </p>
         <button
           class="mt-8 px-6 py-3 bg-accent text-white rounded-full hover:bg-accent-700 transition duration-300"
+          @click="navigateTo({ name: 'facilitators' })"
         >
           Let's start translation
         </button>
@@ -23,20 +24,25 @@
 </template>
 
 <script>
-import heroImage from "@/assets/images/facilitators.svg";
+import heroImage from '@/assets/images/facilitators.svg'
 
 export default {
   data() {
     return {
       heroImage,
-    };
+    }
   },
-};
+  methods: {
+    navigateTo(route) {
+      this.$router.push(route)
+    },
+  },
+}
 </script>
 
 <style>
 .bg-facilitator {
-  background-image: url("/assets/images/facilitators-bg.png");
+  background-image: url('/assets/images/facilitators-bg.png');
   background-size: contain;
   background-position: center;
 }

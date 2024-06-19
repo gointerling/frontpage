@@ -7,8 +7,11 @@
       <div class="flex gap-2 items-center justify-center py-2">
         <nuxt-icon name="logo" class="text-primary text-3xl" />
         <b v-if="!isSmallSize" class="font-thin text-primary"> Go </b>
-        <span v-if="!isSmallSize" class="text-primary -ml-2 font-bold">
-          ADMIN
+        <span
+          v-if="!isSmallSize"
+          class="text-primary -ml-2 font-bold uppercase"
+        >
+          {{ title }}
         </span>
       </div>
       <UVerticalNavigation
@@ -43,6 +46,10 @@ const props = defineProps({
   isSmallSize: {
     type: Boolean,
     default: false,
+  },
+  title: {
+    type: String,
+    default: 'Admin',
   },
 })
 

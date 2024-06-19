@@ -9,7 +9,7 @@
           <h6 class="font-semibold">My Profile</h6>
           <div class="flex flex-col items-start mt-4">
             <UButton
-              v-for="(nav, index) in navs"
+              v-for="(nav, index) in filteredNavs"
               :key="index"
               block
               class="py-3 px-3.5 flex justify-start bg-white hover:bg-[#FDF1EE] shadow-none"
@@ -50,36 +50,48 @@
                   <nuxt-icon name="edit" class="text-xs" />
                 </UButton>
               </div>
-              <h6 class="font-semibold text-xl pb-4">
-                {{ user.fullname }}
-              </h6>
+              <div class="flex flex-col justify-center pb-4">
+                <h6 class="font-semibold text-xl">
+                  {{ user.fullname }}
+                </h6>
+                <span
+                  v-if="photoWarning"
+                  class="text-xs text-gray-300 flex gap-1 items-center"
+                >
+                  <nuxt-icon name="warning-triangle" class="text-gray-300" />
+                  {{ photoWarning }}
+                </span>
+              </div>
             </div>
 
             <div class="flex flex-col gap-4">
               <div class="flex justify-between">
                 <span class="font-semibold">Name</span>
-                <UInput v-model="payload.fullname" class="w-8/12" />
+                <UInput v-model="payload.fullname" class="w-7/12" />
               </div>
               <div class="flex justify-between">
                 <span class="font-semibold">Street Address</span>
-                <UInput v-model="payload.address" class="w-8/12" />
+                <UInput v-model="payload.address" class="w-7/12" />
               </div>
               <div class="flex justify-between">
                 <span class="font-semibold">Email</span>
-                <UInput v-model="payload.email" class="w-8/12" />
+                <UInput v-model="payload.email" class="w-7/12" />
               </div>
               <div class="flex justify-between">
                 <span class="font-semibold">Phone</span>
-                <UInput v-model="payload.phone" class="w-8/12" />
+                <UInput v-model="payload.phone" class="w-7/12" />
               </div>
               <div class="flex justify-between">
                 <span class="font-semibold">About Yourself</span>
-                <UTextarea v-model="payload.description" class="w-8/12" />
+                <UTextarea
+                  v-model="payload.personal_description"
+                  class="w-7/12"
+                />
               </div>
               <div class="flex justify-between">
                 <span class="font-semibold">Language Skills</span>
                 <USelectMenu
-                  v-model="selectedMainSkills"
+                  v-model="payload.main_skills"
                   v-model:query="mainSkillQuery"
                   searchable
                   :options="mainSkillsList"
@@ -88,15 +100,15 @@
                   multiple
                   trailing
                   by="id"
-                  class="w-8/12"
+                  class="w-7/12"
                 >
                   <UButton color="gray" class="flex-1 justify-between">
                     <div
-                      v-if="selectedMainSkills.length > 0"
+                      v-if="payload.main_skills.length > 0"
                       class="flex flex-wrap gap-2"
                     >
                       <UBadge
-                        v-for="(selected, index) in selectedMainSkills"
+                        v-for="(selected, index) in payload.main_skills"
                         :key="index"
                         color="blue"
                         variant="soft"
@@ -110,7 +122,7 @@
                     </span>
 
                     <UIcon
-                      name="i-heroicons-chevron-right-20-solid"
+                      name="i-heroicons-chevron-down-20-solid"
                       class="w-5 h-5 transition-transform text-gray-400 dark:text-gray-500"
                       :class="[open && 'transform rotate-90']"
                     />
@@ -120,7 +132,7 @@
               <div class="flex justify-between">
                 <span class="font-semibold">Additional Skills</span>
                 <USelectMenu
-                  v-model="selectedAdditionalSkills"
+                  v-model="payload.additional_skills"
                   v-model:query="addtionalSkillQuery"
                   searchable
                   :options="additionalSkillList"
@@ -129,15 +141,15 @@
                   multiple
                   trailing
                   by="id"
-                  class="w-8/12"
+                  class="w-7/12"
                 >
                   <UButton color="gray" class="flex-1 justify-between">
                     <div
-                      v-if="selectedAdditionalSkills.length > 0"
+                      v-if="payload.additional_skills.length > 0"
                       class="flex flex-wrap gap-2"
                     >
                       <UBadge
-                        v-for="(selected, index) in selectedAdditionalSkills"
+                        v-for="(selected, index) in payload.additional_skills"
                         :key="index"
                         color="blue"
                         variant="soft"
@@ -151,7 +163,7 @@
                     </span>
 
                     <UIcon
-                      name="i-heroicons-chevron-right-20-solid"
+                      name="i-heroicons-chevron-down-20-solid"
                       class="w-5 h-5 transition-transform text-gray-400 dark:text-gray-500"
                       :class="[open && 'transform rotate-90']"
                     />
@@ -235,6 +247,143 @@
             </div>
           </UCard>
         </div>
+
+        <div v-if="selectedTab === 'account'" class="w-10/12">
+          <h6 class="font-semibold mb-3">Account Information</h6>
+
+          <UCard>
+            <div class="flex flex-col gap-4">
+              <div class="flex justify-between">
+                <span class="font-semibold">Bank</span>
+                <UInputMenu
+                  v-model="bank"
+                  :options="bankList"
+                  placeholder="Pilih Nama Bank"
+                  by="id"
+                  option-attribute="name"
+                  :search-attributes="['name']"
+                  class="w-7/12"
+                />
+              </div>
+              <div class="flex justify-between">
+                <span class="font-semibold">Account Number</span>
+                <u-input
+                  type="number"
+                  v-model="bank_account"
+                  required
+                  placeholder="Masukkan No Rekening"
+                  class="w-7/12"
+                  :color="isError ? 'red' : 'gray'"
+                />
+              </div>
+
+              <div class="flex justify-end">
+                <!-- save button -->
+                <UButton @click="updateProfile" class="mt-4 bg-accent">
+                  <nuxt-icon name="floppy" class="text-white" />
+                  Save
+                </UButton>
+              </div>
+            </div>
+          </UCard>
+        </div>
+
+        <div v-if="selectedTab === 'service'" class="w-10/12">
+          <h6 class="font-semibold mb-3">Service Information</h6>
+
+          <UCard>
+            <div class="flex flex-col gap-4">
+              <div class="flex justify-between">
+                <span class="font-semibold">Service</span>
+                <UInputMenu
+                  v-model="merchant.type"
+                  :options="typeList"
+                  placeholder="Choose Service Type"
+                  by="id"
+                  option-attribute="name"
+                  :search-attributes="['name']"
+                  class="w-7/12"
+                />
+              </div>
+              <div class="flex justify-between">
+                <span class="font-semibold">Service Options</span>
+                <UInputMenu
+                  v-model="service.type"
+                  :options="['Standard', 'Premium']"
+                  placeholder="Choose Service Options"
+                  class="w-7/12"
+                />
+              </div>
+              <div class="flex justify-between">
+                <span class="font-semibold">Service Price</span>
+                <u-input
+                  type="number"
+                  v-model="service.price"
+                  required
+                  placeholder="Masukkan No Rekening"
+                  class="w-7/12"
+                  :color="isError ? 'red' : 'gray'"
+                />
+              </div>
+              <div class="flex justify-between">
+                <span class="font-semibold">Working Hours</span>
+                <div class="flex gap-1 items-center">
+                  <u-input
+                    type="number"
+                    v-model="service.time_estimated"
+                    required
+                    placeholder="Estimated Time"
+                    class="w-full"
+                    :color="isError ? 'red' : 'gray'"
+                  />
+                  <UInputMenu
+                    v-model="service.time_estimated_unit"
+                    :options="['hours', 'days', 'weeks', 'months']"
+                    class="w-3/12"
+                  />
+                </div>
+              </div>
+
+              <div class="flex justify-end">
+                <!-- save button -->
+                <UButton @click="updateProfile" class="mt-4 bg-accent">
+                  <nuxt-icon name="floppy" class="text-white" />
+                  Save
+                </UButton>
+              </div>
+            </div>
+          </UCard>
+        </div>
+
+        <div v-if="selectedTab === 'certificate'" class="w-10/12">
+          <h6 class="font-semibold mb-3">List of Certificates</h6>
+
+          <UCard>
+            <div class="flex flex-col gap-4">
+              <u-form-group
+                name="certificates"
+                label="Certificates "
+                class="mb-2"
+              >
+                <!-- max size 6MB -->
+                <MultipleFileUpload
+                  title="Certificate"
+                  accept="application/pdf"
+                  max-size="6291456"
+                  @file-uploaded="setCertificate"
+                />
+              </u-form-group>
+
+              <div class="flex justify-end">
+                <!-- save button -->
+                <UButton @click="updateProfile" class="mt-4 bg-accent">
+                  <nuxt-icon name="floppy" class="text-white" />
+                  Save
+                </UButton>
+              </div>
+            </div>
+          </UCard>
+        </div>
       </div>
     </div>
 
@@ -249,40 +398,67 @@ import PageLoader from '~/components/PageLoader.vue'
 
 // imports
 import { ref, onMounted } from 'vue'
+const toast = useToast()
+const route = useRoute()
+const router = useRouter()
 
 // services
+import { useMerchantService } from '~/composables/useMerchantService'
+import { useUserService } from '~/composables/useUserService'
 import { useSkillService } from '~/composables/useSkillService'
+import { useFileService } from '~/composables/useFileService'
 
+const { getMerchant, updateMerchant } = useMerchantService()
+const { updateMyProfile } = useUserService()
 const { getSkills } = useSkillService()
+const { uploadFile } = useFileService()
 
 // navs
+const fileInput = ref(null)
 const navs = [
   {
     key: 'profile',
     label: 'Profile',
     icon: 'user-circle',
+    scope: 'all',
   },
   {
     key: 'account',
     label: 'Account Number',
     icon: 'credit-card',
+    scope: 'merchant',
   },
   {
     key: 'service',
     label: 'Service',
     icon: 'service',
+    scope: 'merchant',
   },
   {
     key: 'certificate',
-    label: 'Certification',
+    label: 'Certificates',
     icon: 'badge',
+    scope: 'merchant',
   },
+]
+
+const bankList = [
+  { id: 'bca', name: 'BCA' },
+  { id: 'bni', name: 'BNI' },
+  { id: 'bri', name: 'BRI' },
+  { id: 'mandiri', name: 'Mandiri' },
+]
+
+const typeList = [
+  { id: 'translator', name: 'Translator' },
+  { id: 'interpreter', name: 'Interpreter' },
 ]
 
 // state
 const isPageLoading = ref(true)
 const selectedTab = ref('profile')
 const showPassword = ref(false)
+const photoWarning = ref('')
 
 // data
 const user = ref({
@@ -292,6 +468,11 @@ const user = ref({
   phone: '',
   address: '',
   role: '',
+  personal_description: '',
+  main_skills: [],
+  additional_skills: [],
+  is_admin: false,
+  is_facilitator: false,
 })
 
 const payload = ref({
@@ -300,8 +481,31 @@ const payload = ref({
   email: '',
   phone: '',
   address: '',
-  description: '',
+  personal_description: '',
+  main_skills: [],
+  additional_skills: [],
 })
+
+const merchant = ref({
+  type: '',
+  bank: '',
+  bank_account: '',
+  cv_url: '',
+  certificates: [],
+  portfolios: [],
+})
+
+const service = ref({
+  name: '',
+  price: '',
+  type: '',
+  time_estimated: '',
+  time_estimated_unit: '',
+  desc: '',
+  language_sources: [],
+  language_destinations: [],
+})
+
 const newPassword = ref('')
 const confirmPassword = ref('')
 const skillList = ref([])
@@ -329,6 +533,20 @@ const additionalSkillList = computed(() => {
     }))
 })
 
+const filteredNavs = computed(() => {
+  if (!user.value) return []
+
+  const isAdmin = user.value.is_admin ?? false
+  const isMerchant = user.value.is_facilitator ?? false
+
+  return navs.filter(
+    (nav) =>
+      nav.scope === 'all' ||
+      (nav.scope === 'admin' && isAdmin) ||
+      (nav.scope === 'merchant' && isMerchant)
+  )
+})
+
 // methods
 // toggle password visibility
 const toggleShowPassword = () => {
@@ -337,8 +555,21 @@ const toggleShowPassword = () => {
 
 // logout
 const logout = () => {
+  console.log('Logging out...')
   useCookie('token').value = null
-  user.value = null
+  user.value = {
+    fullname: '',
+    photo: '',
+    email: '',
+    phone: '',
+    address: '',
+    role: '',
+    personal_description: '',
+    main_skills: [],
+    additional_skills: [],
+    is_admin: false,
+    is_facilitator: false,
+  }
 }
 
 // fetch skills list
@@ -366,12 +597,60 @@ const fetchUser = async () => {
       email: user.value.email,
       phone: user.value.phone,
       address: user.value.address,
-      description: user.value.description,
+      personal_description: user.value.personal_description,
       photo: user.value.photo,
+      main_skills: user.value.main_skills ?? [],
+      additional_skills: user.value.additional_skills ?? [],
     }
   } catch (error) {
     console.error('Fetching user failed:', error)
   }
+}
+
+// trigger file input click
+const triggerFileInput = () => {
+  fileInput.value.click()
+}
+
+// handle file change
+const onFileChange = async (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    // toast upload progress
+    toast.add({
+      title: 'Uploading...',
+      color: 'blue',
+      icon: 'i-heroicons-arrow-up-tray',
+      description: 'Please wait while we upload your photo...',
+    })
+
+    try {
+      const response = await uploadFile(file, `profile_picture_${file.name}`)
+
+      payload.value.photo = response.data.data.fileRecord.url
+      photoWarning.value =
+        'This preview is temporary, please save to apply changes.'
+    } catch (err) {
+      console.error('Photo upload failed:', err)
+
+      // show error message
+      toast.add({
+        title: 'Uh Oh!',
+        color: 'red',
+        icon: 'i-heroicons-exclamation-triangle',
+        description: getFirstErrorMessage(err.response.data.error),
+      })
+    }
+  }
+}
+
+const getFirstErrorMessage = (errors) => {
+  for (const field in errors) {
+    if (errors[field].length > 0) {
+      return errors[field][0]
+    }
+  }
+  return null
 }
 
 onMounted(async () => {

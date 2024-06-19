@@ -26,6 +26,10 @@ export const useUserService = () => {
       return $axios.get(`/users/${id}`, {
         params,
       })
+    },
+
+    updateMyProfile(data) {
+      return $axios.put('/users/me', data)
     }
   }
 }

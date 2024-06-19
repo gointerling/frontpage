@@ -9,19 +9,19 @@
           <h3 class="text-lg text-primary font-bold mb-4">Help</h3>
           <ul>
             <li>
-              <a href="#" class="text-gray-500 hover:text-primary">
+              <nuxt-link href="#" class="text-gray-500 hover:text-primary">
                 Chat Admin
-              </a>
+              </nuxt-link>
             </li>
             <li>
-              <a href="#" class="text-gray-500 hover:text-primary">
+              <nuxt-link href="#" class="text-gray-500 hover:text-primary">
                 Order Status
-              </a>
+              </nuxt-link>
             </li>
             <li>
-              <a href="#" class="text-gray-500 hover:text-primary">
+              <nuxt-link href="#" class="text-gray-500 hover:text-primary">
                 Delivery
-              </a>
+              </nuxt-link>
             </li>
           </ul>
         </div>
@@ -29,13 +29,24 @@
           <h3 class="text-lg text-primary font-bold mb-4">Company</h3>
           <ul>
             <li>
-              <a href="#" class="text-gray-500 hover:text-primary">About Us</a>
+              <nuxt-link
+                :to="{
+                  name: 'ads-setup',
+                }"
+                class="text-gray-500 hover:text-primary"
+              >
+                Place an Ads Here</nuxt-link
+              >
             </li>
             <li>
-              <a href="#" class="text-gray-500 hover:text-primary">News</a>
+              <nuxt-link href="#" class="text-gray-500 hover:text-primary"
+                >News</nuxt-link
+              >
             </li>
             <li>
-              <a href="#" class="text-gray-500 hover:text-primary">Career</a>
+              <nuxt-link href="#" class="text-gray-500 hover:text-primary"
+                >Career</nuxt-link
+              >
             </li>
           </ul>
         </div>
@@ -44,15 +55,15 @@
           <ul>
             <li class="flex flex-col mb-2">
               <span class="text-gray-900 font-semibold">Phone Number</span>
-              <a href="#" class="text-gray-500 hover:text-primary">
+              <nuxt-link href="#" class="text-gray-500 hover:text-primary">
                 081568277818
-              </a>
+              </nuxt-link>
             </li>
             <li class="flex flex-col">
               <span class="text-gray-900 font-semibold">Email</span>
-              <a href="#" class="text-gray-500 hover:text-primary">
+              <nuxt-link href="#" class="text-gray-500 hover:text-primary">
                 gointerling@gmail.com
-              </a>
+              </nuxt-link>
             </li>
           </ul>
         </div>
@@ -60,18 +71,18 @@
           <div>
             <h3 class="text-lg text-primary font-bold mb-4">Social Medias</h3>
             <div class="flex gap-3">
-              <a href="#">
+              <nuxt-link href="#">
                 <nuxt-icon
                   name="instagram"
                   class="text-2xl text-[#64748B] hover:text-primary"
                 />
-              </a>
-              <a href="#">
+              </nuxt-link>
+              <nuxt-link href="#">
                 <nuxt-icon
                   name="facebook"
                   class="text-2xl text-[#64748B] hover:text-primary"
                 />
-              </a>
+              </nuxt-link>
             </div>
           </div>
           <div class="mt-5">

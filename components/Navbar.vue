@@ -4,17 +4,26 @@
       <div class="flex justify-between h-16 px-8">
         <!-- Logo -->
         <div class="flex">
-          <div class="flex-shrink-0 flex items-center align-middle">
-            <nuxt-icon name="logo" class="text-primary text-3xl" />
-            <span class="text-primary ml-2">gointerling</span>
-          </div>
+          <nuxt-link
+            :to="{
+              name: 'index',
+            }"
+            class="flex-shrink-0 flex items-center align-middle"
+          >
+            <div class="flex-shrink-0 flex items-center align-middle">
+              <nuxt-icon name="logo" class="text-primary text-3xl" />
+              <span class="text-primary ml-2">gointerling</span>
+            </div>
+          </nuxt-link>
           <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-            <a
-              href="#"
+            <nuxt-link
+              :to="{
+                name: 'facilitators',
+              }"
               class="inline-flex items-center px-1 pt-1 font-semibold border-primary text-sm leading-5 text-gray-900 focus:outline-none focus:border-blue-900 transition duration-150 ease-in-out"
             >
               Facilitators List
-            </a>
+            </nuxt-link>
           </div>
         </div>
 
@@ -84,21 +93,26 @@
                   <nuxt-icon name="order" class="text-2xl" filled />
                 </button>
                 <button
-                  @click="
-                    navigateTo({
-                      name: 'notification',
-                    })
+                  @click="toggleNotification"
+                  :class="
+                    isNotificationOpen
+                      ? 'bg-primary text-white p-2 rounded-full'
+                      : 'p-2'
                   "
                 >
-                  <nuxt-icon name="notification" class="text-2xl" filled />
+                  <nuxt-icon
+                    name="notification"
+                    class="text-xl"
+                    :class="isNotificationOpen ? 'text-white' : 'text-primary'"
+                  />
                 </button>
               </div>
               <button
-                @click="open = !open"
+                @click="toggleDropdown"
                 class="flex items-center align-middle text-sm font-medium text-gray-900 rounded-full focus:outline-none focus:shadow-outline"
               >
-                <UAvatar :alt="user.fullname" :src="user.photo" size="sm" />
-                <span class="mx-2">{{ user.fullname }}</span>
+                <UAvatar :alt="user?.fullname" :src="user?.photo" size="sm" />
+                <span class="mx-2">{{ user?.fullname }}</span>
                 <nuxt-icon name="chevron-simple-down" class="mx-4" filled />
               </button>
 
@@ -107,7 +121,7 @@
                 v-show="open"
                 class="absolute right-0 z-10 mt-12 w-48 py-1 bg-white rounded-lg shadow-lg"
               >
-                <a
+                <nuxt-link
                   href="#"
                   class="flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   @click="
@@ -118,17 +132,24 @@
                 >
                   <nuxt-icon name="user-circle" class="text-2xl"></nuxt-icon>
                   Profile
-                </a>
-                <a
+                </nuxt-link>
+                <button
+                  class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  @click="navigateTo({ name: 'index' })"
+                >
+                  <nuxt-icon name="home" class="text-2xl"></nuxt-icon>
+                  Home
+                </button>
+                <nuxt-link
                   href="#"
                   class="flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
                   <nuxt-icon name="history" class="text-2xl"></nuxt-icon>
 
                   Order History
-                </a>
+                </nuxt-link>
                 <button
-                  v-if="user.is_facilitator"
+                  v-if="user?.is_facilitator"
                   class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   @click="
                     navigateTo({
@@ -147,6 +168,37 @@
                 >
                   <nuxt-icon name="logout" class="text-2xl"></nuxt-icon>
                   Sign out
+                </button>
+              </div>
+
+              <!-- Notification -->
+              <div
+                v-show="isNotificationOpen"
+                class="absolute right-20 z-10 mt-12 w-96 py-1 bg-white rounded-lg shadow-lg"
+              >
+                <div
+                  class="flex justify-between px-4 items-center border-b border-gray-200"
+                >
+                  <span class="uppercase text-primary font-semibold">
+                    Notifications
+                  </span>
+                  <UButton variant="link" color="red" class="">
+                    Mark all as read
+                  </UButton>
+                </div>
+                <button
+                  class="w-full flex justify-start gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-200"
+                  href="#"
+                >
+                  Your order has been received and is now being processed. Thank
+                  you for choosing Gointering!
+                </button>
+                <button
+                  class="w-full flex justify-start gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-200"
+                  href="#"
+                >
+                  Your order has been received and is now being processed. Thank
+                  you for choosing Gointering!
                 </button>
               </div>
             </div>
@@ -172,10 +224,9 @@ const props = defineProps({
   },
 })
 
-// data
-const logo =
-  'https://fastly.picsum.photos/id/579/200/300.jpg?hmac=9MD8EV4Jl9EqKLkTj5kyNdBUKQWyHk2m4pE4UCBGc8Q'
+// state
 const open = ref(false)
+const isNotificationOpen = ref(false)
 
 // emits
 const emit = defineEmits(['update'])
@@ -183,6 +234,20 @@ const emit = defineEmits(['update'])
 // methods
 const navigateTo = (path) => {
   router.push(path)
+}
+
+const toggleNotification = () => {
+  isNotificationOpen.value = !isNotificationOpen.value
+
+  // close the user dropdown
+  open.value = false
+}
+
+const toggleDropdown = () => {
+  open.value = !open.value
+
+  // close the notification dropdown
+  isNotificationOpen.value = false
 }
 
 const signOut = () => {
@@ -201,6 +266,13 @@ const signOut = () => {
     icon: 'i-heroicons-check-circle',
     description: 'Successfully signed out!',
   })
+
+  // redirect if not on the home page
+  if (router.currentRoute.value.name !== 'index') {
+    router.push({
+      name: 'auth-login',
+    })
+  }
 }
 </script>
 

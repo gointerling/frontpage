@@ -4,14 +4,14 @@
       <h6 class="py-4 text-primary text-2xl font-semibold">
         Find 300+ Facilitators for The Language Translator You Need
       </h6>
-      <div class="flex justify-center gap-3">
+      <div class="flex justify-center gap-3 w-100">
         <input
           type="text"
-          class="px-4 py-2 rounded-lg border border-accent focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+          class="px-4 py-2 rounded-lg border border-accent focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent w-6/12"
           placeholder="Search Facilitators"
         />
         <button
-          class="px-4 py-2 bg-accent ring-accent text-white rounded-lg hover:bg-accnet-700 transition duration-300"
+          class="px-10 py-2 bg-accent ring-accent text-white rounded-lg hover:bg-accnet-700 transition duration-300"
         >
           Find
         </button>
