@@ -1,6 +1,6 @@
 <template>
   <div>
-    <NuxtLayout name="admin">
+    <NuxtLayout name="merchant">
       <div class="w-full pt-0 p-6 flex flex-col gap-2">
         <UCard
           :ui="{

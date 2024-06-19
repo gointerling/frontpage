@@ -92,19 +92,21 @@ const navs = [
     label: 'Dashboard',
     icon: 'i-heroicons-home',
     to: '/admin/dashboard',
-    isMultiple: false,
   },
   {
     label: 'Transactions',
     icon: 'i-heroicons-chart-bar',
     to: '/admin/transactions',
-    isMultiple: false,
   },
   {
     label: 'Merchants',
     icon: 'i-heroicons-building-storefront',
     to: '/admin/merchants',
-    isMultiple: false,
+  },
+  {
+    label: 'Users',
+    icon: 'i-heroicons-users',
+    to: '/admin/users',
   },
 ]
 

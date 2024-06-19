@@ -97,17 +97,12 @@ const navs = [
   {
     label: 'Dashboard',
     icon: 'i-heroicons-home',
-    to: `/my/dashboard`,
+    to: `/my/merchant/dashboard`,
   },
   {
-    label: 'Transactions',
-    icon: 'i-heroicons-chart-bar',
-    to: '/my/transactions',
-  },
-  {
-    label: 'Merchants',
+    label: 'Orders',
     icon: 'i-heroicons-building-storefront',
-    to: '/merchant/merchants',
+    to: '/my/merchant/orders',
   },
 ]
 
@@ -132,23 +127,12 @@ const signOut = () => {
   router.push('/auth/login')
 }
 
-// check if the first time setup merchant
-const checkFirstTimeSetup = async () => {
-  const { data } = await getMyMerchants()
-  const isFirstTime = data.data.user.merchants[0].is_first_time === 1
-
-  if (isFirstTime) {
-    router.push('/my/merchant/onboarding')
-  }
-}
-
 // on mount
 onMounted(async () => {
   // sidebar size
   isSmallSize.value = localStorage.getItem('sidenav-closed') === 'true'
 
   // check if the first time setup merchant
-  await checkFirstTimeSetup()
 
   // fetch user data
   if (useCookie('token').value) {

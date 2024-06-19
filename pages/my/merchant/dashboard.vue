@@ -1,6 +1,6 @@
 <template>
   <div>
-    <NuxtLayout name="admin">
+    <NuxtLayout name="merchant">
       <div class="w-full pt-0 p-6 flex flex-col gap-2">
         <UCard
           :ui="{
@@ -270,6 +270,7 @@ const toast = useToast()
 
 definePageMeta({
   layout: false,
+  middleware: ['merchant-status'],
 })
 
 // state
@@ -281,7 +282,7 @@ const modalData = ref({
 })
 
 // data
-const pageTitle = 'Facilitators List'
+const pageTitle = 'Dashboard'
 const facilitators = ref([])
 const selectedStatus = ref({
   label: 'All',

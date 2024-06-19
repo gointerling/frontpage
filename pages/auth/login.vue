@@ -275,7 +275,7 @@ const handleLogin = async () => {
       router.push('/')
     })
     .catch((err) => {
-      console.error(err.response)
+      console.error(err)
       toast.add({
         title: 'Uh Oh!',
         color: 'red',

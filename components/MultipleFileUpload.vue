@@ -4,6 +4,7 @@
       ref="fileInput"
       type="file"
       :accept="accept"
+      multiple
       class="hidden"
       @change="handleFileChange"
     />
@@ -19,55 +20,85 @@
 
     <div v-else>
       <button
-        v-if="!fileName"
+        v-if="fileNames.length === 0"
         @click="triggerFileInput"
         class="px-4 py-2 border border-primary rounded hover:bg-primary flex items-center gap-1 group transition duration-200"
       >
         <nuxt-icon
-          name="file-upload"
+          name="file-add"
           class="text-primary group-hover:text-white transition duration-200"
         />
         <span
           class="text-primary group-hover:text-white transition duration-200"
         >
-          Add {{ title }}
+          {{ title }}
         </span>
       </button>
 
-      <button
-        v-if="fileName"
-        @click="clearFile"
-        class="px-4 py-2 border border-red-800 rounded hover:bg-red-800 flex items-center gap-1 group transition duration-200"
-      >
-        <nuxt-icon
-          name="circle-x"
-          class="text-red-800 group-hover:text-white transition duration-200 mb-0 pb-0"
-        />
-        <span
-          class="text-red-800 group-hover:text-white transition duration-200"
+      <div v-if="fileNames.length > 0" class="flex flex-wrap gap-2">
+        <div
+          v-for="(fileName, index) in fileNames"
+          :key="index"
+          class="relative group"
         >
-          Cancel
-        </span>
-      </button>
+          <button
+            @click="clearFile(index)"
+            class="relative group flex items-center gap-1 px-4 py-2 border border-primary bg-slate-100 rounded transition duration-200 hover:bg-red-500"
+          >
+            <div
+              class="absolute top-2 right-2 p-1 text-white bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition duration-200"
+            >
+              <nuxt-icon name="circle-x" class="h-4 w-4" />
+            </div>
+
+            <nuxt-icon
+              name="file"
+              class="text-primary transition duration-200 group-hover:text-white"
+            />
+            <span
+              class="text-primary transition duration-200 group-hover:text-white"
+            >
+              <!-- truncate filename -->
+              {{
+                fileName.length > 5
+                  ? fileName.substring(0, 5) + '...'
+                  : fileName
+              }}
+            </span>
+          </button>
+        </div>
+
+        <button
+          @click="triggerFileInput"
+          class="px-4 py-2 border border-primary rounded hover:bg-primary flex items-center gap-1 group transition duration-200"
+        >
+          <nuxt-icon
+            name="file-add"
+            class="text-primary group-hover:text-white transition duration-200"
+          />
+          <span
+            class="text-primary group-hover:text-white transition duration-200"
+          >
+            {{ title }}
+          </span>
+        </button>
+      </div>
     </div>
 
-    <p v-if="fileName" class="mt-2 text-gray-700 text-xs">
-      Selected file: {{ fileName }}
-    </p>
     <p v-if="fileError" class="mt-2 text-red-500 text-xs">{{ fileError }}</p>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-
 import { useFileService } from '~/composables/useFileService'
+
 const { uploadFile, deleteFile } = useFileService()
 
 const props = defineProps({
   title: {
     type: String,
-    default: 'File',
+    default: 'Files',
   },
   accept: {
     type: String,
@@ -83,9 +114,9 @@ const toast = useToast()
 const emit = defineEmits(['fileUploaded'])
 
 const fileInput = ref(null)
-const fileName = ref('')
+const fileNames = ref([])
 const fileError = ref('')
-const uploadedFile = ref(null)
+const uploadedFiles = ref([])
 const isUploadProgress = ref(false)
 
 const triggerFileInput = () => {
@@ -93,70 +124,58 @@ const triggerFileInput = () => {
 }
 
 const handleFileChange = () => {
-  const file = fileInput.value.files[0]
-  if (file) {
-    fileName.value = file.name
-    if (props.maxSize && file.size > props.maxSize) {
-      fileError.value = `File size exceeds the limit of ${round(
-        props.maxSize / 1024 / 1024,
-        2
-      )} MB.`
-      fileName.value = ''
-    } else {
-      fileError.value = ''
-      // handleUploadFile(file) // Call function to upload file
-    }
+  const files = Array.from(fileInput.value.files)
+  let totalSize = 0
+
+  files.forEach((file) => {
+    totalSize += file.size
+    fileNames.value.push(file.name)
+  })
+
+  if (props.maxSize > props.maxSize) {
+    fileError.value = `Total file size exceeds the limit of ${round(
+      props.maxSize / 1024 / 1024,
+      2
+    )} MB.`
+
+    // Remove the last files from the list
+    fileNames.value.splice(-files.length, files.length)
+  } else {
+    fileError.value = ''
+    handleUploadFiles(files) // Call function to upload files
   }
 }
 
-const clearFile = () => {
-  fileInput.value.value = null
-  fileName.value = ''
-  fileError.value = ''
-
-  handleDeleteFile(uploadedFile.value)
+const clearFile = async (index) => {
+  const file = uploadedFiles.value.splice(index, 1)[0]
+  await handleDeleteFile(file)
+  fileNames.value.splice(index, 1)
 }
 
 const round = (value, decimals) => {
   return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals)
 }
 
-const handleUploadFile = (file) => {
+const handleUploadFiles = (files) => {
   isUploadProgress.value = true
+  const uploadPromises = files.map((file) => uploadFile(file))
 
-  uploadFile(file)
-    .then((response) => {
+  Promise.all(uploadPromises)
+    .then((responses) => {
       isUploadProgress.value = false
+      responses.forEach((response) => {
+        uploadedFiles.value.push(response.data.data.fileRecord)
 
-      uploadedFile.value = response.data.data.fileRecord
-      setFileUrl(response.data.data.fileRecord.url)
+        // set file url array url
+        const arrayOfUrls = uploadedFiles.value.map((file) => file.url)
+        setFileUrl(arrayOfUrls)
+      })
 
       toast.add({
         title: 'Success!',
         color: 'green',
         icon: 'i-heroicons-check-circle',
-        description: 'File uploaded successfully!',
-      })
-    })
-    .catch((err) => {
-      console.error(err)
-      toast.add({
-        title: 'Uh Oh!',
-        color: 'red',
-        icon: 'i-heroicons-exclamation-triangle',
-        description: getFirstErrorMessage(err.response.data.error),
-      })
-    })
-}
-const handleDeleteFile = (file) => {
-  deleteFile(file.id)
-    .then(() => {
-      setFileUrl('')
-      toast.add({
-        title: 'Success!',
-        color: 'green',
-        icon: 'i-heroicons-check-circle',
-        description: 'File deleted successfully!',
+        description: 'Files uploaded successfully!',
       })
     })
     .catch((err) => {
@@ -170,8 +189,32 @@ const handleDeleteFile = (file) => {
     })
 }
 
-const setFileUrl = (url) => {
-  emit('fileUploaded', url)
+const handleDeleteFile = async (file) => {
+  if (file) {
+    await deleteFile(file.id)
+      .then(() => {
+        setFileUrl('')
+        toast.add({
+          title: 'Success!',
+          color: 'green',
+          icon: 'i-heroicons-check-circle',
+          description: 'File deleted successfully!',
+        })
+      })
+      .catch((err) => {
+        console.error(err)
+        toast.add({
+          title: 'Uh Oh!',
+          color: 'red',
+          icon: 'i-heroicons-exclamation-triangle',
+          description: getFirstErrorMessage(err.response.data.error),
+        })
+      })
+  }
+}
+
+const setFileUrl = (urls) => {
+  emit('fileUploaded', urls)
 }
 
 const getFirstErrorMessage = (error) => {
@@ -181,7 +224,3 @@ const getFirstErrorMessage = (error) => {
   return error.message
 }
 </script>
-
-<style scoped>
-/* Add any additional styling here if needed */
-</style>

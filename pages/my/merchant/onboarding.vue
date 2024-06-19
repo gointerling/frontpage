@@ -33,16 +33,23 @@ import PageLoader from '~/components/PageLoader.vue'
 import MerchantForm from '~/components/facilitators/MerchantForm.vue'
 
 // import services
+import { useMerchantService } from '~/composables/useMerchantService'
+
+// services
+const { getMyMerchants } = useMerchantService()
 
 // component setup
 const isPageLoading = ref(true)
 
 // mounted
-onMounted(() => {
-  // timeout
-  setTimeout(() => {
+onMounted(async () => {
+  // get my merchants
+  await getMyMerchants().then((result) => {
+    const merchantStatus = result.data.data.user.merchants[0].status
+    useCookie('token').value.user.merchant_status = merchantStatus
+
     isPageLoading.value = false
-  }, 1000)
+  })
 })
 </script>
 

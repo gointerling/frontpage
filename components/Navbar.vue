@@ -22,13 +22,23 @@
         <div v-if="!user" class="hidden sm:ml-6 sm:flex sm:items-center gap-2">
           <button
             class="px-4 py-2 text-sm font-medium text-white bg-accent rounded-lg hover:bg-accent-700 focus:outline-none focus:bg-accent-500 transition duration-150 ease-in-out"
-            @click="navigateTo('/auth/login?as=user')"
+            @click="
+              navigateTo({
+                name: 'auth-login',
+                query: { as: 'user' },
+              })
+            "
           >
             Sign in as User
           </button>
           <button
             class="px-4 py-2 text-sm font-medium text-accent border border-accent rounded-lg hover:bg-accent-700 focus:outline-none focus:bg-accent-500 transition duration-150 ease-in-out"
-            @click="navigateTo('/auth/login?as=facilitator')"
+            @click="
+              navigateTo({
+                name: 'auth-login',
+                query: { as: 'facilitator' },
+              })
+            "
           >
             Sign in as Facilitator
           </button>
@@ -40,7 +50,14 @@
             <div class="relative flex gap-1">
               <!-- Button -->
               <div class="flex align-middle items-center gap-6 mr-4">
-                <button @click="navigateTo('admin/dashboard')">
+                <button
+                  @click="
+                    navigateTo({
+                      name: 'admin-dashboard',
+                      query: { as: 'admin' },
+                    })
+                  "
+                >
                   <nuxt-icon
                     v-if="user.is_admin === 1"
                     name="admin"
@@ -48,13 +65,31 @@
                     filled
                   />
                 </button>
-                <button @click="navigateTo('admin')">
+                <button
+                  @click="
+                    navigateTo({
+                      name: 'notification',
+                    })
+                  "
+                >
                   <nuxt-icon name="badge" class="text-2xl" filled />
                 </button>
-                <button @click="navigateTo('admin')">
+                <button
+                  @click="
+                    navigateTo({
+                      name: 'notification',
+                    })
+                  "
+                >
                   <nuxt-icon name="order" class="text-2xl" filled />
                 </button>
-                <button @click="navigateTo('admin')">
+                <button
+                  @click="
+                    navigateTo({
+                      name: 'notification',
+                    })
+                  "
+                >
                   <nuxt-icon name="notification" class="text-2xl" filled />
                 </button>
               </div>
@@ -75,6 +110,11 @@
                 <a
                   href="#"
                   class="flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  @click="
+                    navigateTo({
+                      name: 'profile',
+                    })
+                  "
                 >
                   <nuxt-icon name="user-circle" class="text-2xl"></nuxt-icon>
                   Profile
@@ -90,7 +130,11 @@
                 <button
                   v-if="user.is_facilitator"
                   class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  @click="navigateTo(`my/dashboard`)"
+                  @click="
+                    navigateTo({
+                      name: 'my-merchant-dashboard',
+                    })
+                  "
                 >
                   <nuxt-icon name="merchant" class="text-2xl"></nuxt-icon>
 
