@@ -70,6 +70,7 @@
           <u-form-group name="bank" label="File CV (Max 6MB)" class="mb-4">
             <!-- max size 6MB -->
             <FileUpload
+              title="CV"
               accept="application/pdf"
               max-size="6291456"
               @file-uploaded="setCV"
@@ -84,20 +85,20 @@
             to be a Gointerling facilitator.
           </p>
 
-          <u-form-group name="portfolios" label="Portfolio " class="mb-2">
+          <u-form-group name="portfolios" label="Portfolios" class="mb-2">
             <!-- max size 6MB -->
             <MultipleFileUpload
-              file="Portfolio"
+              title="Portfolio"
               accept="application/pdf"
               max-size="6291456"
               @file-uploaded="setPortofolio"
             />
           </u-form-group>
 
-          <u-form-group name="certificates" label="Certificate " class="mb-2">
+          <u-form-group name="certificates" label="Certificates " class="mb-2">
             <!-- max size 6MB -->
             <MultipleFileUpload
-              file="Certificate"
+              title="Certificate"
               accept="application/pdf"
               max-size="6291456"
               @file-uploaded="setCertificate"
@@ -123,11 +124,16 @@
           </template>
         </UButton>
 
-        <UButton v-if="flow === 4" @click="navigateTo(1)">
+        <UButton v-if="flow === 4" @click="finishSetup()">
           <template #default>
             <div class="flex items-center gap-2">
-              <span>Skip For Now</span>
-              <nuxt-icon name="chevron-right" />
+              <span>
+                {{
+                  portfolios.length > 0 || certificates.length > 0
+                    ? 'Finish Setup'
+                    : 'Skip for Now'
+                }}
+              </span>
             </div>
           </template>
         </UButton>
@@ -140,9 +146,9 @@
 import { ref } from 'vue'
 import * as yup from 'yup'
 
-// import { useMerchantService } from '~/composables/useMerchantService'
+import { useMerchantService } from '~/composables/useMerchantService'
 
-// const { updateMerchant } = useMerchantService()
+const { updateMyMerchant } = useMerchantService()
 
 // ref
 const validationSchema = yup.object({
@@ -159,8 +165,8 @@ const router = useRouter()
 // data references
 const toast = useToast()
 const typeList = [
-  { id: 'translator', name: 'Translator', colors: ['red', 'yellow'] },
-  { id: 'intepreter', name: 'Intepreter', colors: ['red', 'yellow'] },
+  { id: 'translator', name: 'Translator' },
+  { id: 'interpreter', name: 'Interpreter' },
 ]
 const bankList = [
   { id: 'bca', name: 'BCA' },
@@ -242,6 +248,8 @@ const validateCurrentFlow = (flow) => {
       isValid = false
       isError.value = true
     }
+
+    isError.value = false
   })
 
   return isValid
@@ -256,6 +264,10 @@ const showToast = (error) => {
   })
 }
 
+const to = (to) => {
+  router.push(to)
+}
+
 const setCV = (value) => {
   cv_url.value = value
 }
@@ -266,6 +278,37 @@ const setPortofolio = (value) => {
 
 const setCertificate = (value) => {
   certificates.value = value
+}
+
+const finishSetup = async () => {
+  const data = {
+    type: type.value.id,
+    bank_id: bank.value.id,
+    bank: bank.value.name,
+    bank_account: `${bank_account.value}`,
+    cv_url: cv_url.value,
+    portfolios: portfolios.value,
+    certificates: certificates.value,
+  }
+
+  try {
+    await updateMyMerchant(data)
+    toast.add({
+      title: 'Success!',
+      color: 'green',
+      icon: 'i-heroicons-check-circle',
+      description: 'Merchant setup successfully!',
+    })
+
+    to('/my/merchant/status')
+  } catch (error) {
+    toast.add({
+      title: 'Uh Oh!',
+      color: 'red',
+      icon: 'i-heroicons-x-circle',
+      description: error.response.data.error.message,
+    })
+  }
 }
 
 // onMounted

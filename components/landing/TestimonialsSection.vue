@@ -38,7 +38,28 @@ export default {
   data() {
     return {
       testimonials: [],
+      pickedRole: [],
     }
+  },
+  methods: {
+    // random user role but never the same
+    randomRole() {
+      const roles = [
+        'Professional Translator',
+        'Certified Interpreter',
+        'Student',
+      ]
+
+      let role = roles[Math.floor(Math.random() * roles.length)]
+
+      if (this.pickedRole.includes(role)) {
+        return this.randomRole()
+      }
+
+      this.pickedRole.push(role)
+
+      return role
+    },
   },
   async mounted() {
     // fetch random user picture from https://randomuser.me/api/?nat=us&randomapi=
@@ -50,7 +71,7 @@ export default {
             id: user.login.uuid,
             avatar: user.picture.large,
             name: `${user.name.first} ${user.name.last}`,
-            role: 'CEO, Company Name',
+            role: this.randomRole(),
             icon: 'quotation',
             text: 'Gointerling offers high-quality professional translators for seamless communication in any language. Their professional translators are certified and recognized as experts in their specific fields, ensuring top-quality services and reliable results.',
           }

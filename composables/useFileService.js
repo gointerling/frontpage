@@ -6,9 +6,10 @@ export const useFileService = () => {
   const { $axios } = useNuxtApp()
 
   return {
-    uploadFile(file) {
+    uploadFile(file, fileName) {
       const formData = new FormData()
       formData.append('file', file)
+      formData.append('file_name', fileName)
       return $axios.post('/files', formData)
     },
     deleteFile(id) {

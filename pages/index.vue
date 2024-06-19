@@ -10,6 +10,9 @@
       <FacilitatorsSection />
       <TestimonialsSection />
       <FooterSection />
+
+      <!-- Ads -->
+      <BannerModal :isOpen="adsOpen" />
     </div>
 
     <!-- Loader -->
@@ -21,20 +24,22 @@
 // components
 import PageLoader from '~/components/PageLoader.vue'
 import Navbar from '~/components/Navbar.vue'
-import HeroSection from '~/components/HeroSection.vue'
-import StatsSection from '~/components/StatsSection.vue'
-import TranslatorSearchSection from '~/components/TranslatorSearchSection.vue'
-import WelcomeSection from '~/components/WelcomeSection.vue'
-import PartnerLogosSection from '~/components/PartnerLogosSection.vue'
-import FacilitatorsSection from '~/components/FacilitatorsSection.vue'
-import TestimonialsSection from '~/components/TestimonialsSection.vue'
-import FooterSection from '~/components/FooterSection.vue'
+import HeroSection from '~/components/landing/HeroSection.vue'
+import StatsSection from '~/components/landing/StatsSection.vue'
+import TranslatorSearchSection from '~/components/landing/TranslatorSearchSection.vue'
+import WelcomeSection from '~/components/landing/WelcomeSection.vue'
+import PartnerLogosSection from '~/components/landing/PartnerLogosSection.vue'
+import FacilitatorsSection from '~/components/landing/FacilitatorsSection.vue'
+import TestimonialsSection from '~/components/landing/TestimonialsSection.vue'
+import FooterSection from '~/components/landing/FooterSection.vue'
+import BannerModal from '~/components/ads/BannerModal.vue'
 
 // imports
 import { ref, onMounted } from 'vue'
 
 // component setup
 const isPageLoading = ref(true)
+const adsOpen = ref(false)
 const user = ref(null)
 
 // fetch user data on mount
@@ -60,6 +65,8 @@ onMounted(async () => {
   }
 
   isPageLoading.value = false
+
+  adsOpen.value = true
 
   window.scrollTo({
     top: 0,

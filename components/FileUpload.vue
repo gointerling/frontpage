@@ -65,6 +65,10 @@ import { useFileService } from '~/composables/useFileService'
 const { uploadFile, deleteFile } = useFileService()
 
 const props = defineProps({
+  title: {
+    type: String,
+    default: 'File',
+  },
   accept: {
     type: String,
     default: '',
@@ -100,7 +104,8 @@ const handleFileChange = () => {
       fileName.value = ''
     } else {
       fileError.value = ''
-      handleUploadFile(file) // Call function to upload file
+
+      handleUploadFile(file, `${props.title}_${file.name}`)
     }
   }
 }
@@ -117,10 +122,10 @@ const round = (value, decimals) => {
   return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals)
 }
 
-const handleUploadFile = (file) => {
+const handleUploadFile = (file, customFileName) => {
   isUploadProgress.value = true
 
-  uploadFile(file)
+  uploadFile(file, customFileName)
     .then((response) => {
       isUploadProgress.value = false
 
@@ -177,7 +182,3 @@ const getFirstErrorMessage = (error) => {
   return error.message
 }
 </script>
-
-<style scoped>
-/* Add any additional styling here if needed */
-</style>
