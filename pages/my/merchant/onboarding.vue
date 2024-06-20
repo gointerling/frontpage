@@ -17,7 +17,7 @@
             <img :src="heroImage" width="300px" />
           </div>
           <div class="px-6 min-w-[400px]">
-            <MerchantForm />
+            <MerchantForm :merchant_id="merchant_id" />
           </div>
         </div>
       </UCard>
@@ -40,13 +40,22 @@ const { getMyMerchants } = useMerchantService()
 
 // component setup
 const isPageLoading = ref(true)
+const merchant_id = ref(null)
 
 // mounted
 onMounted(async () => {
   // get my merchants
   await getMyMerchants().then((result) => {
     const merchantStatus = result.data.data.user.merchants[0].status
+    const isFirstTime = result.data.data.user.merchants[0].is_first_time
+
+    console.log(isFirstTime)
+
+    // check if merchant status is not onboarding
     useCookie('token').value.user.merchant_status = merchantStatus
+
+    // set merchant id
+    merchant_id.value = result.data.data.user.merchants[0].id
 
     isPageLoading.value = false
   })

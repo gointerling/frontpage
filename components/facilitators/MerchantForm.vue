@@ -148,7 +148,16 @@ import * as yup from 'yup'
 
 import { useMerchantService } from '~/composables/useMerchantService'
 
-const { updateMyMerchant } = useMerchantService()
+const { updateMyMerchant, setupMyMerchantService } = useMerchantService()
+
+// define props
+
+const props = defineProps({
+  merchant_id: {
+    type: Number,
+    required: true,
+  },
+})
 
 // ref
 const validationSchema = yup.object({
@@ -289,10 +298,12 @@ const finishSetup = async () => {
     cv_url: cv_url.value,
     portfolios: portfolios.value,
     certificates: certificates.value,
+    merchant_id: props.merchant_id,
   }
 
   try {
     await updateMyMerchant(data)
+
     toast.add({
       title: 'Success!',
       color: 'green',

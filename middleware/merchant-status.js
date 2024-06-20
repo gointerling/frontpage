@@ -3,13 +3,20 @@ import { defineNuxtRouteMiddleware, useCookie, navigateTo, abortNavigation } fro
 
 export default defineNuxtRouteMiddleware((to) => {
   const status = useCookie('token').value.user.merchant_status || null;
+  const isFirstTime = useCookie('token').value.user.is_first_time || null;
 
   console.log('Merchant Status:', status);
+  console.log('Merchant isFirstTime:', isFirstTime);
   
   switch (status) {
     case 'pending':
       abortNavigation();
-      return navigateTo('/my/merchant/onboarding');
+
+      if(isFirstTime){
+        return navigateTo('/my/merchant/onboarding');
+      }
+      
+      return navigateTo('/my/merchant/status');
       break;
 
     case 'inactive':

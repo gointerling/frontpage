@@ -29,7 +29,11 @@ export const useUserService = () => {
     },
 
     updateMyProfile(data) {
-      return $axios.put('/users/me', data)
+      return $axios.put('/profile', data)
+    },
+
+    updateMyPassword(data) {
+      return $axios.put('/profile/password', data)
     }
   }
 }
