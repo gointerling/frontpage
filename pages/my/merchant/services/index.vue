@@ -1,6 +1,6 @@
 <template>
   <div>
-    <NuxtLayout name="admin">
+    <NuxtLayout name="merchant">
       <div class="w-full pt-0 p-6 flex flex-col gap-2">
         <UCard
           :ui="{
@@ -38,6 +38,14 @@
               v-model="searchQuery"
               @input="onSearchChange()"
             />
+
+            <UButton
+              size="sm"
+              color="primary"
+              @click="navigateTo({ name: 'my-merchant-services-add' })"
+            >
+              Add Service
+            </UButton>
           </div>
         </UCard>
         <UCard
@@ -268,6 +276,7 @@ const { getMerchants, updateMerchantStatus } = useMerchantService()
 
 // components
 const toast = useToast()
+const router = useRouter()
 
 definePageMeta({
   layout: false,
@@ -282,7 +291,7 @@ const modalData = ref({
 })
 
 // data
-const pageTitle = 'Facilitators List'
+const pageTitle = 'Service List'
 const facilitators = ref([])
 const selectedStatus = ref({
   label: 'All',
@@ -388,6 +397,11 @@ function debounce(func, wait, immediate) {
     timeout = setTimeout(later, wait)
     if (callNow) func.apply(context, args)
   }
+}
+
+// Navigate to page
+const navigateTo = (to) => {
+  router.push(to)
 }
 
 // Open link in new tab

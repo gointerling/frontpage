@@ -15,7 +15,8 @@ const route = useRoute()
 const router = useRouter()
 
 const backTo = () => {
-  router.push('/')
+  // back to previous page history
+  router.go(-1)
 }
 </script>
 

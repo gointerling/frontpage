@@ -72,6 +72,7 @@
                   :alt="row.user.fullname"
                   size="sm"
                   variant="rounded-full"
+                  imgClass="object-cover"
                 />
 
                 <div class="flex flex-col">
@@ -281,7 +282,7 @@ const modalData = ref({
 })
 
 // data
-const pageTitle = 'Facilitators List'
+const pageTitle = 'Transactions List'
 const facilitators = ref([])
 const selectedStatus = ref({
   label: 'All',

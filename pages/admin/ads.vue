@@ -282,7 +282,7 @@ const modalData = ref({
 })
 
 // data
-const pageTitle = 'Facilitators List'
+const pageTitle = 'Ads List'
 const facilitators = ref([])
 const selectedStatus = ref({
   label: 'All',

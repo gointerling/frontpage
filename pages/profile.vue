@@ -23,8 +23,8 @@
         </div>
 
         <div v-if="selectedTab === 'profile'" class="w-10/12">
+          <!-- Personal info -->
           <h6 class="font-semibold mb-3">Personal Information</h6>
-
           <UCard>
             <div class="flex justify-start gap-6 items-center mb-6">
               <div class="relative">
@@ -89,13 +89,13 @@
                 />
               </div>
               <div class="flex justify-between">
-                <span class="font-semibold">Language Skills</span>
+                <span class="font-semibold">Skills</span>
                 <USelectMenu
                   v-model="payload.main_skills"
                   v-model:query="mainSkillQuery"
                   searchable
                   :options="mainSkillsList"
-                  placeholder="Select a Language Skills"
+                  placeholder="Select Main Skills"
                   option-attribute="name"
                   multiple
                   trailing
@@ -118,7 +118,7 @@
                     </div>
 
                     <span v-else class="text-gray-400">
-                      Select a Language Skills
+                      Select Main Skills
                     </span>
 
                     <UIcon
@@ -136,7 +136,7 @@
                   v-model:query="addtionalSkillQuery"
                   searchable
                   :options="additionalSkillList"
-                  placeholder="Select a Additional Skills"
+                  placeholder="Select an Additional Skills"
                   option-attribute="name"
                   multiple
                   trailing
@@ -159,7 +159,7 @@
                     </div>
 
                     <span v-else class="text-gray-400">
-                      Select a Additional Skills
+                      Select an Additional Skills
                     </span>
 
                     <UIcon
@@ -182,7 +182,6 @@
           </UCard>
 
           <h6 class="font-semibold mt-6 mb-4">Change Password</h6>
-
           <UCard>
             <div class="flex flex-col gap-4">
               <u-form-group
@@ -240,7 +239,7 @@
             </div>
             <div class="flex justify-end">
               <!-- save button -->
-              <UButton @click="updateProfile" class="mt-4 bg-accent">
+              <UButton @click="updatePassword" class="mt-4 bg-accent">
                 <nuxt-icon name="floppy" class="text-white" />
                 Change Password
               </UButton>
@@ -256,7 +255,7 @@
               <div class="flex justify-between">
                 <span class="font-semibold">Bank</span>
                 <UInputMenu
-                  v-model="bank"
+                  v-model="merchant.bank"
                   :options="bankList"
                   placeholder="Pilih Nama Bank"
                   by="id"
@@ -269,7 +268,7 @@
                 <span class="font-semibold">Account Number</span>
                 <u-input
                   type="number"
-                  v-model="bank_account"
+                  v-model="merchant.bank_account"
                   required
                   placeholder="Masukkan No Rekening"
                   class="w-7/12"
@@ -279,7 +278,7 @@
 
               <div class="flex justify-end">
                 <!-- save button -->
-                <UButton @click="updateProfile" class="mt-4 bg-accent">
+                <UButton class="mt-4 bg-accent" @click="updateBank">
                   <nuxt-icon name="floppy" class="text-white" />
                   Save
                 </UButton>
@@ -292,8 +291,40 @@
           <h6 class="font-semibold mb-3">Service Information</h6>
 
           <UCard>
-            <div class="flex flex-col gap-4">
-              <div class="flex justify-between">
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+              Current Service
+            </label>
+            <div class="flex gap-4">
+              <UCard
+                @click="setActiveService('Standard')"
+                class="cursor-pointer my-4"
+                :class="
+                  service.type === 'Standard' ? 'border border-accent' : ''
+                "
+              >
+                <div class="flex gap-2 items-center">
+                  <span class="text-primary"> Standard </span>
+                </div>
+              </UCard>
+
+              <UCard
+                @click="setActiveService('Premium')"
+                class="cursor-pointer my-4"
+                :class="
+                  service.type === 'Premium' ? 'border border-accent' : ''
+                "
+              >
+                <div class="flex gap-2 items-center">
+                  <span class="text-primary"> Premium </span>
+                </div>
+              </UCard>
+            </div>
+
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+              Detail Services
+            </label>
+            <div class="flex flex-col gap-4 py-4">
+              <div class="flex justify-between items-center">
                 <span class="font-semibold">Service</span>
                 <UInputMenu
                   v-model="merchant.type"
@@ -302,10 +333,12 @@
                   by="id"
                   option-attribute="name"
                   :search-attributes="['name']"
-                  class="w-7/12"
+                  class="w-7/12 capitalize"
+                  disabled
+                  :ui="{ base: 'capitalize' }"
                 />
               </div>
-              <div class="flex justify-between">
+              <div class="flex justify-between items-center">
                 <span class="font-semibold">Service Options</span>
                 <UInputMenu
                   v-model="service.type"
@@ -314,20 +347,29 @@
                   class="w-7/12"
                 />
               </div>
-              <div class="flex justify-between">
+              <div class="flex justify-between items-center">
                 <span class="font-semibold">Service Price</span>
                 <u-input
                   type="number"
                   v-model="service.price"
                   required
-                  placeholder="Masukkan No Rekening"
+                  placeholder="Enter Price"
                   class="w-7/12"
                   :color="isError ? 'red' : 'gray'"
                 />
               </div>
-              <div class="flex justify-between">
+              <div class="flex justify-between items-center">
                 <span class="font-semibold">Working Hours</span>
-                <div class="flex gap-1 items-center">
+                <UInputMenu
+                  v-model="service.working_hours"
+                  :options="['Anytime', 'Special Time']"
+                  placeholder="Choose Working Hours"
+                  class="w-7/12"
+                />
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="font-semibold">Working Estimated</span>
+                <div class="flex items-center gap-2">
                   <u-input
                     type="number"
                     v-model="service.time_estimated"
@@ -344,9 +386,49 @@
                 </div>
               </div>
 
+              <div class="flex justify-between items-center">
+                <span class="font-semibold">Languages</span>
+                <USelectMenu
+                  v-model="service.languages"
+                  v-model:query="languageQuery"
+                  searchable
+                  :options="languageList"
+                  placeholder="Select Languages"
+                  option-attribute="name"
+                  multiple
+                  trailing
+                  by="id"
+                  class="w-7/12"
+                >
+                  <UButton color="gray" class="flex-1 justify-between">
+                    <div
+                      v-if="service.languages.length > 0"
+                      class="flex flex-wrap gap-2"
+                    >
+                      <UBadge
+                        v-for="(selected, index) in service.languages"
+                        :key="index"
+                        color="blue"
+                        variant="soft"
+                      >
+                        <span class="text-sm">{{ selected.name }}</span>
+                      </UBadge>
+                    </div>
+
+                    <span v-else class="text-gray-400"> Select Languages </span>
+
+                    <UIcon
+                      name="i-heroicons-chevron-down-20-solid"
+                      class="w-5 h-5 transition-transform text-gray-400 dark:text-gray-500"
+                      :class="[open && 'transform rotate-90']"
+                    />
+                  </UButton>
+                </USelectMenu>
+              </div>
+
               <div class="flex justify-end">
                 <!-- save button -->
-                <UButton @click="updateProfile" class="mt-4 bg-accent">
+                <UButton @click="updateService" class="mt-4 bg-accent">
                   <nuxt-icon name="floppy" class="text-white" />
                   Save
                 </UButton>
@@ -356,14 +438,35 @@
         </div>
 
         <div v-if="selectedTab === 'certificate'" class="w-10/12">
-          <h6 class="font-semibold mb-3">List of Certificates</h6>
+          <h6 class="font-semibold mb-3">Certificates</h6>
 
           <UCard>
-            <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-2">
+              <label
+                class="text-sm font-medium text-gray-700 dark:text-gray-200"
+              >
+                List of Certificates
+              </label>
+              <div class="flex">
+                <UCard
+                  v-for="(certificate_url, index) in merchant.certificates"
+                  :key="index"
+                  @click="openNewTab(certificate_url)"
+                  class="cursor-pointer"
+                >
+                  <div class="flex gap-2 items-center">
+                    <nuxt-icon name="file" class="text-primary" />
+                    <span class="text-primary">
+                      Certificate {{ index + 1 }}
+                    </span>
+                  </div>
+                </UCard>
+              </div>
+
               <u-form-group
                 name="certificates"
-                label="Certificates "
-                class="mb-2"
+                label="Upload Certificates "
+                class="mt-4 mb-2"
               >
                 <!-- max size 6MB -->
                 <MultipleFileUpload
@@ -376,7 +479,7 @@
 
               <div class="flex justify-end">
                 <!-- save button -->
-                <UButton @click="updateProfile" class="mt-4 bg-accent">
+                <UButton @click="updateCertificate" class="mt-4 bg-accent">
                   <nuxt-icon name="floppy" class="text-white" />
                   Save
                 </UButton>
@@ -395,6 +498,8 @@
 <script setup>
 // components
 import PageLoader from '~/components/PageLoader.vue'
+import Navbar from '~/components/Navbar.vue'
+import ServiceTab from '~/components/profile/ServiceTab.vue'
 
 // imports
 import { ref, onMounted } from 'vue'
@@ -407,11 +512,13 @@ import { useMerchantService } from '~/composables/useMerchantService'
 import { useUserService } from '~/composables/useUserService'
 import { useSkillService } from '~/composables/useSkillService'
 import { useFileService } from '~/composables/useFileService'
+import { useMasterDataService } from '~/composables/useMasterDataService'
 
-const { getMerchant, updateMerchant } = useMerchantService()
-const { updateMyProfile } = useUserService()
+const { getMyMerchants, updateMyMerchant } = useMerchantService()
+const { updateMyProfile, updateMyPassword } = useUserService()
 const { getSkills } = useSkillService()
 const { uploadFile } = useFileService()
+const { getLanguages } = useMasterDataService()
 
 // navs
 const fileInput = ref(null)
@@ -488,7 +595,10 @@ const payload = ref({
 
 const merchant = ref({
   type: '',
-  bank: '',
+  bank: {
+    id: '',
+    name: '',
+  },
   bank_account: '',
   cv_url: '',
   certificates: [],
@@ -497,22 +607,22 @@ const merchant = ref({
 
 const service = ref({
   name: '',
-  price: '',
-  type: '',
+  price: 50000,
+  type: 'Standard',
   time_estimated: '',
-  time_estimated_unit: '',
+  time_estimated_unit: 'days',
   desc: '',
-  language_sources: [],
-  language_destinations: [],
+  working_hours: '',
+  languages: [],
 })
 
 const newPassword = ref('')
 const confirmPassword = ref('')
 const skillList = ref([])
+const languageList = ref([])
 const mainSkillQuery = ref('')
 const addtionalSkillQuery = ref('')
-const selectedMainSkills = ref([])
-const selectedAdditionalSkills = ref([])
+const languageQuery = ref('')
 
 // computed
 const mainSkillsList = computed(() => {
@@ -553,6 +663,10 @@ const toggleShowPassword = () => {
   showPassword.value = !showPassword.value
 }
 
+const openNewTab = (url) => {
+  window.open(url, '_blank')
+}
+
 // logout
 const logout = () => {
   console.log('Logging out...')
@@ -572,6 +686,21 @@ const logout = () => {
   }
 }
 
+// set Active Service
+const setActiveService = (serviceType) => {
+  // set active service
+  service.value.type = serviceType
+}
+
+// check if json
+const checkIfJSON = (data) => {
+  try {
+    return JSON.parse(data)
+  } catch (error) {
+    return data
+  }
+}
+
 // fetch skills list
 const fetchSkills = async () => {
   try {
@@ -580,8 +709,6 @@ const fetchSkills = async () => {
     })
 
     skillList.value = data.data.data
-
-    console.log('Skills:', data.data.data)
   } catch (error) {
     console.error('Fetching skills failed:', error)
   }
@@ -599,11 +726,46 @@ const fetchUser = async () => {
       address: user.value.address,
       personal_description: user.value.personal_description,
       photo: user.value.photo,
-      main_skills: user.value.main_skills ?? [],
-      additional_skills: user.value.additional_skills ?? [],
+      main_skills: checkIfJSON(user.value.main_skills) ?? [],
+      additional_skills: checkIfJSON(user.value.additional_skills) ?? [],
     }
   } catch (error) {
     console.error('Fetching user failed:', error)
+  }
+}
+
+const fetchMyMerchant = async () => {
+  try {
+    const { data } = await getMyMerchants()
+
+    if (data.data.user.merchants.length > 0) {
+      merchant.value = data.data.user.merchants[0]
+
+      merchant.value.bank = {
+        id: data.data.user.merchants[0].bank_id,
+        name: data.data.user.merchants[0].bank,
+      }
+
+      merchant.value.certificates = JSON.parse(
+        data.data.user.merchants[0].certificates
+      )
+
+      merchant.value.portfolios = JSON.parse(
+        data.data.user.merchants[0].portfolios
+      )
+    }
+  } catch (error) {
+    console.error('Fetching merchant failed:', error)
+  }
+}
+
+const fetchLanguages = async () => {
+  try {
+    const { data } = await getLanguages()
+
+    languageList.value = data.data.data
+  } catch (error) {
+    console.error('Fetching languages failed:', error)
   }
 }
 
@@ -653,11 +815,127 @@ const getFirstErrorMessage = (errors) => {
   return null
 }
 
+// update profile
+const updateProfile = async () => {
+  try {
+    console.log(payload.value)
+
+    const { data } = await updateMyProfile(payload.value)
+
+    const userData = {
+      ...useCookie('token').value.user,
+      email: data.data.user.email,
+      fullname: data.data.user.fullname,
+      photo: data.data.user.photo,
+      address: data.data.user.address,
+      phone: data.data.user.phone,
+      personal_description: data.data.user.personal_description,
+      main_skills: data.data.user.main_skills,
+      additional_skills: data.data.user.additional_skills,
+    }
+
+    console.log(JSON.parse(JSON.stringify(userData)))
+
+    // set local user
+    user.value = userData
+
+    // update cookie
+    useCookie('token').value.user = userData
+
+    // show success message
+    toast.add({
+      title: 'Success!',
+      color: 'green',
+      icon: 'i-heroicons-check-circle',
+      description: data.message,
+    })
+
+    // reset photo warning
+    photoWarning.value = ''
+  } catch (error) {
+    console.error('Update profile failed:', error)
+
+    // show error message
+    toast.add({
+      title: 'Uh Oh!',
+      color: 'red',
+      icon: 'i-heroicons-exclamation-triangle',
+      description: getFirstErrorMessage(error.response.data.error),
+    })
+  }
+}
+
+const updatePassword = async () => {
+  try {
+    const { data } = await updateMyPassword({
+      password: newPassword.value,
+      password_confirmation: confirmPassword.value,
+    })
+
+    // show success message
+    toast.add({
+      title: 'Success!',
+      color: 'green',
+      icon: 'i-heroicons-check-circle',
+      description: data.message,
+    })
+
+    // reset password fields
+    newPassword.value = ''
+    confirmPassword.value = ''
+  } catch (error) {
+    console.error('Change password failed:', error)
+
+    // show error message
+    toast.add({
+      title: 'Uh Oh!',
+      color: 'red',
+      icon: 'i-heroicons-exclamation-triangle',
+      description: getFirstErrorMessage(error.response.data.error),
+    })
+  }
+}
+
+const updateBank = async () => {
+  console.log(merchant.value)
+  try {
+    const { data } = await updateMyMerchant({
+      type: merchant.value.type,
+      bank_id: merchant.value.bank.id,
+      bank_account: `${merchant.value.bank_account}`,
+      bank: merchant.value.bank.name,
+      cv_url: merchant.value.cv_url,
+      certificates: merchant.value.certificates,
+      portfolios: merchant.value.portfolios,
+    })
+
+    // show success message
+    toast.add({
+      title: 'Success!',
+      color: 'green',
+      icon: 'i-heroicons-check-circle',
+      description: data.message,
+    })
+  } catch (error) {
+    console.error('Update merchant failed:', error)
+
+    // show error message
+    toast.add({
+      title: 'Uh Oh!',
+      color: 'red',
+      icon: 'i-heroicons-exclamation-triangle',
+      description: getFirstErrorMessage(error.response.data.error),
+    })
+  }
+}
+
 onMounted(async () => {
   // fetch user data
   if (useCookie('token').value) {
     await fetchUser()
     await fetchSkills()
+    await fetchMyMerchant()
+    await fetchLanguages()
   }
 
   isPageLoading.value = false
