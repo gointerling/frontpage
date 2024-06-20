@@ -1,1 +1,0 @@
-import{c as e,b as o,w as t,j as s,o as n,a as _}from"./BMWu61xc.js";const c=_("div",{class:"w-full p-2"},"Dashboard Comingsoon",-1),u={__name:"dashboard",setup(r){return(d,l)=>{const a=s;return n(),e("div",null,[o(a,{name:"admin"},{default:t(()=>[c]),_:1})])}}};export{u as default};
