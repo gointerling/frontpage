@@ -48,10 +48,28 @@ export const useMerchantService = () => {
       return $axios.put(`/my/merchant`, data)
     },
 
-    setupMyMerchantService(data) {
-      return $axios.post('/services', data)
+    getMyMerchantServices() {
+      return $axios.get('/my/service')
+    },
+
+    getServices(params) {
+      params = {
+        page: 1,
+        per_page: 10,
+        ...params
+      }
+
+      Object.keys(params).forEach(key => {
+        if (params[key] === null || params[key] === '' || params[key] === undefined) {
+          delete params[key]
+        }
+      })
+
+      return $axios.get('/services', { params })
+    },
+
+    updateMyService(serviceId, data) {
+      return $axios.put(`/my/service/${serviceId}`, data)
     }
-
-
   }
 }

@@ -3,23 +3,47 @@
   <div
     class="bg-[#D7EEF8] rounded-3xl shadow-lg pt-8 flex flex-col items-center"
   >
-    <img :src="facilitator.image" class="w-32 h-32 rounded-full" />
+    <UAvatar
+      :alt="data.users[0].fullname"
+      :src="data.users[0].photo"
+      imgClass="object-cover"
+      class="rounded-full"
+      size="4xl"
+      :ui="{
+        size: {
+          '4xl': 'h-32 w-32 text-4xl',
+        },
+      }"
+    />
 
-    <h2 class="text-xl text-primary font-bold py-3">{{ facilitator.name }}</h2>
+    <h2 class="text-xl text-primary font-bold pt-3 pb-1">
+      {{ data.users[0].fullname }}
+    </h2>
+
+    <UBadge
+      color="orange"
+      :label="data.type"
+      variant="soft"
+      class="uppercase my-2"
+    />
+
     <div class="flex gap-2 pt-2 pb-6">
       <div class="flex gap-2 items-center px-2">
         <nuxt-icon name="star" filled />
-        <span class="font-bold text-primary"> 5.0 </span>
+        <span class="font-bold text-primary">
+          {{ data.rating }}
+        </span>
       </div>
 
       <div class="w-[2px] h-100 rounded bg-primary"></div>
       <div class="flex gap-2 items-center px-2">
         <nuxt-icon name="love" filled />
-        <span class="font-bold text-primary"> 768 </span>
+        <span class="font-bold text-primary"> {{ data.recomended_count }}</span>
       </div>
     </div>
+
     <UTabs
-      :items="items"
+      :items="serviceItems"
       class="w-full h-full bg-white rounded-b-3xl"
       :ui="tabConfig"
     >
@@ -53,15 +77,13 @@ import { defineProps } from 'vue'
 
 // props
 const props = defineProps({
-  facilitator: {
+  data: {
     type: Object,
     required: true,
     default: () => ({
       name: 'Facilitator Name',
       role: 'Facilitator Role',
       bio: 'Facilitator Bio',
-      linkedin: 'https://linkedin.com',
-      image: 'https://via.placeholder.com/150',
     }),
   },
 })
@@ -100,6 +122,23 @@ const tabConfig = {
     },
   },
 }
+
+// computed items
+const serviceItems = computed(() => {
+  return props.data.services.map((service) => {
+    return {
+      label: service.name,
+      price: service.price,
+      contents: [
+        service.desc,
+        `${service.time_estimated} ${service.time_estimated_unit} delivery`,
+        `${service.working_hours} Working Hours`,
+        'Proofreading',
+        'Document formatting',
+      ],
+    }
+  })
+})
 
 // data
 const items = [

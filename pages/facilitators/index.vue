@@ -7,11 +7,13 @@
       <div class="p-8 lg:px-36">
         <div class="flex justify-center py-8 gap-2">
           <input
+            v-model="searchQuery"
             type="text"
             class="px-4 py-2 rounded-lg border border-accent focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent w-6/12"
             placeholder="Search Facilitators"
           />
           <button
+            @click="applyFilter"
             class="px-10 py-2 bg-accent ring-accent text-white rounded-lg hover:bg-accnet-700 transition duration-300"
           >
             Find
@@ -107,13 +109,13 @@
                     <label
                       v-for="skill in mainSkillList"
                       :key="skill.id"
-                      class="flex gap-1 py-[0.1em]"
+                      class="flex gap-1 py-[0.1em] w-fit"
                     >
                       <input
                         type="checkbox"
                         class="form-checkbox h-5 w-5 text-primary rounded-md"
                         :value="skill.id"
-                        v-model="selectedSkills"
+                        v-model="filter.mainSkills"
                       />
                       <span class="ml-2 text-gray-700">{{ skill.name }}</span>
                     </label>
@@ -134,7 +136,7 @@
                         type="checkbox"
                         class="form-checkbox h-5 w-5 text-primary rounded-md"
                         :value="skill.id"
-                        v-model="selectedSkills"
+                        v-model="filter.additionalSkills"
                       />
                       <span class="ml-2 text-gray-700">{{ skill.name }}</span>
                     </label>
@@ -164,7 +166,7 @@
                   </UFormGroup>
                 </div>
 
-                <hr class="my-3" />
+                <!-- <hr class="my-3" />
                 <div class="mt-2">
                   <h6 class="font-semibold text-primary capitalize my-1">
                     Budgets
@@ -173,14 +175,15 @@
                     <URange
                       :min="0"
                       :max="filter.priceTo"
-                      :model-value="filter.priceFrom"
+                      v-model:start="filter.priceFrom"
+                      v-model:end="filter.priceTo"
                     />
                     <div class="flex justify-between">
                       <span class="text-accent">{{ filter.priceFrom }}</span>
                       <span class="text-accent">{{ filter.priceTo }}</span>
                     </div>
                   </UFormGroup>
-                </div>
+                </div> -->
 
                 <hr class="my-3" />
                 <div class="mt-2">
@@ -194,11 +197,11 @@
                           variant="outline"
                           class="flex justify-center items-center hover:bg-accent hover:text-white rounded-lg"
                           :class="
-                            filter.category === 'translator'
+                            filter.workingHours === 'anytime'
                               ? 'bg-accent text-white'
                               : ''
                           "
-                          @click="toggleCategory('translator')"
+                          @click="filter.workingHours = 'anytime'"
                         >
                           Anytime
                         </UButton>
@@ -206,11 +209,11 @@
                           variant="outline"
                           class="flex justify-center items-center hover:bg-accent hover:text-white rounded-lg"
                           :class="
-                            filter.category === 'interpreter'
+                            filter.workingHours === 'special'
                               ? 'bg-accent text-white'
                               : ''
                           "
-                          @click="toggleCategory('interpreter')"
+                          @click="filter.workingHours = 'special'"
                         >
                           Special Time
                         </UButton>
@@ -221,22 +224,35 @@
               </div>
 
               <template #footer>
-                <UButton block class="bg-accent"> Apply Filter </UButton>
+                <UButton block class="bg-accent" @click="applyFilter">
+                  Apply Filter
+                </UButton>
               </template>
             </UCard>
           </div>
-          <div class="col-span-9">
+          <div class="col-span-9 flex flex-col justify-between">
             <!-- card -->
-            <div class="grid grid-cols-12 gap-4 overflow-y-auto">
-              <FacilitatorCard class="col-span-6" v-for="i in 4" :key="i" />
+            <div class="grid grid-cols-12 gap-4 h-fit overflow-y-visible">
+              <FacilitatorCard
+                class="col-span-6"
+                v-for="service in serviceList"
+                :key="service.id"
+                :data="service"
+              />
             </div>
 
             <div class="mt-2 flex justify-between items-center">
-              <span class="text-sm"> Showing 1 to 10 of 100 entries </span>
+              <span class="text-sm">
+                Showing {{ paginations.page }} of
+                {{ paginations.total }} entries
+              </span>
               <UPagination
                 v-model="paginations.page"
-                :page-count="5"
+                :page-count="
+                  Math.ceil(paginations.total / paginations.per_page)
+                "
                 :total="paginations.total"
+                @update:page="applyFilter"
               />
             </div>
           </div>
@@ -247,22 +263,21 @@
 </template>
 
 <script setup>
+import { ref, computed, onMounted, watch } from 'vue'
 import PageLoader from '~/components/PageLoader.vue'
 import Navbar from '~/components/Navbar.vue'
-import UserSidebar from '~/components/facilitators/UserSidebar.vue'
-import Detail from '~/components/facilitators/Detail.vue'
 import FacilitatorCard from '~/components/facilitators/FacilitatorCard.vue'
 
-// ref
-import { ref } from 'vue'
-const route = useRoute()
-const router = useRouter()
-
-// fetch
 import { useMasterDataService } from '~/composables/useMasterDataService'
+import { useMerchantService } from '~/composables/useMerchantService'
 import { useSkillService } from '~/composables/useSkillService'
+
 const { getLanguages } = useMasterDataService()
 const { getSkills } = useSkillService()
+const { getServices } = useMerchantService()
+
+const route = useRoute()
+const router = useRouter()
 
 // state
 const isPageLoading = ref(true)
@@ -276,6 +291,8 @@ const paginations = ref({
   per_page: 10,
   total: 0,
 })
+const serviceList = ref([])
+const searchQuery = ref('')
 
 // filter
 const filter = ref({
@@ -284,21 +301,18 @@ const filter = ref({
   to: '',
   mainSkills: [],
   additionalSkills: [],
-  fileExtensions: '',
+  fileExtensions: [],
   priceFrom: 0,
   priceTo: 100,
   workingHours: '',
 })
 
-// computed
 const fromLanguageList = computed(() => {
-  // filter language list without the 'to' language
-  return languageList.value.filter((lang) => lang !== filter.value.to)
+  return languageList.value.filter((lang) => lang.id !== filter.value.to)
 })
 
 const toLanguageList = computed(() => {
-  // filter language list without the 'from' language
-  return languageList.value.filter((lang) => lang !== filter.value.from)
+  return languageList.value.filter((lang) => lang.id !== filter.value.from)
 })
 
 const mainSkillList = computed(() => {
@@ -311,12 +325,9 @@ const additionalSkillList = computed(() => {
 
 const toggleCategory = (category) => {
   filter.value.category = category
-
-  // fetch skill list
   fetchSkillList()
 }
 
-// fetch user data on mount
 const fetchUser = async () => {
   try {
     user.value = useCookie('token').value.user || null
@@ -327,11 +338,7 @@ const fetchUser = async () => {
 
 const fetchLanguageList = async () => {
   try {
-    const { data } = await getLanguages({
-      page: 1,
-      per_page: 10000,
-    })
-
+    const { data } = await getLanguages({ page: 1, per_page: 10000 })
     languageList.value = data.data.data
   } catch (error) {
     console.error('Fetching language list failed:', error)
@@ -345,10 +352,24 @@ const fetchSkillList = async () => {
       per_page: 10000,
       merchant_type: filter.value.category,
     })
-
     skillList.value = data.data.data
   } catch (error) {
-    console.error('Fetching language list failed:', error)
+    console.error('Fetching skill list failed:', error)
+  }
+}
+
+const fetchServices = async () => {
+  try {
+    const { data } = await getServices({
+      page: paginations.value.page,
+      per_page: paginations.value.per_page,
+      search: searchQuery.value,
+      ...filter.value,
+    })
+    serviceList.value = data.data.services.data
+    paginations.value.total = data.data.services.total
+  } catch (error) {
+    console.error('Fetching services failed:', error)
   }
 }
 
@@ -359,8 +380,6 @@ const logout = () => {
 
 const convertAllFilterToQuery = () => {
   const query = {}
-
-  // convert filter into query params and if array, join with comma
   for (const key in filter.value) {
     if (Array.isArray(filter.value[key])) {
       query[key] = filter.value[key].join(',')
@@ -371,44 +390,28 @@ const convertAllFilterToQuery = () => {
   return query
 }
 
-watch(
-  filter,
-  () => {
-    // convert filter into query params
-    const query = convertAllFilterToQuery()
+const applyFilter = async () => {
+  const query = convertAllFilterToQuery()
+  router.push({ query })
+  await fetchServices()
+}
 
-    // set route params
-    router.push({
-      query,
-    })
-  },
-  { deep: true }
-)
+// watch search query
+// watch(filter, applyFilter, { deep: true })
 
 onMounted(async () => {
-  // convert filter into query params
   const query = convertAllFilterToQuery()
-
-  // set route params
-  router.push({
-    query,
-  })
-
-  // simulate a loading delay
+  router.push({ query })
   await fetchLanguageList()
   await fetchSkillList()
+  await fetchServices()
 
-  // fetch user data
   if (useCookie('token').value) {
     await fetchUser()
   }
 
   isPageLoading.value = false
-
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth',
-  })
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 })
 </script>
 
