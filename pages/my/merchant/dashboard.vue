@@ -34,10 +34,32 @@
               size="sm"
               color="white"
               :trailing="false"
-              placeholder="Search Facilitator"
+              placeholder="Search "
               v-model="searchQuery"
               @input="onSearchChange()"
             />
+          </div>
+        </UCard>
+      </div>
+
+      <div class="w-full pt-0 p-6 grid grid-cols-4 gap-4">
+        <UCard
+          v-for="i in 4"
+          :key="i"
+          :ui="{
+            body: {
+              base: 'flex justify-between items-center',
+              background: '',
+              padding: 'p-2 sm:p-4',
+            },
+          }"
+        >
+          <div>
+            <h6 class="font-semibold text-2xl">40</h6>
+            <span>Order</span>
+          </div>
+          <div>
+            <nuxt-icon name="user-circle" class="text-3xl" />
           </div>
         </UCard>
       </div>

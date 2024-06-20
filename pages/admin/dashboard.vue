@@ -1,7 +1,7 @@
 <template>
   <div>
     <NuxtLayout name="admin">
-      <div class="w-full p-2">content</div>
+      <div class="w-full p-2">Dashboard Comingsoon</div>
     </NuxtLayout>
   </div>
 </template>

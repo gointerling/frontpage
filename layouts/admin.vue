@@ -18,7 +18,12 @@
             @click="open = !open"
             class="flex items-center align-middle text-sm font-medium text-gray-900 rounded-full focus:outline-none focus:shadow-outline"
           >
-            <UAvatar :alt="user.fullname ?? ''" :src="user.photo" size="sm" />
+            <UAvatar
+              :alt="user.fullname ?? ''"
+              :src="user.photo"
+              size="sm"
+              imgClass="object-cover"
+            />
             <span class="mx-2">{{ user.fullname ?? '' }}</span>
             <nuxt-icon name="chevron-simple-down" class="mx-4" filled />
           </button>
@@ -114,6 +119,11 @@ const navs = [
     label: 'Users',
     icon: 'i-heroicons-users',
     to: '/admin/users',
+  },
+  {
+    label: 'Ads',
+    icon: 'i-heroicons-megaphone',
+    to: '/admin/ads',
   },
 ]
 

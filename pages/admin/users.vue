@@ -72,6 +72,7 @@
                   :alt="row.user.fullname"
                   size="sm"
                   variant="rounded-full"
+                  imgClass="object-cover"
                 />
 
                 <div class="flex flex-col">

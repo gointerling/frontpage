@@ -25,8 +25,8 @@
         <button
           class="flex gap-1 justify-center items-center rounded-lg bg-accent p-3 w-full"
         >
-          <nuxt-icon name="logout" class="text-white" />
-          <span v-if="!isSmallSize" class="text-white text-sm"> Sign Out </span>
+          <nuxt-icon name="star" class="text-white" />
+          <span v-if="!isSmallSize" class="text-white text-sm"> Subscribe</span>
         </button>
       </div>
     </div>
