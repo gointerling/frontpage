@@ -1,1 +1,0 @@
-import{c as t,b as a,w as o,g as n,o as s,a as c}from"./REdEvUJb.js";const _=c("div",{class:"w-full p-2"},"content",-1),m={__name:"dashboard",setup(r){return(d,l)=>{const e=n;return s(),t("div",null,[a(e,{name:"admin"},{default:o(()=>[_]),_:1})])}}};export{m as default};
