@@ -308,14 +308,13 @@
               </UCard>
 
               <UCard
-                @click="setActiveService('Premium')"
-                class="cursor-pointer my-4"
+                class="cursor-not-allowed my-4 border-gray border-gray"
                 :class="
                   service.type === 'Premium' ? 'border border-accent' : ''
                 "
               >
                 <div class="flex gap-2 items-center">
-                  <span class="text-primary"> Premium </span>
+                  <span class="text-gray-500"> Premium </span>
                 </div>
               </UCard>
             </div>
@@ -345,6 +344,8 @@
                   :options="['Standard', 'Premium']"
                   placeholder="Choose Service Options"
                   class="w-7/12"
+                  disabled
+                  :ui="{ base: 'capitalize' }"
                 />
               </div>
               <div class="flex justify-between items-center">
@@ -514,7 +515,12 @@ import { useSkillService } from '~/composables/useSkillService'
 import { useFileService } from '~/composables/useFileService'
 import { useMasterDataService } from '~/composables/useMasterDataService'
 
-const { getMyMerchants, updateMyMerchant } = useMerchantService()
+const {
+  getMyMerchants,
+  updateMyMerchant,
+  getMyMerchantServices,
+  updateMyService,
+} = useMerchantService()
 const { updateMyProfile, updateMyPassword } = useUserService()
 const { getSkills } = useSkillService()
 const { uploadFile } = useFileService()
@@ -761,11 +767,30 @@ const fetchMyMerchant = async () => {
 
 const fetchLanguages = async () => {
   try {
-    const { data } = await getLanguages()
+    const { data } = await getLanguages({
+      per_page: 10000,
+    })
 
     languageList.value = data.data.data
   } catch (error) {
     console.error('Fetching languages failed:', error)
+  }
+}
+
+const fetchMyService = async () => {
+  try {
+    const { data } = await getMyMerchantServices()
+
+    if (data.data.user.merchants[0].services.length > 0) {
+      service.value = {
+        ...data.data.user.merchants[0].services[0],
+        languages: checkIfJSON(
+          data.data.user.merchants[0].services[0].language_sources ?? []
+        ),
+      }
+    }
+  } catch (error) {
+    console.error('Fetching service failed:', error)
   }
 }
 
@@ -929,6 +954,40 @@ const updateBank = async () => {
   }
 }
 
+const updateService = async () => {
+  try {
+    const { data } = await updateMyService(service.value.id, {
+      name: service.value.name,
+      price: service.value.price,
+      type: service.value.type,
+      time_estimated: service.value.time_estimated,
+      time_estimated_unit: service.value.time_estimated_unit,
+      desc: service.value.desc,
+      working_hours: service.value.working_hours,
+      language_sources: service.value.languages,
+      language_destinations: service.value.languages,
+    })
+
+    // show success message
+    toast.add({
+      title: 'Success!',
+      color: 'green',
+      icon: 'i-heroicons-check-circle',
+      description: data.message,
+    })
+  } catch (error) {
+    console.error('Update service failed:', error)
+
+    // show error message
+    toast.add({
+      title: 'Uh Oh!',
+      color: 'red',
+      icon: 'i-heroicons-exclamation-triangle',
+      description: getFirstErrorMessage(error.response.data.error),
+    })
+  }
+}
+
 onMounted(async () => {
   // fetch user data
   if (useCookie('token').value) {
@@ -936,6 +995,7 @@ onMounted(async () => {
     await fetchSkills()
     await fetchMyMerchant()
     await fetchLanguages()
+    await fetchMyService()
   }
 
   isPageLoading.value = false

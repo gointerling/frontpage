@@ -5,28 +5,33 @@
       <div class="flex flex-wrap gap-3 py-4">
         <UBadge
           :label="skill.name"
-          v-for="skill in facilitatorDetail.skills"
+          v-for="skill in checkIfJSON(data.users[0].main_skills)"
           :key="skill"
           class="bg-[#E4F1F7] text-primary text-md shadow-md rounded-lg"
         />
-        {{ skills }}
       </div>
     </div>
 
     <h6 class="text-primary font-bold text-xl">About</h6>
     <div class="flex gap-2 py-4">
-      <p class="text-primary text-md">{{ facilitatorDetail.about }}</p>
+      <p class="text-primary text-md">
+        {{ data.users[0].personal_description }}
+      </p>
     </div>
 
     <h6 class="text-primary font-bold text-xl">Certificate</h6>
     <div class="flex gap-2 py-4">
-      <img
-        v-for="certificate in facilitatorDetail.certificates"
+      <UCard
+        v-for="(certificate, index) in checkIfJSON(data.certificates)"
         :key="certificate.id"
-        :src="certificate.image"
-        :alt="certificate.name"
-        class="w-64 h-32 rounded-lg shadow-lg image-certificate"
-      />
+        class="w-64 h-32 rounded-lg shadow-lg image-certificate cursor-pointer flex justify-center items-center border-1 border-accent"
+        @click="openNewTab(certificate)"
+      >
+        <div class="flex justify-center items-center gap-2">
+          <nuxt-icon name="file" class="text-primary" />
+          <span class="text-primary">Certificate {{ index + 1 }}</span>
+        </div>
+      </UCard>
     </div>
   </div>
 </template>
@@ -36,7 +41,7 @@ import { defineProps } from 'vue'
 
 // define props
 const props = defineProps({
-  facilitatorDetail: {
+  data: {
     type: Object,
     required: true,
     default: () => ({
@@ -72,6 +77,19 @@ const props = defineProps({
     }),
   },
 })
+
+// check if json
+const checkIfJSON = (data) => {
+  try {
+    return JSON.parse(data)
+  } catch (error) {
+    return data
+  }
+}
+
+const openNewTab = (url) => {
+  window.open(url, '_blank')
+}
 </script>
 
 <style>

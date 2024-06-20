@@ -20,17 +20,24 @@
 
         <UAvatar
           size="3xl"
-          :src="facilitator.avatar"
+          :alt="props.data.merchants[0].users[0].fullname"
+          :src="props.data.merchants[0].users[0].photo"
           imgClass="object-cover"
           class="-mt-10"
         />
-        <h2 class="font-semibold py-2">{{ facilitator.name }}</h2>
+        <h2 class="font-semibold py-2">
+          {{ props.data.merchants[0].users[0].fullname }}
+        </h2>
 
         <!-- hide this on hover -->
         <div class="flex gap-4 items-center py-2">
-          <div v-if="facilitator.languages.length <= 2" class="flex gap-2">
+          <div v-if="props.data.languages.length === 0" class="flex gap-2">
+            <span class="text-sm"> No Language </span>
+          </div>
+
+          <div v-else-if="props.data.languages.length <= 2" class="flex gap-2">
             <span
-              v-for="(language, index) in facilitator.languages"
+              v-for="(language, index) in props.data.languages"
               :key="index"
               class="text-sm"
             >
@@ -41,15 +48,15 @@
           <div v-else class="flex gap-2">
             <UTooltip>
               <span class="text-sm cursor-pointer">
-                {{ facilitator.languages.length }} Languages
+                {{ props.data.languages.length }} Languages
               </span>
 
               <template #text>
                 <span
-                  v-for="(language, index) in facilitator.languages"
+                  v-for="(language, index) in props.data.languages"
                   :key="index"
                 >
-                  {{ `${language} ` }}
+                  {{ `${language.name} ` }}
                 </span>
               </template>
             </UTooltip>
@@ -58,12 +65,12 @@
           <div class="flex gap-2 items-center border-x border-gray-900 px-6">
             <nuxt-icon name="star" class="text-2xl" filled />
             <strong>
-              {{ facilitator.rating }}
+              {{ props.data.merchants[0].rating }}
             </strong>
           </div>
 
           <div>
-            <strong>{{ formatPrice(facilitator.price) }}</strong>
+            <strong>{{ formatPrice(props.data.price) }}</strong>
           </div>
         </div>
 
@@ -85,7 +92,7 @@
             @click="
               navigateTo({
                 name: 'facilitators-id',
-                params: { id: facilitator.id },
+                params: { id: props.data.merchants[0].id },
               })
             "
           >
@@ -107,15 +114,11 @@ const router = useRouter()
 
 // data
 
-const facilitator = ref({
-  id: 1,
-  avatar:
-    'https://pict.sindonews.net/dyn/850/pena/news/2023/09/02/11/1191599/jadi-bintang-di-indonesia-rafael-struick-ngaku-bukan-pesepak-bola-terkenal-di-belanda-jql.jpeg',
-  name: 'John Doe',
-  bio: 'John is a facilitator with 10 years of experience in the field.',
-  languages: ['English', 'German', 'Spanish'],
-  rating: 4.5,
-  price: 200000,
+const props = defineProps({
+  data: {
+    type: Object,
+    required: true,
+  },
 })
 
 const navigateTo = (route) => {
