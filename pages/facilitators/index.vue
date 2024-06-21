@@ -320,11 +320,8 @@
     <OrderSidebar
       :isOpen="isOrderSidebarOpen"
       :data="selectedMerchant"
-      :languages="languageList"
       @hide="isOrderSidebarOpen = false"
     />
-
-    <!-- <ConfirmationModal :isOpen="isConfirmationModalOpen" :data="modalData" /> -->
   </div>
 </template>
 

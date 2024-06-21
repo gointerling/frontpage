@@ -63,6 +63,7 @@
 
           <button
             class="px-4 py-2 mt-4 mb-2 text-sm font-medium text-white bg-accent rounded-full hover:bg-accent-700 focus:outline-none focus:bg-accent-500 transition duration-150 ease-in-out"
+            @click="emitOrder"
           >
             Order Now
           </button>
@@ -74,6 +75,8 @@
 
 <script setup>
 import { defineProps } from 'vue'
+
+const emit = defineEmits(['order'])
 
 // props
 const props = defineProps({
@@ -140,29 +143,8 @@ const serviceItems = computed(() => {
   })
 })
 
-// data
-const items = [
-  {
-    label: 'Standard',
-    price: 50000,
-    contents: [
-      'This package includes 1000 words.',
-      '5-day delivery',
-      'Unlimited Revisions',
-      'Proofreading',
-      'Document formatting',
-    ],
-  },
-  {
-    label: 'Premium',
-    price: 150000,
-    contents: [
-      'This package includes 1000 words.',
-      '5-day delivery',
-      'Unlimited Revisions',
-      'Proofreading',
-      'Document formatting',
-    ],
-  },
-]
+// emit order
+const emitOrder = () => {
+  emit('order')
+}
 </script>

@@ -130,10 +130,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  languages: {
-    type: Array,
-    default: () => [],
-  },
   data: {
     type: Object,
     default: () => ({
@@ -147,11 +143,15 @@ const props = defineProps({
 })
 
 const fromLanguageList = computed(() => {
-  return props.languages.filter((lang) => lang.id !== payload.value.to.id)
+  return props.data.language_sources.filter(
+    (lang) => lang.id !== payload.value.to.id
+  )
 })
 
 const toLanguageList = computed(() => {
-  return props.languages.filter((lang) => lang.id !== payload.value.from.id)
+  return props.data.language_destinations.filter(
+    (lang) => lang.id !== payload.value.from.id
+  )
 })
 
 const payload = ref({
