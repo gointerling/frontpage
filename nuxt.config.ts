@@ -3,6 +3,7 @@ export default defineNuxtConfig({
   app: {
     // pageTransition: { name: 'fade', mode: 'out-in' },
   },
+  ssr: false,
   colorMode: {
     preference: 'light',
   },
