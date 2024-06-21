@@ -1,7 +1,7 @@
 <template>
   <div>
     <NuxtLayout name="merchant">
-      <div class="w-full pt-0 p-6 flex flex-col gap-2">
+      <!-- <div class="w-full pt-0 p-6 flex flex-col gap-2">
         <UCard
           :ui="{
             body: {
@@ -13,7 +13,6 @@
         >
           <h6 class="font-semibold">{{ pageTitle }}</h6>
 
-          <!-- search and filter -->
           <div class="flex gap-2">
             <UInputMenu
               :options="[
@@ -62,6 +61,13 @@
             <nuxt-icon name="user-circle" class="text-3xl" />
           </div>
         </UCard>
+      </div> -->
+
+      <div class="w-full h-full p-2 flex flex-col justify-center items-center">
+        <img :src="comingSoon" alt="" width="300px" />
+        <span class="font-semibold text-2xl text-primary">
+          Dashboard Comingsoon
+        </span>
       </div>
     </NuxtLayout>
 
@@ -69,6 +75,8 @@
   </div>
 </template>
 <script setup>
+import comingSoon from '~/assets/images/empty-dashboard.svg'
+
 import { ref, computed, onMounted } from 'vue'
 import { useMerchantService } from '~/composables/useMerchantService'
 

@@ -47,29 +47,40 @@
             },
           }"
         >
-          <UTable :rows="facilitators">
-            <template #phone-data="{ row }">
+          <UTable :rows="orders">
+            <template #service-data="{ row }">
               <!-- button wa.me -->
-              <UButton
-                v-if="row.phone"
-                target="_blank"
-                size="sm"
-                color="green"
-                :trailing="false"
-                @click="openLink(`https://wa.me/${row.phone}`)"
+              <div
+                v-if="row.service"
+                class="flex flex-col gap-1 items-start capitalize"
               >
-                <nuxt-icon name="whatsapp" class="text-white" />
-                {{ row.phone }}
-              </UButton>
+                <span class="text-primary">
+                  {{ row.service.name }} Service
+                </span>
+                <UBadge variant="soft" color="orange" class="capitalize">
+                  {{ row.service.type }}
+                </UBadge>
+              </div>
 
               <span v-else class="text-gray-300"> Kosong </span>
             </template>
 
-            <template #user-data="{ row }">
+            <template #price-data="{ row }">
+              <span class="text-primary"> {{ formatPrice(row.price) }} </span>
+            </template>
+
+            <template #languages-data="{ row }">
+              <span class="text-primary">
+                {{ row.languages.language_source.name }} ->
+                {{ row.languages.language_destination.name }}
+              </span>
+            </template>
+
+            <template #buyer-data="{ row }">
               <div class="flex gap-3 items-center">
                 <UAvatar
-                  :src="row.user.photo"
-                  :alt="row.user.fullname"
+                  :src="row.buyer.photo"
+                  :alt="row.buyer.fullname"
                   size="sm"
                   variant="rounded-full"
                   imgClass="object-cover"
@@ -77,135 +88,75 @@
 
                 <div class="flex flex-col">
                   <span class="font-semibold text-primary">
-                    {{ row.user.fullname }}
+                    {{ row.buyer.fullname }}
                   </span>
                   <span class="text-sm text-gray-600">
-                    {{ row.user.email }}
+                    {{ row.buyer.email }}
                   </span>
                 </div>
               </div>
-            </template>
-
-            <template #bank-data="{ row }">
-              <div v-if="row.bank.bank" class="flex gap-1 flex-col">
-                <div class="flex gap-1 items-center">
-                  <span class="font-semibold text-primary">
-                    Bank {{ row.bank.bank }}
-                  </span>
-                  <UButton
-                    size="xs"
-                    variant="outline"
-                    color="blue"
-                    @click="copyToClipboard(row.bank.bankAccount)"
-                    class=""
-                  >
-                    <nuxt-icon name="copy" class="text-xs" />
-                  </UButton>
-                </div>
-                <span> {{ row.bank.bankAccount }} </span>
-              </div>
-
-              <span v-else class="text-gray-300"> Kosong </span>
             </template>
 
             <template #status-data="{ row }">
               <UBadge
                 size="xs"
-                :label="row.status"
-                :color="resolveStatusColor(row.status)"
+                :label="resolveOrderStatus(row.status).text"
+                :color="resolveOrderStatus(row.status).color"
                 variant="subtle"
                 class="capitalize"
               />
             </template>
 
-            <template #type-data="{ row }">
-              <UBadge
-                size="xs"
-                :label="row.type"
-                :color="row.type === 'interpreter' ? 'emerald' : 'blue'"
-                variant="subtle"
-                class="capitalize"
-              />
-            </template>
-
-            <template #CV-data="{ row }">
+            <template #file-data="{ row }">
               <UButton
-                v-if="row.CV"
+                v-if="row.file"
                 size="sm"
                 color="primary"
                 :trailing="false"
-                @click="openLink(row.CV)"
+                @click="openLink(row.file)"
               >
                 <nuxt-icon name="file" class="text-white" />
-                Open CV
+                Open Client File
               </UButton>
 
-              <span v-else class="text-gray-300"> No CV </span>
-            </template>
-
-            <template #portfolio-data="{ row }">
-              <div
-                v-if="row.portfolio"
-                class="flex gap-1 flex-col justify-center"
-                :class="
-                  row.portfolio.length === 0 ? 'items-start' : 'items-center'
-                "
-              >
-                <UButton
-                  v-for="(portfolioLink, index) in row.portfolio"
-                  :key="index"
-                  size="sm"
-                  color="primary"
-                  :trailing="false"
-                  @click="openLink(portfolioLink)"
-                >
-                  <nuxt-icon name="file" class="text-white" />
-                  Portfolio {{ index + 1 }}
-                </UButton>
-
-                <span v-if="row.portfolio.length === 0" class="text-gray-300">
-                  No Portfolio
-                </span>
-              </div>
-
-              <span v-else class="text-gray-300"> No Portfolio </span>
-            </template>
-
-            <template #certificate-data="{ row }">
-              <div
-                v-if="row.certificate"
-                class="flex gap-1 flex-col justify-center"
-                :class="
-                  row.certificate.length === 0 ? 'items-start' : 'items-center'
-                "
-              >
-                <UButton
-                  v-for="(certificateLink, index) in row.certificate"
-                  :key="index"
-                  size="sm"
-                  color="primary"
-                  :trailing="false"
-                  @click="openLink(certificateLink)"
-                >
-                  <nuxt-icon name="file" class="text-white" />
-                  Certificate {{ index + 1 }}
-                </UButton>
-
-                <span v-if="row.certificate.length === 0" class="text-gray-300">
-                  No Certificate
-                </span>
-              </div>
-
-              <span v-else class="text-gray-300"> No Certificate </span>
+              <span v-else class="text-gray-300"> No File Uploaded </span>
             </template>
 
             <template #actions-data="{ row }">
               <div class="flex gap-1">
-                <UTooltip text="Deactive" v-if="row.status === 'verified'">
+                <UTooltip
+                  v-if="row.actions.status === 'pending'"
+                  text="Accept Order"
+                >
                   <UButton
-                    icon="i-heroicons-trash"
+                    icon="i-heroicons-check"
                     size="2xs"
-                    color="orange"
+                    color="green"
+                    variant="outline"
+                    :ui="{ rounded: 'rounded-full' }"
+                    square
+                    @click="
+                      displayConfirmationModal(
+                        'Hang On',
+                        'Are you sure you want to deactivate this facilitator?',
+                        'Deactivate',
+                        'Cancel',
+                        () => {
+                          updateUserStatus(row.user.id, 'inactive')
+                        }
+                      )
+                    "
+                  />
+                </UTooltip>
+
+                <UTooltip
+                  v-if="row.actions.status === 'waitingpaid'"
+                  text="Upload Works"
+                >
+                  <UButton
+                    icon="i-heroicons-arrow-up-tray"
+                    size="2xs"
+                    color="green"
                     variant="outline"
                     :ui="{ rounded: 'rounded-full' }"
                     square
@@ -263,8 +214,10 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useMerchantService } from '~/composables/useMerchantService'
+import { useOrderService } from '~/composables/useOrderService'
 
 const { getMerchants, updateMerchantStatus } = useMerchantService()
+const { getMyMerchantOrders } = useOrderService()
 
 // components
 const toast = useToast()
@@ -284,6 +237,7 @@ const modalData = ref({
 // data
 const pageTitle = 'Order List'
 const facilitators = ref([])
+const orders = ref([])
 const selectedStatus = ref({
   label: 'All',
   value: 'all',
@@ -296,29 +250,6 @@ const paginationsData = ref({
   totalItems: 0,
   itemsPerPage: 10,
 })
-
-const actions = [
-  [
-    {
-      key: 'completed',
-      label: 'Completed',
-      icon: 'i-heroicons-check',
-      callback: () => {
-        console.log('completed')
-      },
-    },
-  ],
-  [
-    {
-      key: 'uncompleted',
-      label: 'In Progress',
-      icon: 'i-heroicons-arrow-path',
-      callback: () => {
-        console.log('uncompleted')
-      },
-    },
-  ],
-]
 
 // Fetch facilitators
 const fetchFacilitators = async () => {
@@ -346,7 +277,6 @@ const fetchFacilitators = async () => {
         portfolio: JSON.parse(user.merchants[0].portfolios),
         certificate: JSON.parse(user.merchants[0].certificates),
         status: user.merchants[0].status,
-        actions: actions,
       }))
       paginationsData.value = {
         page: response.data.data.current_page,
@@ -357,6 +287,46 @@ const fetchFacilitators = async () => {
     })
   } catch (error) {
     console.error('Error fetching facilitators:', error)
+  }
+}
+
+const fetchMerchantOrders = async () => {
+  try {
+    await getMyMerchantOrders({
+      page: page.value,
+      per_page: paginationsData.value.itemsPerPage,
+      status:
+        selectedStatus.value.value === 'all' ? '' : selectedStatus.value.value,
+      search: searchQuery.value,
+    }).then((response) => {
+      orders.value = response.data.data.orders.data.map((order, index) => ({
+        no: index + 1,
+        service: {
+          id: order.service.id,
+          name: order.merchant.type,
+          type: order.service.type,
+        },
+
+        buyer: {
+          id: order.user.id,
+          fullname: order.user.fullname,
+          email: order.user.email,
+        },
+        languages: {
+          language_source: order.language_source,
+          language_destination: order.language_destination,
+        },
+        price: order.price,
+        status: order.order_status,
+        file: order.user_file_url,
+        actions: {
+          id: order.id,
+          status: order.order_status,
+        },
+      }))
+    })
+  } catch (error) {
+    console.error('Error fetching merchant orders:', error)
   }
 }
 
@@ -394,6 +364,13 @@ function debounce(func, wait, immediate) {
 const openLink = (url) => {
   // Open link in new tab
   window.open(url, '_blank')
+}
+
+const formatPrice = (price) => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+  }).format(price)
 }
 
 const copyToClipboard = (text) => {
@@ -465,8 +442,48 @@ const updateUserStatus = async (userId, status) => {
     })
 }
 
+const resolveOrderStatus = (status) => {
+  switch (status) {
+    case 'completed':
+      return {
+        color: 'green',
+        text: 'Completed',
+      }
+
+    case 'paid':
+      return {
+        color: 'blue',
+        text: 'In Progress',
+      }
+
+    case 'pending':
+      return {
+        color: 'violet',
+        text: 'Pending',
+      }
+
+    case 'waitingpaid':
+      return {
+        color: 'orange',
+        text: 'Approved',
+      }
+
+    case 'failed':
+      return {
+        color: 'red',
+        text: 'Failed',
+      }
+
+    default:
+      return {
+        color: 'gray',
+        text: 'Unknown',
+      }
+  }
+}
+
 // Mounted lifecycle hook
 onMounted(() => {
-  fetchFacilitators()
+  fetchMerchantOrders()
 })
 </script>

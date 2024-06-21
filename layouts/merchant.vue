@@ -58,7 +58,7 @@
           </div>
         </nav>
 
-        <div class="w-full">
+        <div class="w-full h-full">
           <slot />
         </div>
       </div>
@@ -111,11 +111,11 @@ const navs = [
     icon: 'i-heroicons-home',
     to: `/my/merchant/dashboard`,
   },
-  {
-    label: 'Services',
-    icon: 'i-heroicons-language',
-    to: '/my/merchant/services',
-  },
+  // {
+  //   label: 'Services',
+  //   icon: 'i-heroicons-language',
+  //   to: '/my/merchant/services',
+  // },
   {
     label: 'Orders',
     icon: 'i-heroicons-building-storefront',
