@@ -4,14 +4,18 @@ import { defineNuxtRouteMiddleware, useCookie, navigateTo, abortNavigation } fro
 export default defineNuxtRouteMiddleware((to) => {
   const token = useCookie('token'); // get token from cookies
 
-  // ignore the middleware if the route is /auth/login and / 
-  if (to?.name === 'auth-login' || to?.name === 'index') {
-    return;
-  }
+  console.log('token', token.value);
+
 
   // if token exists and url is /login redirect to homepage
   if (token.value && to?.name === 'auth-login') {
     return navigateTo('/');
+  }
+
+
+  // ignore the middleware if the route is /auth/login and / 
+  if (to?.name === 'auth-login' || to?.name === 'index') {
+    return;
   }
 
   // if token doesn't exist redirect to log in
