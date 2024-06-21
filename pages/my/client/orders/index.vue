@@ -34,7 +34,12 @@
                 { label: 'All', value: '', color: 'gray' },
                 { label: 'Completed', value: 'completed', color: 'blue' },
                 { label: 'In Progress', value: 'paid', color: 'green' },
-                { label: 'Wait to be Paid', value: 'pending', color: 'orange' },
+                {
+                  label: 'Wait to be Paid',
+                  value: 'waitingpaid',
+                  color: 'orange',
+                },
+                { label: 'Pending', value: 'pending', color: 'violet' },
                 { label: 'Failed', value: 'failed', color: 'red' },
               ]"
               v-model="selectedStatus"
@@ -273,6 +278,12 @@ const resolveOrderStatus = (status) => {
       }
 
     case 'pending':
+      return {
+        color: 'violet',
+        text: 'Pending',
+      }
+
+    case 'waitingpaid':
       return {
         color: 'orange',
         text: 'Waiting to be paid',

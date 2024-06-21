@@ -111,7 +111,10 @@
                 Download Result
               </UButton>
 
-              <div class="flex flex-col text-right">
+              <div
+                v-if="order.order_status === 'waitingpaid'"
+                class="flex flex-col text-right"
+              >
                 <span class="font-thin text-primary text-md">
                   Amount to be transfer :
                 </span>
@@ -138,6 +141,17 @@
                 </h6>
 
                 <img src="" alt="" />
+              </div>
+
+              <div
+                v-if="order.order_status === 'paid'"
+                class="flex flex-col text-right items-end"
+              >
+                <span class="font-semibold text-xl pb-2">Work In Progress</span>
+                <p class="w-7/12 text-gray-600 text-sm">
+                  Your order has been received and is now being processed. Thank
+                  you for your trust in using our services.
+                </p>
               </div>
             </div>
           </UCard>
@@ -238,8 +252,6 @@ const filteredNavs = computed(() => {
   )
 })
 
-// methods
-// toggle password visibility
 const resolveOrderStatus = (status) => {
   switch (status) {
     case 'completed':
@@ -255,6 +267,12 @@ const resolveOrderStatus = (status) => {
       }
 
     case 'pending':
+      return {
+        color: 'violet',
+        text: 'Pending',
+      }
+
+    case 'waitingpaid':
       return {
         color: 'orange',
         text: 'Waiting to be paid',
@@ -329,93 +347,6 @@ const formatPrice = (price) => {
   }).format(price)
 }
 
-// fetch skills list
-const fetchSkills = async () => {
-  try {
-    const { data } = await getSkills({
-      per_page: 10000,
-    })
-
-    skillList.value = data.data.data
-  } catch (error) {
-    console.error('Fetching skills failed:', error)
-  }
-}
-
-// fetch user data on mount
-const fetchUser = async () => {
-  try {
-    user.value = useCookie('token').value.user || null
-
-    payload.value = {
-      fullname: user.value.fullname,
-      email: user.value.email,
-      phone: user.value.phone,
-      address: user.value.address,
-      personal_description: user.value.personal_description,
-      photo: user.value.photo,
-      main_skills: checkIfJSON(user.value.main_skills) ?? [],
-      additional_skills: checkIfJSON(user.value.additional_skills) ?? [],
-    }
-  } catch (error) {
-    console.error('Fetching user failed:', error)
-  }
-}
-
-const fetchMyMerchant = async () => {
-  try {
-    const { data } = await getMyMerchants()
-
-    if (data.data.user.merchants.length > 0) {
-      merchant.value = data.data.user.merchants[0]
-
-      merchant.value.bank = {
-        id: data.data.user.merchants[0].bank_id,
-        name: data.data.user.merchants[0].bank,
-      }
-
-      merchant.value.certificates = JSON.parse(
-        data.data.user.merchants[0].certificates
-      )
-
-      merchant.value.portfolios = JSON.parse(
-        data.data.user.merchants[0].portfolios
-      )
-    }
-  } catch (error) {
-    console.error('Fetching merchant failed:', error)
-  }
-}
-
-const fetchLanguages = async () => {
-  try {
-    const { data } = await getLanguages({
-      per_page: 10000,
-    })
-
-    languageList.value = data.data.data
-  } catch (error) {
-    console.error('Fetching languages failed:', error)
-  }
-}
-
-const fetchMyService = async () => {
-  try {
-    const { data } = await getMyMerchantServices()
-
-    if (data.data.user.merchants[0].services.length > 0) {
-      service.value = {
-        ...data.data.user.merchants[0].services[0],
-        languages: checkIfJSON(
-          data.data.user.merchants[0].services[0].language_sources ?? []
-        ),
-      }
-    }
-  } catch (error) {
-    console.error('Fetching service failed:', error)
-  }
-}
-
 const fetchDetailOrder = async () => {
   const orderId = route.params.id
 
@@ -429,43 +360,6 @@ const fetchDetailOrder = async () => {
   }
 }
 
-// trigger file input click
-const triggerFileInput = () => {
-  fileInput.value.click()
-}
-
-// handle file change
-const onFileChange = async (event) => {
-  const file = event.target.files[0]
-  if (file) {
-    // toast upload progress
-    toast.add({
-      title: 'Uploading...',
-      color: 'blue',
-      icon: 'i-heroicons-arrow-up-tray',
-      description: 'Please wait while we upload your photo...',
-    })
-
-    try {
-      const response = await uploadFile(file, `profile_picture_${file.name}`)
-
-      payload.value.photo = response.data.data.fileRecord.url
-      photoWarning.value =
-        'This preview is temporary, please save to apply changes.'
-    } catch (err) {
-      console.error('Photo upload failed:', err)
-
-      // show error message
-      toast.add({
-        title: 'Uh Oh!',
-        color: 'red',
-        icon: 'i-heroicons-exclamation-triangle',
-        description: getFirstErrorMessage(err.response.data.error),
-      })
-    }
-  }
-}
-
 const getFirstErrorMessage = (errors) => {
   for (const field in errors) {
     if (errors[field].length > 0) {
@@ -473,193 +367,6 @@ const getFirstErrorMessage = (errors) => {
     }
   }
   return null
-}
-
-// update profile
-const updateProfile = async () => {
-  try {
-    console.log(payload.value)
-
-    const { data } = await updateMyProfile(payload.value)
-
-    const userData = {
-      ...useCookie('token').value.user,
-      email: data.data.user.email,
-      fullname: data.data.user.fullname,
-      photo: data.data.user.photo,
-      address: data.data.user.address,
-      phone: data.data.user.phone,
-      personal_description: data.data.user.personal_description,
-      main_skills: data.data.user.main_skills,
-      additional_skills: data.data.user.additional_skills,
-    }
-
-    console.log(JSON.parse(JSON.stringify(userData)))
-
-    // set local user
-    user.value = userData
-
-    // update cookie
-    useCookie('token').value.user = userData
-
-    // show success message
-    toast.add({
-      title: 'Success!',
-      color: 'green',
-      icon: 'i-heroicons-check-circle',
-      description: data.message,
-    })
-
-    // reset photo warning
-    photoWarning.value = ''
-  } catch (error) {
-    console.error('Update profile failed:', error)
-
-    // show error message
-    toast.add({
-      title: 'Uh Oh!',
-      color: 'red',
-      icon: 'i-heroicons-exclamation-triangle',
-      description: getFirstErrorMessage(error.response.data.error),
-    })
-  }
-}
-
-const updatePassword = async () => {
-  try {
-    const { data } = await updateMyPassword({
-      password: newPassword.value,
-      password_confirmation: confirmPassword.value,
-    })
-
-    // show success message
-    toast.add({
-      title: 'Success!',
-      color: 'green',
-      icon: 'i-heroicons-check-circle',
-      description: data.message,
-    })
-
-    // reset password fields
-    newPassword.value = ''
-    confirmPassword.value = ''
-  } catch (error) {
-    console.error('Change password failed:', error)
-
-    // show error message
-    toast.add({
-      title: 'Uh Oh!',
-      color: 'red',
-      icon: 'i-heroicons-exclamation-triangle',
-      description: getFirstErrorMessage(error.response.data.error),
-    })
-  }
-}
-
-const updateBank = async () => {
-  try {
-    const { data } = await updateMyMerchant({
-      type: merchant.value.type,
-      bank_id: merchant.value.bank.id,
-      bank_account: `${merchant.value.bank_account}`,
-      bank: merchant.value.bank.name,
-      cv_url: merchant.value.cv_url,
-      certificates: merchant.value.certificates,
-      portfolios: merchant.value.portfolios,
-    })
-
-    // show success message
-    toast.add({
-      title: 'Success!',
-      color: 'green',
-      icon: 'i-heroicons-check-circle',
-      description: data.message,
-    })
-  } catch (error) {
-    console.error('Update merchant failed:', error)
-
-    // show error message
-    toast.add({
-      title: 'Uh Oh!',
-      color: 'red',
-      icon: 'i-heroicons-exclamation-triangle',
-      description: getFirstErrorMessage(error.response.data.error),
-    })
-  }
-}
-
-const updateMerchantType = async () => {
-  try {
-    const { data } = await updateMyMerchant({
-      type: merchant.value.type.id,
-      bank_id: merchant.value.bank.id,
-      bank_account: `${merchant.value.bank_account}`,
-      bank: merchant.value.bank.name,
-      cv_url: merchant.value.cv_url,
-      certificates: merchant.value.certificates,
-      portfolios: merchant.value.portfolios,
-    })
-
-    // show success message
-    toast.add({
-      title: 'Success!',
-      color: 'green',
-      icon: 'i-heroicons-check-circle',
-      description: data.message,
-    })
-
-    // set user cookie
-    useCookie('token').value.user.merchant_status = 'pending'
-
-    // redirect to merchant status page
-    router.push({
-      name: 'my-merchant-status',
-    })
-  } catch (error) {
-    console.error('Update merchant failed:', error)
-
-    // show error message
-    toast.add({
-      title: 'Uh Oh!',
-      color: 'red',
-      icon: 'i-heroicons-exclamation-triangle',
-      description: getFirstErrorMessage(error.response.data.error),
-    })
-  }
-}
-
-const updateService = async () => {
-  try {
-    const { data } = await updateMyService(service.value.id, {
-      name: service.value.name,
-      price: service.value.price,
-      type: service.value.type,
-      time_estimated: service.value.time_estimated,
-      time_estimated_unit: service.value.time_estimated_unit,
-      desc: service.value.desc,
-      working_hours: service.value.working_hours,
-      language_sources: service.value.languages,
-      language_destinations: service.value.languages,
-    })
-
-    // show success message
-    toast.add({
-      title: 'Success!',
-      color: 'green',
-      icon: 'i-heroicons-check-circle',
-      description: data.message,
-    })
-  } catch (error) {
-    console.error('Update service failed:', error)
-
-    // show error message
-    toast.add({
-      title: 'Uh Oh!',
-      color: 'red',
-      icon: 'i-heroicons-exclamation-triangle',
-      description: getFirstErrorMessage(error.response.data.error),
-    })
-  }
 }
 
 // watch for changes
@@ -678,6 +385,14 @@ watch(
     }
   }
 )
+
+const fetchUser = async () => {
+  try {
+    user.value = useCookie('token').value.user || null
+  } catch (error) {
+    console.error('Fetching user failed:', error)
+  }
+}
 
 onMounted(async () => {
   // fetch user data
