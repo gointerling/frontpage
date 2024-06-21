@@ -111,7 +111,7 @@ const navs = [
     to: '/admin/transactions',
   },
   {
-    label: 'Merchants',
+    label: 'Facilitator',
     icon: 'i-heroicons-building-storefront',
     to: '/admin/merchants',
   },

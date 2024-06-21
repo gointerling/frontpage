@@ -1,71 +1,93 @@
 <template>
-  <div>
+  <UModal
+    v-model="internalIsOpen"
+    fullscreen
+    :overlay="false"
+    :ui="{
+      base: 'w-[500px] absolute top-0 right-0 h-screen bg-white dark:bg-gray-800 rounded-l-3xl',
+      rounded: 'rounded-l-3xl rounded-r-0',
+    }"
+  >
     <UCard
-      class="rounded-xl"
       :ui="{
-        base: {},
+        base: 'h-full',
+        ring: '',
+        divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+        rounded: 'rounded-l-3xl rounded-r-0',
         body: {
-          base: '',
-          background: '',
-          padding: 'sm:px-4 sm:py-2',
+          base: 'h-full',
+          padding: 'px-6 py-5 sm:p-10',
+        },
+        header: {
+          padding: 'px-6 py-5 sm:px-8',
+        },
+        footer: {
+          padding: 'px-6 py-4 sm:px-10',
         },
       }"
     >
-      <template #header>
-        <div class="flex justify-center">
-          <h6 class="text-primary font-semibold text-xl uppercase">Filter</h6>
-        </div>
-      </template>
-      <!-- Card Content -->
-      <div class="overflow-y-auto pl-1 pr-4 h-fit-screen">
-        <div>
-          <h6 class="font-semibold text-primary">Category</h6>
-          <UFormGroup>
-            <div class="flex gap-2 mt-2">
-              <UButton
-                variant="outline"
-                class="flex justify-center items-center hover:bg-accent hover:text-white rounded-lg"
-                :class="
-                  filter.category === 'translator' ? 'bg-accent text-white' : ''
-                "
-                @click="toggleCategory('translator')"
-              >
-                Translator
-              </UButton>
-              <UButton
-                variant="outline"
-                class="flex justify-center items-center hover:bg-accent hover:text-white rounded-lg"
-                :class="
-                  filter.category === 'interpreter'
-                    ? 'bg-accent text-white'
-                    : ''
-                "
-                @click="toggleCategory('interpreter')"
-              >
-                Interpreter
-              </UButton>
-            </div>
-          </UFormGroup>
-        </div>
-        <hr class="my-3" />
+      <div
+        class="flex justify-between items-center w-full border-b border-1 pb-4"
+      >
+        <button @click="hideSidebar">
+          <nuxt-icon
+            name="back"
+            class="text-2xl text-primary dark:text-gray-300"
+          />
+        </button>
+        <h3
+          class="text-lg font-semibold w-full flex justify-center text-primary"
+        >
+          Your Order
+        </h3>
+      </div>
 
-        <div>
-          <h6 class="font-semibold text-primary">Languages</h6>
-          <UFormGroup label="From" class="py-2">
-            <UInputMenu
-              placeholder="Find Your Language"
-              :options="fromLanguageList"
-              v-model="filter.from"
-              by="id"
-              option-attribute="name"
-              :search-attributes="['name']"
-            />
-          </UFormGroup>
-          <UFormGroup label="To" class="py-2">
+      <div class="flex flex-col justify-between pt-4 pb-10 h-full">
+        <div class="flex flex-col justify-start gap-4 items-center">
+          <div class="flex flex-col w-full">
+            <label class="text-primary uppercase">STANDARD PACKAGE</label>
+            <span class="text-xl font-semibold text-primary">{{
+              formatPrice(payload.price)
+            }}</span>
+          </div>
+
+          <div class="flex flex-col w-full">
+            <label class="text-primary">Category</label>
+            <span class="text-xl font-semibold text-primary">
+              {{ payload.type }}
+            </span>
+          </div>
+
+          <div
+            class="w-full border-t border-b border-1 pt-4 pb-8 flex flex-col gap-4"
+          >
+            <UFormGroup label="From" class="w-full">
+              <UInputMenu
+                placeholder="Find Your Language"
+                :options="fromLanguageList"
+                v-model="payload.from"
+                by="id"
+                option-attribute="name"
+                :search-attributes="['name']"
+              />
+            </UFormGroup>
+            <UFormGroup label="To" class="w-full">
+              <UInputMenu
+                placeholder="Find Your Language"
+                :options="toLanguageList"
+                v-model="payload.to"
+                by="id"
+                option-attribute="name"
+                :search-attributes="['name']"
+              />
+            </UFormGroup>
+          </div>
+
+          <UFormGroup label="To" class="w-full">
             <UInputMenu
               placeholder="Find Your Language"
               :options="toLanguageList"
-              v-model="filter.to"
+              v-model="payload.to"
               by="id"
               option-attribute="name"
               :search-attributes="['name']"
@@ -73,132 +95,108 @@
           </UFormGroup>
         </div>
 
-        <hr class="my-3" />
-
-        <div>
-          <h6 class="font-semibold text-primary capitalize mb-1">
-            {{ filter.category }} Options
-          </h6>
-          <UFormGroup>
-            <label
-              v-for="skill in mainSkillList"
-              :key="skill.id"
-              class="flex gap-1 py-[0.1em]"
+        <div class="flex justify-end space-x-2 px-4">
+          <div class="flex flex-col items-center w-full gap-2">
+            <UButton
+              @click="confirm"
+              block
+              class="px-4 py-2 bg-accent text-white rounded hover:bg-accent-700 rounded-full"
             >
-              <input
-                type="checkbox"
-                class="form-checkbox h-5 w-5 text-primary rounded-md"
-                :value="skill.id"
-                v-model="selectedSkills"
-              />
-              <span class="ml-2 text-gray-700">{{ skill.name }}</span>
-            </label>
-          </UFormGroup>
-        </div>
-
-        <div class="mt-2">
-          <h6 class="font-semibold text-primary capitalize my-1">
-            Additional Skills
-          </h6>
-          <UFormGroup>
-            <label
-              v-for="skill in additionalSkillList"
-              :key="skill.id"
-              class="flex gap-1 py-[0.1em]"
-            >
-              <input
-                type="checkbox"
-                class="form-checkbox h-5 w-5 text-primary rounded-md"
-                :value="skill.id"
-                v-model="selectedSkills"
-              />
-              <span class="ml-2 text-gray-700">{{ skill.name }}</span>
-            </label>
-          </UFormGroup>
-        </div>
-
-        <hr class="my-3" />
-        <div class="mt-2">
-          <h6 class="font-semibold text-primary capitalize my-1">
-            File Extensions
-          </h6>
-          <UFormGroup class="mb-2">
-            <UInputMenu
-              placeholder="Select File Extensions"
-              :options="[
-                { id: 'pdf', name: 'PDF' },
-                { id: 'doc', name: 'DOC' },
-                { id: 'docx', name: 'DOCX' },
-                { id: 'ppt', name: 'PPT' },
-                { id: 'pptx', name: 'PPTX' },
-                { id: 'xls', name: 'XLS' },
-                { id: 'xlsx', name: 'XLSX' },
-              ]"
-              v-model="filter.fileExtensions"
-              by="id"
-              option-attribute="name"
-              :search-attributes="['name']"
-            />
-          </UFormGroup>
-        </div>
-
-        <hr class="my-3" />
-        <div class="mt-2">
-          <h6 class="font-semibold text-primary capitalize my-1">Budgets</h6>
-          <UFormGroup class="mb-2">
-            <URange
-              :min="0"
-              :max="filter.priceTo"
-              :model-value="filter.priceFrom"
-            />
-            <div class="flex justify-between">
-              <span class="text-accent">{{ filter.priceFrom }}</span>
-              <span class="text-accent">{{ filter.priceTo }}</span>
-            </div>
-          </UFormGroup>
-        </div>
-
-        <hr class="my-3" />
-        <div class="mt-2">
-          <h6 class="font-semibold text-primary capitalize my-1">
-            Working Hours
-          </h6>
-          <div class="flex justify-between">
-            <UFormGroup>
-              <div class="flex gap-2 mt-2">
-                <UButton
-                  variant="outline"
-                  class="flex justify-center items-center hover:bg-accent hover:text-white rounded-lg"
-                  :class="
-                    filter.category === 'translator'
-                      ? 'bg-accent text-white'
-                      : ''
-                  "
-                  @click="toggleCategory('translator')"
-                >
-                  Anytime
-                </UButton>
-                <UButton
-                  variant="outline"
-                  class="flex justify-center items-center hover:bg-accent hover:text-white rounded-lg"
-                  :class="
-                    filter.category === 'interpreter'
-                      ? 'bg-accent text-white'
-                      : ''
-                  "
-                  @click="toggleCategory('interpreter')"
-                >
-                  Special Time
-                </UButton>
-              </div>
-            </UFormGroup>
+              {{ data.confirmText }}
+              {{ formatPrice(payload.price) }}
+            </UButton>
+            <UButton @click="cancel" color="orange" variant="link">
+              {{ data.cancelText }}
+            </UButton>
           </div>
         </div>
       </div>
-
-      <template #footer>
-        <UButton block class="bg-accent"> Apply Filter </UButton>
-      </template>
     </UCard>
-  </div>
+  </UModal>
 </template>
+
+<script setup>
+import { ref, watch } from 'vue'
+
+// define props
+const props = defineProps({
+  isOpen: {
+    type: Boolean,
+    default: false,
+  },
+  languages: {
+    type: Array,
+    default: () => [],
+  },
+  data: {
+    type: Object,
+    default: () => ({
+      title: 'Sidebar Title',
+      content: 'Sidebar Content',
+      confirmText: 'Continue',
+      cancelText: 'Cancel',
+      callback: () => {},
+    }),
+  },
+})
+
+const fromLanguageList = computed(() => {
+  return props.languages.filter((lang) => lang.id !== payload.value.to.id)
+})
+
+const toLanguageList = computed(() => {
+  return props.languages.filter((lang) => lang.id !== payload.value.from.id)
+})
+
+const payload = ref({
+  price: 0,
+  type: 'Translator',
+  from: {},
+  to: {},
+})
+
+// emit event to update the prop value
+const emit = defineEmits(['update:isOpen'])
+
+// internal state to handle the modal visibility
+const internalIsOpen = ref(props.isOpen)
+
+// watch for changes in the prop to update the internal state
+watch(
+  () => props.isOpen,
+  (newVal) => {
+    internalIsOpen.value = newVal
+  }
+)
+
+// watch for changes in the internal state to emit the event
+watch(internalIsOpen, (newVal) => {
+  emit('update:isOpen', newVal)
+
+  console.log(newVal)
+})
+
+const hideSidebar = () => {
+  internalIsOpen.value = false
+
+  emit('hide')
+}
+
+// methods for handling confirmation and cancellation
+const confirm = () => {
+  props.data.callback(true)
+  internalIsOpen.value = false
+}
+
+const cancel = () => {
+  props.data.callback(false)
+  internalIsOpen.value = false
+}
+
+const formatPrice = (price) => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+  }).format(price)
+}
+</script>

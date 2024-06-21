@@ -124,7 +124,7 @@
               <!-- Dropdown -->
               <div
                 v-show="open"
-                class="absolute right-0 z-10 mt-12 w-48 py-1 bg-white rounded-lg shadow-lg"
+                class="absolute right-0 z-10 mt-12 w-58 py-1 bg-white rounded-lg shadow-lg"
               >
                 <nuxt-link
                   href="#"
@@ -165,6 +165,14 @@
                   <nuxt-icon name="merchant" class="text-2xl"></nuxt-icon>
 
                   Facilitator
+
+                  <UBadge
+                    v-if="user?.merchant_status === 'pending'"
+                    color="orange"
+                    :label="user?.merchant_status"
+                    variant="soft"
+                    class="uppercase"
+                  />
                 </button>
                 <button
                   class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
