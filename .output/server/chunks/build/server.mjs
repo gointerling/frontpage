@@ -668,7 +668,7 @@ const cfg0 = defineAppConfig({
 });
 const inlineConfig = {
   "nuxt": {
-    "buildId": "f06c0ba5-83ec-4d28-870a-38d825c5f08c"
+    "buildId": "b0875b52-9328-4fd1-bf2d-a31b58db2914"
   },
   "ui": {
     "primary": "green",
