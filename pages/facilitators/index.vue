@@ -45,7 +45,17 @@
                 <div>
                   <h6 class="font-semibold text-primary">Category</h6>
                   <UFormGroup>
-                    <div class="flex gap-2 mt-2">
+                    <div class="flex gap-2 mt-2 flex-wrap">
+                      <UButton
+                        variant="outline"
+                        class="flex justify-center items-center hover:bg-accent hover:text-white rounded-lg"
+                        :class="
+                          filter.category === '' ? 'bg-accent text-white' : ''
+                        "
+                        @click="toggleCategory('')"
+                      >
+                        All
+                      </UButton>
                       <UButton
                         variant="outline"
                         class="flex justify-center items-center hover:bg-accent hover:text-white rounded-lg"
@@ -76,7 +86,16 @@
                 <hr class="my-3" />
 
                 <div>
-                  <h6 class="font-semibold text-primary">Languages</h6>
+                  <div class="flex justify-between items-center">
+                    <h6 class="font-semibold text-primary">Languages</h6>
+                    <UButton
+                      variant="link"
+                      color="orange"
+                      @click="clearLanguageFilter"
+                    >
+                      Clear
+                    </UButton>
+                  </div>
 
                   <UFormGroup label="From" class="py-2">
                     <UInputMenu
@@ -368,7 +387,7 @@ const searchQuery = ref('')
 
 // filter
 const filter = ref({
-  category: 'translator',
+  category: '',
   from: '',
   to: '',
   mainSkills: [],
@@ -429,7 +448,12 @@ const processedFilter = computed(() => {
 
 const toggleCategory = (category) => {
   filter.value.category = category
+
   fetchSkillList()
+
+  // reset the filter
+  filter.value.mainSkills = []
+  filter.value.additionalSkills = []
 }
 
 const priceFormat = (price) => {
@@ -545,6 +569,11 @@ const debounce = (func, wait) => {
       func.apply(context, args)
     }, wait)
   }
+}
+
+const clearLanguageFilter = () => {
+  filter.value.from = ''
+  filter.value.to = ''
 }
 
 // watch
