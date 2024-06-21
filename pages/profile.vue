@@ -510,25 +510,6 @@
     <!-- Loader -->
     <PageLoader v-if="isPageLoading" />
 
-    <!-- Confirmation Modal -->
-    <!-- <UModal v-model="isConfirmationModalOpen">
-      <UCard>
-        <template #header>
-          <div class="flex justify-between">
-            <span> Confirmation </span>
-
-            <button
-              @click="isConfirmationModalOpen = false"
-              class="flex items-center align-middle text-sm font-medium text-gray-900 rounded-full focus:outline-none focus:shadow-outline"
-            >
-              <nuxt-icon name="x" class="text-md" />
-            </button>
-          </div>
-        </template>
-
-      </UCard>
-    </UModal> -->
-
     <ConfirmationModal :isOpen="isConfirmationModalOpen" :data="modalData" />
   </div>
 </template>
@@ -537,7 +518,6 @@
 // components
 import PageLoader from '~/components/PageLoader.vue'
 import Navbar from '~/components/Navbar.vue'
-import ServiceTab from '~/components/profile/ServiceTab.vue'
 
 // imports
 import { ref, onMounted } from 'vue'
@@ -904,8 +884,6 @@ const getFirstErrorMessage = (errors) => {
 // update profile
 const updateProfile = async () => {
   try {
-    console.log(payload.value)
-
     const { data } = await updateMyProfile(payload.value)
 
     const userData = {
