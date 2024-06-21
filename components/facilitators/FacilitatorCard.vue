@@ -143,7 +143,6 @@ const navigateTo = (route) => {
 }
 
 const openOrderSidebar = () => {
-  console.log('order')
   emit('order')
 }
 

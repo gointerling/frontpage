@@ -174,7 +174,6 @@ watch(
   (newVal) => {
     internalIsOpen.value = newVal
 
-    console.log('newVal', newVal)
     if (!newVal) {
       hideSidebar()
     }
@@ -184,8 +183,6 @@ watch(
 // watch for changes in the internal state to emit the event
 watch(internalIsOpen, (newVal) => {
   emit('update:isOpen', newVal)
-
-  console.log(newVal)
 })
 
 const hideSidebar = () => {
@@ -281,8 +278,6 @@ const setOrder = async () => {
 
     // close the side bar
     hideSidebar()
-
-    console.log(data.data)
 
     // route to order
     router.push({

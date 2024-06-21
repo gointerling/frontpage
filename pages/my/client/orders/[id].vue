@@ -350,7 +350,6 @@ const formatPrice = (price) => {
 const fetchDetailOrder = async () => {
   const orderId = route.params.id
 
-  console.log(orderId)
   try {
     const { data } = await getDetailOrder(orderId)
 

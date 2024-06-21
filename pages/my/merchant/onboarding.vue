@@ -49,8 +49,6 @@ onMounted(async () => {
     const merchantStatus = result.data.data.user.merchants[0].status
     const isFirstTime = result.data.data.user.merchants[0].is_first_time
 
-    console.log(isFirstTime)
-
     // check if merchant status is not onboarding
     useCookie('token').value.user.merchant_status = merchantStatus
 

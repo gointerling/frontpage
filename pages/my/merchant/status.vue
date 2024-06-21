@@ -83,7 +83,6 @@ const checkFirstTimeSetup = async () => {
   const merchantStatus = data.data.user.merchants[0].status
   useCookie('token').value.user.merchant_status = merchantStatus
 
-  console.log(isStatusVerified)
   if (isStatusVerified) {
     router.push({
       name: 'my-merchant-dashboard',
