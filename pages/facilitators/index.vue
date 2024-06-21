@@ -19,7 +19,7 @@
             Find
           </button>
         </div>
-        <div class="grid grid-cols-12 gap-4">
+        <div class="grid grid-cols-12 gap-6">
           <div class="col-span-3">
             <!-- side filter -->
             <UCard
@@ -77,6 +77,7 @@
 
                 <div>
                   <h6 class="font-semibold text-primary">Languages</h6>
+
                   <UFormGroup label="From" class="py-2">
                     <UInputMenu
                       placeholder="Find Your Language"
@@ -105,7 +106,7 @@
                   <h6 class="font-semibold text-primary capitalize mb-1">
                     {{ filter.category }} Options
                   </h6>
-                  <UFormGroup>
+                  <UFormGroup v-if="!isFilterLoading">
                     <label
                       v-for="skill in mainSkillList"
                       :key="skill.id"
@@ -120,13 +121,21 @@
                       <span class="ml-2 text-gray-700">{{ skill.name }}</span>
                     </label>
                   </UFormGroup>
+                  <div v-else class="flex gap-1 justify-center py-4">
+                    <UIcon
+                      name="i-ph-rocket-launch"
+                      dynamic
+                      class="text-xl text-gray-600"
+                    />
+                    <span class="text-gray-600"> Loading Options... </span>
+                  </div>
                 </div>
 
                 <div class="mt-2">
                   <h6 class="font-semibold text-primary capitalize my-1">
                     Additional Skills
                   </h6>
-                  <UFormGroup>
+                  <UFormGroup v-if="!isFilterLoading">
                     <label
                       v-for="skill in additionalSkillList"
                       :key="skill.id"
@@ -141,6 +150,14 @@
                       <span class="ml-2 text-gray-700">{{ skill.name }}</span>
                     </label>
                   </UFormGroup>
+                  <div v-else class="flex gap-1 justify-center py-4">
+                    <UIcon
+                      name="i-ph-rocket-launch"
+                      dynamic
+                      class="text-xl text-gray-600"
+                    />
+                    <span class="text-gray-600"> Loading Options... </span>
+                  </div>
                 </div>
 
                 <hr class="my-3" />
@@ -166,7 +183,7 @@
                   </UFormGroup>
                 </div>
 
-                <!-- <hr class="my-3" />
+                <hr class="my-3" />
                 <div class="mt-2">
                   <h6 class="font-semibold text-primary capitalize my-1">
                     Budgets
@@ -174,16 +191,18 @@
                   <UFormGroup class="mb-2">
                     <URange
                       :min="0"
-                      :max="filter.priceTo"
-                      v-model:start="filter.priceFrom"
-                      v-model:end="filter.priceTo"
+                      :step="20000"
+                      :max="1000000"
+                      v-model="filter.priceTo"
                     />
                     <div class="flex justify-between">
                       <span class="text-accent">{{ filter.priceFrom }}</span>
-                      <span class="text-accent">{{ filter.priceTo }}</span>
+                      <span class="text-accent"
+                        >Rp.{{ priceFormat(filter.priceTo) }}</span
+                      >
                     </div>
                   </UFormGroup>
-                </div> -->
+                </div>
 
                 <hr class="my-3" />
                 <div class="mt-2">
@@ -232,33 +251,80 @@
           </div>
           <div class="col-span-9 flex flex-col justify-between">
             <!-- card -->
-            <div class="grid grid-cols-12 gap-4 h-fit overflow-y-visible">
-              <FacilitatorCard
-                class="col-span-6"
-                v-for="service in serviceList"
-                :key="service.id"
-                :data="service"
-              />
+            <div v-if="!isItemsLoading" class="h-full">
+              <div
+                v-if="serviceList.length > 0"
+                class="grid grid-cols-12 gap-4 h-fit overflow-y-visible"
+              >
+                <FacilitatorCard
+                  class="col-span-6"
+                  v-for="service in serviceList"
+                  :key="service.id"
+                  :data="service"
+                  @order="openOrderSidebar"
+                />
+              </div>
+
+              <div v-else class="flex justify-center items-center h-full">
+                <div class="flex flex-col items-center">
+                  <!-- loading -->
+                  <img :src="emptyState" width="200px" alt="" />
+                  <div class="flex gap-2 justify-center items-center pt-4 pb-2">
+                    <UIcon
+                      name="i-heroicons-exclamation-triangle"
+                      class="text-2xl text-gray-800"
+                    />
+                    <span class="text-gray-800 text-xl font-semibold">
+                      No Data Found...
+                    </span>
+                  </div>
+                  <span class="text-gray-600">
+                    Please try another filter or search query
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div v-else class="flex justify-center items-center h-full">
+              <!-- loading -->
+              <div class="flex gap-1 justify-center py-4">
+                <UIcon
+                  name="i-ph-rocket-launch"
+                  dynamic
+                  class="text-xl text-gray-600"
+                />
+                <span class="text-gray-600"> Loading Facilitators... </span>
+              </div>
             </div>
 
             <div class="mt-2 flex justify-between items-center">
-              <span class="text-sm">
-                Showing {{ paginations.page }} of
-                {{ paginations.total }} entries
+              <span v-if="paginationsData.totalItems !== 0" class="text-sm">
+                Showing {{ currentEntries.start }} to
+                {{ currentEntries.end }} of
+                {{ paginationsData.totalItems }} entries
               </span>
+              <span v-else class="text-sm"> No Items 0 / 0 </span>
+
               <UPagination
-                v-model="paginations.page"
-                :page-count="
-                  Math.ceil(paginations.total / paginations.per_page)
-                "
-                :total="paginations.total"
-                @update:page="applyFilter"
+                v-model="page"
+                :page-count="1"
+                :total="paginationsData.totalPage"
               />
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Order Sidebar -->
+    <OrderSidebar
+      :isOpen="isOrderSidebarOpen"
+      :data="selectedMerchant"
+      :languages="languageList"
+      @hide="isOrderSidebarOpen = false"
+    />
+
+    <!-- <ConfirmationModal :isOpen="isConfirmationModalOpen" :data="modalData" /> -->
   </div>
 </template>
 
@@ -267,6 +333,9 @@ import { ref, computed, onMounted, watch } from 'vue'
 import PageLoader from '~/components/PageLoader.vue'
 import Navbar from '~/components/Navbar.vue'
 import FacilitatorCard from '~/components/facilitators/FacilitatorCard.vue'
+import OrderSidebar from '~/components/facilitators/OrderSidebar.vue'
+
+import emptyState from '~/assets/images/empty.svg'
 
 import { useMasterDataService } from '~/composables/useMasterDataService'
 import { useMerchantService } from '~/composables/useMerchantService'
@@ -278,18 +347,23 @@ const { getServices } = useMerchantService()
 
 const route = useRoute()
 const router = useRouter()
+const toast = useToast()
 
 // state
 const isPageLoading = ref(true)
+const isItemsLoading = ref(false)
+const isFilterLoading = ref(false)
+const isOrderSidebarOpen = ref(false)
 
 // data
 const user = ref(null)
 const languageList = ref([])
 const skillList = ref([])
-const paginations = ref({
-  page: 1,
-  per_page: 10,
-  total: 0,
+const page = ref(1)
+const paginationsData = ref({
+  totalPage: 1,
+  totalItems: 0,
+  itemsPerPage: 4,
 })
 const serviceList = ref([])
 const searchQuery = ref('')
@@ -303,16 +377,22 @@ const filter = ref({
   additionalSkills: [],
   fileExtensions: [],
   priceFrom: 0,
-  priceTo: 100,
+  priceTo: 1000000,
   workingHours: '',
 })
 
+const openOrderSidebar = () => {
+  isOrderSidebarOpen.value = true
+}
+
 const fromLanguageList = computed(() => {
-  return languageList.value.filter((lang) => lang.id !== filter.value.to)
+  // filter out the selected language and map only the id and name
+  return languageList.value.filter((lang) => lang.id !== filter.value.to.id)
 })
 
 const toLanguageList = computed(() => {
-  return languageList.value.filter((lang) => lang.id !== filter.value.from)
+  // filter out the selected language and map only the id and name
+  return languageList.value.filter((lang) => lang.id !== filter.value.from.id)
 })
 
 const mainSkillList = computed(() => {
@@ -323,10 +403,48 @@ const additionalSkillList = computed(() => {
   return skillList.value.filter((skill) => skill.skill_type === 'additional')
 })
 
+const processedFilter = computed(() => {
+  // make the filter object simpler like become
+  const processed = { ...filter.value }
+
+  // convert array to string
+  processed.main_skills = filter.value.mainSkills.join(',')
+  processed.additional_skills = filter.value.additionalSkills.join(',')
+  processed.price_from = filter.value.priceFrom
+  processed.price_to = filter.value.priceTo
+  processed.from = filter.value.from.id
+  processed.to = filter.value.to.id
+  processed.file_extensions = filter.value.fileExtensions.id
+  processed.working_hours = filter.value.workingHours
+
+  // remove unused key
+  delete processed.mainSkills
+  delete processed.additionalSkills
+  delete processed.priceFrom
+  delete processed.priceTo
+  delete processed.fileExtensions
+  delete processed.workingHours
+
+  return processed
+})
+
 const toggleCategory = (category) => {
   filter.value.category = category
   fetchSkillList()
 }
+
+const priceFormat = (price) => {
+  return new Intl.NumberFormat('id-ID').format(price)
+}
+
+const currentEntries = computed(() => {
+  const start = (page.value - 1) * paginationsData.value.itemsPerPage + 1
+  const end = Math.min(
+    page.value * paginationsData.value.itemsPerPage,
+    paginationsData.value.totalItems
+  )
+  return { start, end }
+})
 
 const fetchUser = async () => {
   try {
@@ -337,15 +455,23 @@ const fetchUser = async () => {
 }
 
 const fetchLanguageList = async () => {
+  isFilterLoading.value = true
   try {
     const { data } = await getLanguages({ page: 1, per_page: 10000 })
-    languageList.value = data.data.data
+
+    // return only the data id and name
+    languageList.value = data.data.data.map((lang) => ({
+      id: lang.id,
+      name: lang.name,
+    }))
   } catch (error) {
     console.error('Fetching language list failed:', error)
   }
+  isFilterLoading.value = false
 }
 
 const fetchSkillList = async () => {
+  isFilterLoading.value = true
   try {
     const { data } = await getSkills({
       page: 1,
@@ -356,20 +482,26 @@ const fetchSkillList = async () => {
   } catch (error) {
     console.error('Fetching skill list failed:', error)
   }
+  isFilterLoading.value = false
 }
 
 const fetchServices = async () => {
+  isItemsLoading.value = true
   try {
     const { data } = await getServices({
-      page: paginations.value.page,
-      per_page: paginations.value.per_page,
+      page: page.value,
+      per_page: paginationsData.value.itemsPerPage,
       search: searchQuery.value,
-      ...filter.value,
+      ...processedFilter.value,
     })
+
     serviceList.value = data.data.services.data
-    paginations.value.total = data.data.services.total
-  } catch (error) {
-    console.error('Fetching services failed:', error)
+    paginationsData.value.totalPage = data.data.services.last_page
+    paginationsData.value.totalItems = data.data.services.total
+  } catch (err) {
+    console.error('Fetching services failed:', err)
+  } finally {
+    isItemsLoading.value = false
   }
 }
 
@@ -380,13 +512,21 @@ const logout = () => {
 
 const convertAllFilterToQuery = () => {
   const query = {}
+
+  // convert all filter to query and if contain object just get the id and if array join with comma, if undefined just ignore
   for (const key in filter.value) {
-    if (Array.isArray(filter.value[key])) {
-      query[key] = filter.value[key].join(',')
-    } else {
-      query[key] = filter.value[key]
+    if (filter.value[key]) {
+      if (Array.isArray(filter.value[key])) {
+        query[key] = filter.value[key].join(',')
+      } else if (typeof filter.value[key] === 'object') {
+        query[key] = filter.value[key].id
+      } else {
+        query[key] = filter.value[key]
+      }
     }
   }
+
+  console.log('query:', query)
   return query
 }
 
@@ -396,12 +536,46 @@ const applyFilter = async () => {
   await fetchServices()
 }
 
-// watch search query
+const debounce = (func, wait) => {
+  let timeout
+  return function (...args) {
+    const context = this
+    clearTimeout(timeout)
+    timeout = setTimeout(() => {
+      timeout = null
+      func.apply(context, args)
+    }, wait)
+  }
+}
+
+// watch
 // watch(filter, applyFilter, { deep: true })
+
+watch(
+  page,
+  async () => {
+    await fetchServices()
+  },
+  {
+    immediate: true,
+  }
+)
+
+watch(
+  searchQuery,
+  debounce(async () => {
+    page.value = 1
+    await fetchServices()
+  }, 500),
+  {
+    immediate: true,
+  }
+)
 
 onMounted(async () => {
   const query = convertAllFilterToQuery()
   router.push({ query })
+
   await fetchLanguageList()
   await fetchSkillList()
   await fetchServices()

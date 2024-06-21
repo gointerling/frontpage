@@ -29,6 +29,17 @@
           {{ props.data.merchants[0].users[0].fullname }}
         </h2>
 
+        <UBadge
+          variant="soft"
+          size="sm"
+          :color="
+            props.data.merchants[0].type === 'interpreter' ? 'orange' : 'green'
+          "
+          class="text-sm uppercase"
+        >
+          {{ props.data.merchants[0].type }}
+        </UBadge>
+
         <!-- hide this on hover -->
         <div class="flex gap-4 items-center py-2">
           <div v-if="props.data.languages.length === 0" class="flex gap-2">
@@ -81,6 +92,7 @@
             variant="outline"
             color="orange"
             class="rounded-full hover:bg-accent hover:text-white"
+            @click="openOrderSidebar"
           >
             <span>Order Now</span>
           </UButton>
@@ -105,12 +117,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import bannerImage from '/assets/images/facilitators-blue-bg.png'
 
 // route
 const route = useRoute()
 const router = useRouter()
+
+const emit = defineEmits(['order'])
 
 // data
 
@@ -119,10 +132,19 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  callback: {
+    type: Function,
+    required: true,
+  },
 })
 
 const navigateTo = (route) => {
   router.push(route)
+}
+
+const openOrderSidebar = () => {
+  console.log('order')
+  emit('order')
 }
 
 const formatPrice = (price) => {

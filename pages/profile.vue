@@ -290,9 +290,39 @@
         <div v-if="selectedTab === 'service'" class="w-10/12">
           <h6 class="font-semibold mb-3">Service Information</h6>
 
+          <UCard class="mb-4">
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+              Facilitator Type
+            </label>
+            <div class="flex justify-between items-center">
+              <span class="font-semibold">Service</span>
+              <UInputMenu
+                v-model="merchant.type"
+                :options="typeList"
+                placeholder="Choose Service Type"
+                by="id"
+                option-attribute="name"
+                :search-attributes="['name']"
+                class="w-7/12 capitalize"
+                :ui="{ base: 'capitalize' }"
+              />
+            </div>
+
+            <div class="flex justify-end">
+              <!-- save button -->
+              <UButton
+                @click="changeService(() => updateMerchantType())"
+                class="mt-4 bg-accent"
+              >
+                <nuxt-icon name="floppy" class="text-white" />
+                Change Service
+              </UButton>
+            </div>
+          </UCard>
+
           <UCard>
             <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
-              Current Service
+              Service Packages
             </label>
             <div class="flex gap-4">
               <UCard
@@ -323,20 +353,6 @@
               Detail Services
             </label>
             <div class="flex flex-col gap-4 py-4">
-              <div class="flex justify-between items-center">
-                <span class="font-semibold">Service</span>
-                <UInputMenu
-                  v-model="merchant.type"
-                  :options="typeList"
-                  placeholder="Choose Service Type"
-                  by="id"
-                  option-attribute="name"
-                  :search-attributes="['name']"
-                  class="w-7/12 capitalize"
-                  disabled
-                  :ui="{ base: 'capitalize' }"
-                />
-              </div>
               <div class="flex justify-between items-center">
                 <span class="font-semibold">Service Options</span>
                 <UInputMenu
@@ -448,7 +464,7 @@
               >
                 List of Certificates
               </label>
-              <div class="flex">
+              <div class="flex gap-2 flex-wrap">
                 <UCard
                   v-for="(certificate_url, index) in merchant.certificates"
                   :key="index"
@@ -493,6 +509,27 @@
 
     <!-- Loader -->
     <PageLoader v-if="isPageLoading" />
+
+    <!-- Confirmation Modal -->
+    <!-- <UModal v-model="isConfirmationModalOpen">
+      <UCard>
+        <template #header>
+          <div class="flex justify-between">
+            <span> Confirmation </span>
+
+            <button
+              @click="isConfirmationModalOpen = false"
+              class="flex items-center align-middle text-sm font-medium text-gray-900 rounded-full focus:outline-none focus:shadow-outline"
+            >
+              <nuxt-icon name="x" class="text-md" />
+            </button>
+          </div>
+        </template>
+
+      </UCard>
+    </UModal> -->
+
+    <ConfirmationModal :isOpen="isConfirmationModalOpen" :data="modalData" />
   </div>
 </template>
 
@@ -565,10 +602,20 @@ const bankList = [
 const typeList = [
   { id: 'translator', name: 'Translator' },
   { id: 'interpreter', name: 'Interpreter' },
+  // { id: 'both', name: 'Both' },
 ]
+
+const modalData = ref({
+  title: '',
+  content: '',
+  confirmText: '',
+  cancelText: '',
+  callback: null,
+})
 
 // state
 const isPageLoading = ref(true)
+const isConfirmationModalOpen = ref(false)
 const selectedTab = ref('profile')
 const showPassword = ref(false)
 const photoWarning = ref('')
@@ -705,6 +752,20 @@ const checkIfJSON = (data) => {
   } catch (error) {
     return data
   }
+}
+
+const changeService = (callback) => {
+  // display confirmation modal
+  modalData.value = {
+    title: 'Change Service',
+    content:
+      'Are you sure you want to change your main service? This action cannot be undone and your Facilitator Status will be reset and waiting for approval.',
+    confirmText: 'Sure',
+    cancelText: 'Cancel',
+    callback,
+  }
+
+  isConfirmationModalOpen.value = true
 }
 
 // fetch skills list
@@ -922,7 +983,6 @@ const updatePassword = async () => {
 }
 
 const updateBank = async () => {
-  console.log(merchant.value)
   try {
     const { data } = await updateMyMerchant({
       type: merchant.value.type,
@@ -940,6 +1000,46 @@ const updateBank = async () => {
       color: 'green',
       icon: 'i-heroicons-check-circle',
       description: data.message,
+    })
+  } catch (error) {
+    console.error('Update merchant failed:', error)
+
+    // show error message
+    toast.add({
+      title: 'Uh Oh!',
+      color: 'red',
+      icon: 'i-heroicons-exclamation-triangle',
+      description: getFirstErrorMessage(error.response.data.error),
+    })
+  }
+}
+
+const updateMerchantType = async () => {
+  try {
+    const { data } = await updateMyMerchant({
+      type: merchant.value.type.id,
+      bank_id: merchant.value.bank.id,
+      bank_account: `${merchant.value.bank_account}`,
+      bank: merchant.value.bank.name,
+      cv_url: merchant.value.cv_url,
+      certificates: merchant.value.certificates,
+      portfolios: merchant.value.portfolios,
+    })
+
+    // show success message
+    toast.add({
+      title: 'Success!',
+      color: 'green',
+      icon: 'i-heroicons-check-circle',
+      description: data.message,
+    })
+
+    // set user cookie
+    useCookie('token').value.user.merchant_status = 'pending'
+
+    // redirect to merchant status page
+    router.push({
+      name: 'my-merchant-status',
     })
   } catch (error) {
     console.error('Update merchant failed:', error)
@@ -987,6 +1087,25 @@ const updateService = async () => {
     })
   }
 }
+
+// watch for changes
+watch(
+  () => selectedTab.value,
+  (newValue) => {
+    if (newValue === 'service') {
+      const user = useCookie('token').value.user
+
+      console.log(user.merchant_status)
+
+      if (user.merchant_status === 'pending') {
+        // redirect to merchant status page
+        router.push({
+          name: 'my-merchant-status',
+        })
+      }
+    }
+  }
+)
 
 onMounted(async () => {
   // fetch user data

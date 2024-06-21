@@ -9,10 +9,10 @@
       <div class="flex flex-col justify-center items-center">
         <h3 class="text-lg font-semibold">{{ data.title }}</h3>
         <div class="p-4">
-          <p>{{ data.content }}</p>
+          <p class="text-center text-gray-700">{{ data.content }}</p>
         </div>
 
-        <div class="flex justify-end space-x-2 p-4">
+        <div class="flex justify-end space-x-2 px-4">
           <button
             @click="cancel"
             class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
