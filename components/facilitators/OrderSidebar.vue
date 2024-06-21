@@ -2,9 +2,9 @@
   <UModal
     v-model="internalIsOpen"
     fullscreen
-    :overlay="false"
+    prevent-close
     :ui="{
-      base: 'w-[500px] absolute top-0 right-0 h-screen bg-white dark:bg-gray-800 rounded-l-3xl',
+      base: '!w-[500px] absolute top-0 right-0 h-screen bg-white dark:bg-gray-800 rounded-l-3xl',
       rounded: 'rounded-l-3xl rounded-r-0',
     }"
   >
@@ -45,16 +45,18 @@
       <div class="flex flex-col justify-between pt-4 pb-10 h-full">
         <div class="flex flex-col justify-start gap-4 items-center">
           <div class="flex flex-col w-full">
-            <label class="text-primary uppercase">STANDARD PACKAGE</label>
+            <label class="text-primary uppercase"
+              >{{ props.data.type }} PACKAGE</label
+            >
             <span class="text-xl font-semibold text-primary">{{
-              formatPrice(payload.price)
+              formatPrice(props.data.price)
             }}</span>
           </div>
 
           <div class="flex flex-col w-full">
             <label class="text-primary">Category</label>
-            <span class="text-xl font-semibold text-primary">
-              {{ payload.type }}
+            <span class="text-xl font-semibold text-primary capitalize">
+              {{ props.data.merchants[0].type }}
             </span>
           </div>
 
@@ -83,14 +85,12 @@
             </UFormGroup>
           </div>
 
-          <UFormGroup label="To" class="w-full">
-            <UInputMenu
-              placeholder="Find Your Language"
-              :options="toLanguageList"
-              v-model="payload.to"
-              by="id"
-              option-attribute="name"
-              :search-attributes="['name']"
+          <UFormGroup label="Upload File" class="w-full">
+            <FileUpload
+              title="Order"
+              accept="*"
+              max-size="52428800"
+              @file-uploaded="setOrderFile"
             />
           </UFormGroup>
         </div>
@@ -98,12 +98,11 @@
         <div class="flex justify-end space-x-2 px-4">
           <div class="flex flex-col items-center w-full gap-2">
             <UButton
-              @click="confirm"
+              @click="setOrder"
               block
-              class="px-4 py-2 bg-accent text-white rounded hover:bg-accent-700 rounded-full"
+              class="px-4 py-2 bg-accent text-white hover:bg-accent-700 rounded-full"
             >
-              {{ data.confirmText }}
-              {{ formatPrice(payload.price) }}
+              Continue ({{ formatPrice(props.data.price) }})
             </UButton>
             <UButton @click="cancel" color="orange" variant="link">
               {{ data.cancelText }}
@@ -118,15 +117,18 @@
 <script setup>
 import { ref, watch } from 'vue'
 
+import { useOrderService } from '~/composables/useOrderService'
+const { setMyOrder } = useOrderService()
+
+const route = useRoute()
+const router = useRouter()
+const toast = useToast()
+
 // define props
 const props = defineProps({
   isOpen: {
     type: Boolean,
     default: false,
-  },
-  languages: {
-    type: Array,
-    default: () => [],
   },
   data: {
     type: Object,
@@ -141,11 +143,15 @@ const props = defineProps({
 })
 
 const fromLanguageList = computed(() => {
-  return props.languages.filter((lang) => lang.id !== payload.value.to.id)
+  return props.data.language_sources.filter(
+    (lang) => lang.id !== payload.value.to.id
+  )
 })
 
 const toLanguageList = computed(() => {
-  return props.languages.filter((lang) => lang.id !== payload.value.from.id)
+  return props.data.language_destinations.filter(
+    (lang) => lang.id !== payload.value.from.id
+  )
 })
 
 const payload = ref({
@@ -153,6 +159,7 @@ const payload = ref({
   type: 'Translator',
   from: {},
   to: {},
+  file_url: '',
 })
 
 // emit event to update the prop value
@@ -166,6 +173,11 @@ watch(
   () => props.isOpen,
   (newVal) => {
     internalIsOpen.value = newVal
+
+    console.log('newVal', newVal)
+    if (!newVal) {
+      hideSidebar()
+    }
   }
 )
 
@@ -180,6 +192,10 @@ const hideSidebar = () => {
   internalIsOpen.value = false
 
   emit('hide')
+}
+
+const setOrderFile = (file) => {
+  payload.value.file_url = file
 }
 
 // methods for handling confirmation and cancellation
@@ -198,5 +214,85 @@ const formatPrice = (price) => {
     style: 'currency',
     currency: 'IDR',
   }).format(price)
+}
+
+const setPayload = () => {
+  // Initialize the payload object
+  const data = {
+    service_id: props.data.id,
+    merchant_id: props.data.merchants[0].id,
+    merchant_user_id: props.data.merchants[0].users[0].id,
+    language_source: payload.value.from,
+    language_destination: payload.value.to,
+    user_file_url: payload.value.file_url,
+  }
+
+  // Function to check if a value is null or empty
+  const isNullOrEmpty = (value) => {
+    return value === null || value === undefined || value === ''
+  }
+
+  // Mapping of field names to human-readable names
+  const fieldNames = {
+    service_id: 'Service ID',
+    merchant_id: 'Merchant ID',
+    merchant_user_id: 'Merchant User ID',
+    language_source: 'Source Language',
+    language_destination: 'Destination Language',
+    user_file_url: 'Upload File',
+  }
+
+  // Validate data fields
+  const fieldsToValidate = [
+    'service_id',
+    'merchant_id',
+    'merchant_user_id',
+    'language_source',
+    'language_destination',
+    'user_file_url',
+  ]
+
+  for (const field of fieldsToValidate) {
+    if (isNullOrEmpty(data[field])) {
+      toast.add({
+        title: 'Uh Oh!',
+        color: 'red',
+        icon: 'i-heroicons-exclamation-triangle',
+        description: `${fieldNames[field]} cannot be empty`,
+      })
+      return null
+    }
+  }
+
+  // If all fields are valid, return the data
+  return data
+}
+
+const setOrder = async () => {
+  try {
+    const { data } = await setMyOrder(setPayload())
+
+    toast.add({
+      title: 'Success!',
+      color: 'green',
+      icon: 'i-heroicons-check-circle',
+      description: 'Your order have been successfully listed!',
+    })
+
+    // close the side bar
+    hideSidebar()
+
+    console.log(data.data)
+
+    // route to order
+    router.push({
+      name: 'my-client-orders-id',
+      params: {
+        id: data.data.order.id,
+      },
+    })
+  } catch (error) {
+    console.error('Creating order failed:', error)
+  }
 }
 </script>

@@ -7,7 +7,7 @@
       <div class="p-8 lg:px-36">
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-3 -mt-20">
-            <UserSidebar :data="merchant" />
+            <UserSidebar :data="merchant" @order="isOrderSidebarOpen = true" />
           </div>
           <div class="col-span-9">
             <Detail :data="merchant" />
@@ -15,6 +15,13 @@
         </div>
       </div>
     </div>
+
+    <!-- Order Sidebar -->
+    <OrderSidebar
+      :isOpen="isOrderSidebarOpen"
+      :data="selectedMerchant"
+      @hide="isOrderSidebarOpen = false"
+    />
   </div>
 </template>
 
@@ -24,6 +31,7 @@ import Navbar from '~/components/Navbar.vue'
 import Banner from '~/components/facilitators/Banner.vue'
 import UserSidebar from '~/components/facilitators/UserSidebar.vue'
 import Detail from '~/components/facilitators/Detail.vue'
+import OrderSidebar from '~/components/facilitators/OrderSidebar.vue'
 
 // composable
 import { useMerchantService } from '~/composables/useMerchantService'
@@ -38,10 +46,28 @@ const id = ref(route.params.id)
 
 // state
 const isPageLoading = ref(true)
+const isOrderSidebarOpen = ref(false)
 
 // data
 const user = ref(null)
-const merchant = ref(null)
+const merchant = ref({
+  services: [],
+})
+
+const selectedMerchant = computed(() => {
+  // format with service->merchants->users
+
+  const service = { ...merchant.value.services[0] }
+  const dataMerchant = { ...merchant.value }
+
+  // remove services from merchant
+  delete dataMerchant.services
+
+  return {
+    ...service,
+    merchants: [dataMerchant],
+  }
+})
 
 // methods
 const logout = () => {

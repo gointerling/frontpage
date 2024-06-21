@@ -261,7 +261,7 @@
                   v-for="service in serviceList"
                   :key="service.id"
                   :data="service"
-                  @order="openOrderSidebar"
+                  @order="openOrderSidebar(service)"
                 />
               </div>
 
@@ -320,11 +320,8 @@
     <OrderSidebar
       :isOpen="isOrderSidebarOpen"
       :data="selectedMerchant"
-      :languages="languageList"
       @hide="isOrderSidebarOpen = false"
     />
-
-    <!-- <ConfirmationModal :isOpen="isConfirmationModalOpen" :data="modalData" /> -->
   </div>
 </template>
 
@@ -357,6 +354,7 @@ const isOrderSidebarOpen = ref(false)
 
 // data
 const user = ref(null)
+const selectedMerchant = ref(null)
 const languageList = ref([])
 const skillList = ref([])
 const page = ref(1)
@@ -381,7 +379,8 @@ const filter = ref({
   workingHours: '',
 })
 
-const openOrderSidebar = () => {
+const openOrderSidebar = (service) => {
+  selectedMerchant.value = service
   isOrderSidebarOpen.value = true
 }
 

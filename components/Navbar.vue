@@ -86,7 +86,7 @@
                 <button
                   @click="
                     navigateTo({
-                      name: 'notification',
+                      name: 'my-client-orders',
                     })
                   "
                 >
@@ -126,9 +126,8 @@
                 v-show="open"
                 class="absolute right-0 z-10 mt-12 w-58 py-1 bg-white rounded-lg shadow-lg"
               >
-                <nuxt-link
-                  href="#"
-                  class="flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                <button
+                  class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   @click="
                     navigateTo({
                       name: 'profile',
@@ -137,7 +136,7 @@
                 >
                   <nuxt-icon name="user-circle" class="text-2xl"></nuxt-icon>
                   Profile
-                </nuxt-link>
+                </button>
                 <button
                   class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   @click="navigateTo({ name: 'index' })"
@@ -145,14 +144,18 @@
                   <nuxt-icon name="home" class="text-2xl"></nuxt-icon>
                   Home
                 </button>
-                <nuxt-link
-                  href="#"
-                  class="flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                <button
+                  @click="
+                    navigateTo({
+                      name: 'my-client-orders',
+                    })
+                  "
+                  class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
                   <nuxt-icon name="history" class="text-2xl"></nuxt-icon>
 
                   Order History
-                </nuxt-link>
+                </button>
                 <button
                   v-if="user?.is_facilitator"
                   class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
