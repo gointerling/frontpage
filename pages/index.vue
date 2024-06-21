@@ -58,6 +58,7 @@ const logout = () => {
 
 onMounted(async () => {
   // simulate a loading delay
+  console.log('updated apps')
 
   // fetch user data
   if (useCookie('token').value) {
