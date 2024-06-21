@@ -1,0 +1,1 @@
+import{av as r,B as e,aw as t}from"./ZXMXehP5.js";const i=r(n=>{const a=e("token").value.user.merchant_status||null,s=e("token").value.user.is_first_time||null;switch(a){case"pending":return s?t("/my/merchant/onboarding"):t("/my/merchant/status");case"inactive":return t("/my/merchant/status");case"verified":return;default:return}});export{i as default};
