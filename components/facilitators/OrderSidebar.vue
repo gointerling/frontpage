@@ -286,8 +286,15 @@ const setOrder = async () => {
         id: data.data.order.id,
       },
     })
-  } catch (error) {
-    console.error('Creating order failed:', error)
+  } catch (err) {
+    console.error('Creating order failed:', err)
+
+    toast.add({
+      title: 'Uh Oh!',
+      color: 'red',
+      icon: 'i-heroicons-exclamation-triangle',
+      description: err.response.data.message,
+    })
   }
 }
 </script>

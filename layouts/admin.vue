@@ -115,11 +115,11 @@ const navs = [
     icon: 'i-heroicons-building-storefront',
     to: '/admin/merchants',
   },
-  {
-    label: 'Users',
-    icon: 'i-heroicons-users',
-    to: '/admin/users',
-  },
+  // {
+  //   label: 'Users',
+  //   icon: 'i-heroicons-users',
+  //   to: '/admin/users',
+  // },
   {
     label: 'Ads',
     icon: 'i-heroicons-megaphone',

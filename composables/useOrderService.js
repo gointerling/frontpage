@@ -30,6 +30,10 @@ export const useOrderService = () => {
       return $axios.post('/my/orders', data)
     },
 
+    updateMyOrder(id, data) {
+      return $axios.put(`/my/orders/${id}`, data)
+    },
+
     getMyMerchantOrders(params) {
       // default params and remove any null, empty or undefined values
       params = {

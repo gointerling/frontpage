@@ -26,7 +26,7 @@
               by="value"
               option-attribute="label"
               :search-attributes="['label']"
-              @change="filterFacilitators"
+              @change="filterMerchantOrder"
               class="max-w-[180px]"
             />
             <UInput
@@ -47,7 +47,14 @@
             },
           }"
         >
-          <UTable :rows="orders">
+          <UTable
+            :rows="orders"
+            :loading="isTableLoading"
+            :loading-state="{
+              icon: 'i-heroicons-arrow-path-20-solid',
+              label: 'Loading...',
+            }"
+          >
             <template #service-data="{ row }">
               <!-- button wa.me -->
               <div
@@ -211,6 +218,7 @@ definePageMeta({
 })
 
 // state
+const isTableLoading = ref(true)
 const isModalOpen = ref(false)
 const modalData = ref({
   title: '',
@@ -234,45 +242,6 @@ const paginationsData = ref({
   totalItems: 0,
   itemsPerPage: 10,
 })
-
-// Fetch facilitators
-const fetchFacilitators = async () => {
-  try {
-    await getMerchants({
-      page: page.value,
-      per_page: paginationsData.value.itemsPerPage,
-      status:
-        selectedStatus.value.value === 'all' ? '' : selectedStatus.value.value,
-      search: searchQuery.value,
-    }).then((response) => {
-      facilitators.value = response.data.data.data.map((user) => ({
-        user: {
-          id: user.id,
-          fullname: user.fullname,
-          email: user.email,
-        },
-        phone: user.phone,
-        type: user.merchants[0].type,
-        bank: {
-          bank: user.merchants[0].bank,
-          bankAccount: user.merchants[0].bank_account,
-        },
-        CV: user.merchants[0].cv_url,
-        portfolio: JSON.parse(user.merchants[0].portfolios),
-        certificate: JSON.parse(user.merchants[0].certificates),
-        status: user.merchants[0].status,
-      }))
-      paginationsData.value = {
-        page: response.data.data.current_page,
-        totalPage: response.data.data.last_page,
-        totalItems: response.data.data.total,
-        itemsPerPage: response.data.data.per_page,
-      }
-    })
-  } catch (error) {
-    console.error('Error fetching facilitators:', error)
-  }
-}
 
 const fetchMerchantOrders = async () => {
   try {
@@ -316,20 +285,22 @@ const fetchMerchantOrders = async () => {
     })
   } catch (error) {
     console.error('Error fetching merchant orders:', error)
+  } finally {
+    isTableLoading.value = false
   }
 }
 
 // Watcher to fetch data when page changes
-watch(page, fetchFacilitators)
+watch(page, fetchMerchantOrders)
 
 // Filter facilitators based on search query
-const filterFacilitators = () => {
-  fetchFacilitators(page.value, selectedStatus.value.value, searchQuery.value)
+const filterMerchantOrder = () => {
+  filterMerchantOrder(page.value, selectedStatus.value.value, searchQuery.value)
 }
 
 // Search change handler with manual debounce
 const onSearchChange = debounce(() => {
-  filterFacilitators()
+  filterMerchantOrder()
 }, 500)
 
 // debounce function

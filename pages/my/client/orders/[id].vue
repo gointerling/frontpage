@@ -75,7 +75,7 @@
               </div>
             </template>
             <div class="flex gap-3 justify-between items-center px-2">
-              <div class="flex gap-3">
+              <div class="flex gap-3 w-7/12">
                 <div class="flex flex-col gap-1">
                   <UAvatar
                     :alt="order.merchant_user.fullname"
@@ -154,6 +154,154 @@
                 </p>
               </div>
             </div>
+
+            <div class="mt-6">
+              <h6 class="font-semibold mb-2">Discussions</h6>
+
+              <div v-for="comment in comments" :key="comment">
+                <!-- Others -->
+                <div v-if="comment.is_facilitator" class="pb-4">
+                  <UCard
+                    :ui="{
+                      body: {
+                        base: 'w-full',
+                        padding: 'p-4 sm:p-4',
+                      },
+                    }"
+                    class="flex gap-4 items-center w-full"
+                  >
+                    <div class="flex gap-2 items-center">
+                      <UAvatar
+                        :alt="comment.user.fullname"
+                        :src="comment.user.photo"
+                        size="md"
+                        imgClass="object-cover"
+                      />
+                      <div class="flex flex-col items-start gap-1">
+                        <span class="font-semibold">
+                          {{ comment.user.fullname }}
+                        </span>
+                        <UBadge variant="soft" size="xs" color="blue">
+                          <span class="capitalize"> Faciliator </span>
+                        </UBadge>
+                      </div>
+                    </div>
+
+                    <div class="flex text-gray-700 my-3 text-sm">
+                      {{ comment.message }}
+                    </div>
+
+                    <div
+                      class="flex items-center"
+                      :class="
+                        comment.file_url ? 'justify-between' : 'justify-end'
+                      "
+                    >
+                      <UButton
+                        v-if="comment.file_url"
+                        color="green"
+                        variant="soft"
+                        @click="openNewTab(comment.file_url)"
+                      >
+                        <UIcon name="i-heroicons-arrow-down-tray" />
+                        Attached File
+                      </UButton>
+
+                      <span class="text-gray-700 text-sm">
+                        {{ formatDistanceToNow(new Date(comment.time)) }}
+                      </span>
+                    </div>
+                  </UCard>
+                </div>
+
+                <!-- You -->
+                <div v-else class="pb-4">
+                  <UCard
+                    :ui="{
+                      body: {
+                        base: 'w-full',
+                        padding: 'p-4 sm:p-4',
+                      },
+                    }"
+                    class="flex gap-4 items-center w-ful ml-6 bg-blue-50"
+                  >
+                    <div class="flex gap-2 items-center">
+                      <UAvatar
+                        :alt="comment.user.fullname"
+                        :src="comment.user.photo"
+                        size="md"
+                        imgClass="object-cover"
+                      />
+                      <div class="flex flex-col items-start gap-1">
+                        <span class="font-semibold text-primary"> You </span>
+                      </div>
+                    </div>
+
+                    <div class="flex text-gray-700 my-3 text-sm">
+                      {{ comment.message }}
+                    </div>
+
+                    <div
+                      class="flex items-center"
+                      :class="
+                        comment.file_url ? 'justify-between' : 'justify-end'
+                      "
+                    >
+                      <UButton
+                        v-if="comment.file_url"
+                        color="green"
+                        variant="soft"
+                        @click="openNewTab(comment.file_url)"
+                      >
+                        <UIcon name="i-heroicons-arrow-down-tray" />
+                        Attached File
+                      </UButton>
+
+                      <span class="text-gray-700 text-sm">
+                        {{
+                          formatDistanceToNow(new Date(comment.time), {
+                            addSuffix: true,
+                          })
+                        }}
+                      </span>
+                    </div>
+                  </UCard>
+                </div>
+              </div>
+
+              <UCard
+                :ui="{
+                  body: {
+                    base: 'w-full',
+                    padding: 'p-4 sm:p-2',
+                  },
+                }"
+                class="flex gap-4 items-center w-full"
+              >
+                <UTextarea
+                  v-model="userComment.message"
+                  class="w-full mb-2"
+                  placeholder="Add Comment..."
+                  variant="none"
+                />
+                <div class="flex justify-end border-t border-1 pt-2 gap-2">
+                  <FileUpload
+                    :is-display-file="false"
+                    accept="*"
+                    max-size="6291456"
+                    @file-uploaded="setCommentFileUrl"
+                  />
+
+                  <UButton
+                    color="primary"
+                    @click="updateComment(order.id, userComment)"
+                  >
+                    <UIcon name="i-heroicons-paper-airplane" />
+                    Send
+                  </UButton>
+                </div>
+              </UCard>
+            </div>
           </UCard>
         </div>
       </div>
@@ -170,6 +318,7 @@
 // components
 import PageLoader from '~/components/PageLoader.vue'
 import Navbar from '~/components/Navbar.vue'
+import FileUpload from '~/components/FileUpload.vue'
 
 // imports
 import { ref, onMounted } from 'vue'
@@ -195,10 +344,9 @@ const { updateMyProfile, updateMyPassword } = useUserService()
 const { getSkills } = useSkillService()
 const { uploadFile } = useFileService()
 const { getLanguages } = useMasterDataService()
-const { getDetailOrder } = useOrderService()
+const { getDetailOrder, updateMyOrder } = useOrderService()
 
 // navs
-const fileInput = ref(null)
 const navs = [
   {
     key: 'order-history',
@@ -237,6 +385,18 @@ const user = ref({
 })
 
 const orders = ref([])
+const comments = ref([])
+const userComment = ref({
+  user: {
+    fullname: 'You',
+    photo: '/images/avatar.jpg',
+  },
+  message: '',
+  time: new Date().toISOString(),
+  file_url: '',
+  other_link: '',
+  is_facilitator: false,
+})
 
 const filteredNavs = computed(() => {
   if (!user.value) return []
@@ -275,7 +435,7 @@ const resolveOrderStatus = (status) => {
     case 'waitingpaid':
       return {
         color: 'orange',
-        text: 'Waiting to be paid',
+        text: 'Waiting Payment',
       }
 
     case 'failed':
@@ -310,6 +470,32 @@ const openNewTab = (url) => {
 
 const navigateTo = (route) => {
   router.push(route)
+}
+
+const formatDistanceToNow = (date) => {
+  const now = new Date()
+  const past = new Date(date)
+  const diffInSeconds = Math.floor((now - past) / 1000)
+
+  const intervals = {
+    year: 31536000,
+    month: 2592000,
+    week: 604800,
+    day: 86400,
+    hour: 3600,
+    minute: 60,
+    second: 1,
+  }
+
+  for (const interval in intervals) {
+    const value = Math.floor(diffInSeconds / intervals[interval])
+    if (value >= 1) {
+      return value === 1
+        ? `${value} ${interval} ago`
+        : `${value} ${interval}s ago`
+    }
+  }
+  return 'just now'
 }
 
 // logout
@@ -354,9 +540,18 @@ const fetchDetailOrder = async () => {
     const { data } = await getDetailOrder(orderId)
 
     orders.value = [data.data.order]
+
+    console.log(data.data.order.comment_json)
+
+    comments.value = checkIfJSON(data.data.order.comment_json) ?? []
   } catch (error) {
     console.error('Fetching orders failed:', error)
   }
+}
+
+const setCommentFileUrl = (value) => {
+  console.log('File uploaded:', value)
+  userComment.value.file_url = value
 }
 
 const getFirstErrorMessage = (errors) => {
@@ -388,8 +583,70 @@ watch(
 const fetchUser = async () => {
   try {
     user.value = useCookie('token').value.user || null
+
+    userComment.value.user = {
+      fullname: user.value.fullname,
+      photo: user.value.photo,
+    }
   } catch (error) {
     console.error('Fetching user failed:', error)
+  }
+}
+
+const updateComment = async (orderId, payload) => {
+  const comment_payload = comments.value ?? []
+
+  if (!payload.message && payload.file_url) {
+    payload.message = 'Here I attached a file.'
+  }
+
+  if (!payload.message && !payload.file_url) {
+    toast.add({
+      title: 'Failed!',
+      color: 'red',
+      icon: 'i-heroicons-x-circle',
+      description: 'Comment message is required!',
+    })
+    return
+  }
+
+  comment_payload.push(payload)
+
+  try {
+    const { data } = await updateMyOrder(orderId, {
+      comment_json: comment_payload,
+    })
+    // Show toast
+    toast.add({
+      title: 'Success!',
+      color: 'green',
+      icon: 'i-heroicons-check-circle',
+      description: 'Order updated successfully!',
+    })
+    // fetch updated order
+    await fetchDetailOrder()
+
+    // reset comment
+    userComment.value = {
+      user: {
+        fullname: user.value.fullname,
+        photo: user.value.photo,
+      },
+      message: '',
+      time: new Date().toISOString(),
+      file_url: '',
+      other_link: '',
+      is_facilitator: false,
+    }
+  } catch (error) {
+    console.error('Updating order failed:', error)
+    // Show toast
+    toast.add({
+      title: 'Failed!',
+      color: 'red',
+      icon: 'i-heroicons-x-circle',
+      description: 'Failed to update order!',
+    })
   }
 }
 

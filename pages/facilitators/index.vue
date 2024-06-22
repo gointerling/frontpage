@@ -549,6 +549,11 @@ const convertAllFilterToQuery = () => {
     }
   }
 
+  // add search query
+  if (searchQuery.value) {
+    query.search = searchQuery.value
+  }
+
   console.log('query:', query)
   return query
 }
@@ -601,6 +606,11 @@ watch(
 )
 
 onMounted(async () => {
+  // if have seach query in url
+  if (route.query.search) {
+    searchQuery.value = route.query.search
+  }
+
   const query = convertAllFilterToQuery()
   router.push({ query })
 

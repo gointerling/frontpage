@@ -10,7 +10,7 @@
               <nuxt-icon name="sidebar" class="text-white" />
             </UButton>
             <span class="font-semibold">
-              {{ menuTitle || 'Admin Dashboard' }}
+              {{ menuTitle || 'Facilitator Dashboard' }}
             </span>
           </div>
 

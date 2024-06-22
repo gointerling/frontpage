@@ -63,7 +63,7 @@
                   Login
                 </UButton>
               </u-form>
-              <hr class="py-2 mt-4" />
+              <UDivider label="OR" class="py-2 mt-4" />
               <button
                 class="w-full bg-white py-2 rounded-md flex gap-2 justify-center items-center border-2 border-gray-100"
               >
@@ -167,7 +167,7 @@
                     Sign Up
                   </UButton>
                 </u-form>
-                <hr class="py-2 mt-4" />
+                <UDivider label="OR" class="py-2 mt-4" />
                 <button
                   class="w-full bg-white py-2 rounded-md flex gap-2 justify-center items-center border-2 border-gray-100"
                 >

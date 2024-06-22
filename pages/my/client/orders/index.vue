@@ -1,6 +1,8 @@
 <template>
   <div>
-    <div v-show="!isPageLoading" class="w-100 flex flex-col items-center">
+    <!-- Loader -->
+    <PageLoader v-if="isPageLoading" />
+    <div v-else class="w-100 flex flex-col items-center">
       <Navbar :user="user" @logout="logout" class="w-full" />
 
       <div class="flex justify-between items-stretch w-10/12 my-16 gap-16 px-8">
@@ -35,7 +37,7 @@
                 { label: 'Completed', value: 'completed', color: 'blue' },
                 { label: 'In Progress', value: 'paid', color: 'green' },
                 {
-                  label: 'Wait to be Paid',
+                  label: 'Waiting Payment',
                   value: 'waitingpaid',
                   color: 'orange',
                 },
@@ -158,9 +160,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Loader -->
-    <PageLoader v-if="isPageLoading" />
 
     <ConfirmationModal :isOpen="isConfirmationModalOpen" :data="modalData" />
   </div>
@@ -286,7 +285,7 @@ const resolveOrderStatus = (status) => {
     case 'waitingpaid':
       return {
         color: 'orange',
-        text: 'Waiting to be paid',
+        text: 'Waiting Payment',
       }
 
     case 'failed':

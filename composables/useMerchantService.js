@@ -48,6 +48,17 @@ export const useMerchantService = () => {
       return $axios.put(`/my/merchant`, data)
     },
 
+    updateMyMerchantStatus(status) {
+      const data = {
+        status
+      }
+      return $axios.put(`/my/merchant/status`, data)
+    },
+
+    updateMyMerchantFile(data) {
+      return $axios.put(`/my/merchant/file`, data)
+    },
+
     getMyMerchantServices() {
       return $axios.get('/my/service')
     },
@@ -70,6 +81,8 @@ export const useMerchantService = () => {
 
     updateMyService(serviceId, data) {
       return $axios.put(`/my/service/${serviceId}`, data)
-    }
+    },
+    
+    
   }
 }

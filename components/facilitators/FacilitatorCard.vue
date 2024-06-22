@@ -91,7 +91,13 @@
             block
             variant="outline"
             color="orange"
-            class="rounded-full hover:bg-accent hover:text-white"
+            class="rounded-full"
+            :class="
+              !props.data.language_sources
+                ? 'cursor-not-allowed'
+                : 'hover:bg-accent hover:text-white'
+            "
+            :disabled="!props.data.language_sources"
             @click="openOrderSidebar"
           >
             <span>Order Now</span>

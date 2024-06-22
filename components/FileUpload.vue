@@ -10,7 +10,7 @@
 
     <button
       v-if="isUploadProgress"
-      class="px-4 py-2 border border-primary rounded hover:bg-primary flex items-center gap-1 group transition duration-200"
+      class="px-4 py-2 border border-primary rounded-lg hover:bg-primary flex items-center gap-1 group transition duration-200"
     >
       <span class="text-primary group-hover:text-white transition duration-200">
         Uploading...
@@ -21,7 +21,7 @@
       <button
         v-if="!fileName"
         @click="triggerFileInput"
-        class="px-4 py-2 border border-primary rounded hover:bg-primary flex items-center gap-1 group transition duration-200"
+        class="px-4 py-2 border border-primary rounded-lg hover:bg-primary flex items-center gap-1 group transition duration-200"
       >
         <nuxt-icon
           name="file-upload"
@@ -30,14 +30,14 @@
         <span
           class="text-primary group-hover:text-white transition duration-200"
         >
-          Upload File
+          Upload {{ title }}
         </span>
       </button>
 
       <button
         v-if="fileName"
         @click="clearFile"
-        class="px-4 py-2 border border-red-800 rounded hover:bg-red-800 flex items-center gap-1 group transition duration-200"
+        class="px-4 py-2 border border-red-800 rounded-lg hover:bg-red-800 flex items-center gap-1 group transition duration-200"
       >
         <nuxt-icon
           name="circle-x"
@@ -51,7 +51,7 @@
       </button>
     </div>
 
-    <p v-if="fileName" class="mt-2 text-gray-700 text-xs">
+    <p v-if="fileName && isDisplayFile" class="mt-2 text-gray-700 text-xs">
       Selected file: {{ fileName }}
     </p>
     <p v-if="fileError" class="mt-2 text-red-500 text-xs">{{ fileError }}</p>
@@ -76,6 +76,10 @@ const props = defineProps({
   maxSize: {
     type: Number,
     default: 0, // size in bytes, default 0 means no limit
+  },
+  isDisplayFile: {
+    type: Boolean,
+    default: true,
   },
 })
 

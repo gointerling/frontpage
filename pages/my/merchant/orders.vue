@@ -18,15 +18,18 @@
             <UInputMenu
               :options="[
                 { label: 'All', value: 'all', color: 'gray' },
-                { label: 'Verified', value: 'verified', color: 'blue' },
+                { label: 'Completed', value: 'completed', color: 'orange' },
+                { label: 'In Progress', value: 'paid', color: 'blue' },
                 { label: 'Pending', value: 'pending', color: 'orange' },
+                { label: 'In Progress', value: 'waitingpaid', color: 'orange' },
+                { label: 'Failed', value: 'failed', color: 'orange' },
               ]"
               v-model="selectedStatus"
               placeholder="Pilih Status"
               by="value"
               option-attribute="label"
               :search-attributes="['label']"
-              @change="filterFacilitators"
+              @change="filterMerchantOrder"
               class="max-w-[180px]"
             />
             <UInput
@@ -34,7 +37,7 @@
               size="sm"
               color="white"
               :trailing="false"
-              placeholder="Search Facilitator"
+              placeholder="Search Order"
               v-model="searchQuery"
               @input="onSearchChange()"
             />
@@ -47,7 +50,14 @@
             },
           }"
         >
-          <UTable :rows="orders">
+          <UTable
+            :rows="orders"
+            :loading="isTableLoading"
+            :loading-state="{
+              icon: 'i-heroicons-arrow-path-20-solid',
+              label: 'Loading...',
+            }"
+          >
             <template #service-data="{ row }">
               <!-- button wa.me -->
               <div
@@ -150,7 +160,10 @@
                 </UTooltip>
 
                 <UTooltip
-                  v-if="row.actions.status === 'waitingpaid'"
+                  v-if="
+                    row.actions.status === 'waitingpaid' ||
+                    row.actions.status === 'paid'
+                  "
                   text="Upload Works"
                 >
                   <UButton
@@ -227,6 +240,7 @@ definePageMeta({
 })
 
 // state
+const isTableLoading = ref(true)
 const isModalOpen = ref(false)
 const modalData = ref({
   title: '',
@@ -251,45 +265,6 @@ const paginationsData = ref({
   itemsPerPage: 10,
 })
 
-// Fetch facilitators
-const fetchFacilitators = async () => {
-  try {
-    await getMerchants({
-      page: page.value,
-      per_page: paginationsData.value.itemsPerPage,
-      status:
-        selectedStatus.value.value === 'all' ? '' : selectedStatus.value.value,
-      search: searchQuery.value,
-    }).then((response) => {
-      facilitators.value = response.data.data.data.map((user) => ({
-        user: {
-          id: user.id,
-          fullname: user.fullname,
-          email: user.email,
-        },
-        phone: user.phone,
-        type: user.merchants[0].type,
-        bank: {
-          bank: user.merchants[0].bank,
-          bankAccount: user.merchants[0].bank_account,
-        },
-        CV: user.merchants[0].cv_url,
-        portfolio: JSON.parse(user.merchants[0].portfolios),
-        certificate: JSON.parse(user.merchants[0].certificates),
-        status: user.merchants[0].status,
-      }))
-      paginationsData.value = {
-        page: response.data.data.current_page,
-        totalPage: response.data.data.last_page,
-        totalItems: response.data.data.total,
-        itemsPerPage: response.data.data.per_page,
-      }
-    })
-  } catch (error) {
-    console.error('Error fetching facilitators:', error)
-  }
-}
-
 const fetchMerchantOrders = async () => {
   try {
     await getMyMerchantOrders({
@@ -312,6 +287,8 @@ const fetchMerchantOrders = async () => {
           fullname: order.user.fullname,
           email: order.user.email,
         },
+        'order date': formatDate(order.created_at, 'dd MMM yyyy'),
+        estimated: `${order.service.time_estimated} ${order.service.time_estimated_unit}`,
         languages: {
           language_source: order.language_source,
           language_destination: order.language_destination,
@@ -327,20 +304,22 @@ const fetchMerchantOrders = async () => {
     })
   } catch (error) {
     console.error('Error fetching merchant orders:', error)
+  } finally {
+    isTableLoading.value = false
   }
 }
 
 // Watcher to fetch data when page changes
-watch(page, fetchFacilitators)
+watch(page, fetchMerchantOrders)
 
 // Filter facilitators based on search query
-const filterFacilitators = () => {
-  fetchFacilitators(page.value, selectedStatus.value.value, searchQuery.value)
+const filterMerchantOrder = () => {
+  fetchMerchantOrders(page.value, selectedStatus.value.value, searchQuery.value)
 }
 
 // Search change handler with manual debounce
 const onSearchChange = debounce(() => {
-  filterFacilitators()
+  filterMerchantOrder()
 }, 500)
 
 // debounce function
@@ -371,6 +350,14 @@ const formatPrice = (price) => {
     style: 'currency',
     currency: 'IDR',
   }).format(price)
+}
+
+const formatDate = (date) => {
+  return new Date(date).toLocaleDateString('id-ID', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
 }
 
 const copyToClipboard = (text) => {
@@ -410,36 +397,6 @@ const displayConfirmationModal = (
     callback,
   }
   isModalOpen.value = true
-}
-
-const updateUserStatus = async (userId, status) => {
-  await updateMerchantStatus(userId, status)
-    .then(() => {
-      // Close modal
-      isModalOpen.value = false
-
-      // Show toast
-      toast.add({
-        title: 'Success!',
-        color: 'green',
-        icon: 'i-heroicons-check-circle',
-        description: 'User status updated successfully!',
-      })
-
-      // Fetch facilitators
-      fetchFacilitators()
-    })
-    .catch((error) => {
-      console.error('Error updating user status:', error)
-
-      // Show toast
-      toast.add({
-        title: 'Uh Oh!',
-        color: 'red',
-        icon: 'i-heroicons-x-circle',
-        description: 'Error updating user status!',
-      })
-    })
 }
 
 const resolveOrderStatus = (status) => {
