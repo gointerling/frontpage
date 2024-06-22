@@ -1,6 +1,8 @@
 <template>
   <div>
-    <div v-show="!isPageLoading" class="w-100 flex flex-col items-center">
+    <!-- Loader -->
+    <PageLoader v-if="isPageLoading" />
+    <div v-else class="w-100 flex flex-col items-center">
       <Navbar :user="user" @logout="logout" class="w-full" />
 
       <div class="flex justify-between items-stretch w-10/12 my-16 gap-16 px-8">
@@ -386,7 +388,7 @@
               </div>
               <div class="flex justify-between items-center">
                 <span class="font-semibold">Working Estimated</span>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1 w-7/12">
                   <u-input
                     type="number"
                     v-model="service.time_estimated"
@@ -464,12 +466,11 @@
               >
                 List of Certificates
               </label>
-              <div class="flex gap-2 flex-wrap">
+              <div class="flex gap-3 flex-wrap">
                 <UCard
                   v-for="(certificate_url, index) in merchant.certificates"
                   :key="index"
-                  @click="openNewTab(certificate_url)"
-                  class="cursor-pointer"
+                  class="relative cursor-pointer hover:bg-gray-100 group"
                 >
                   <div class="flex gap-2 items-center">
                     <nuxt-icon name="file" class="text-primary" />
@@ -477,20 +478,45 @@
                       Certificate {{ index + 1 }}
                     </span>
                   </div>
+                  <!-- Remove button -->
+                  <button
+                    @click.stop="removeCertificate(index)"
+                    class="absolute w-full h-full top-0 left-0 bg-red-500 text-white px-2 py-1 rounded hidden group-hover:block"
+                  >
+                    <div class="flex justify-center items-center gap-2">
+                      <nuxt-icon name="circle-x" class="text-white" />
+                      <span>Remove</span>
+                    </div>
+                  </button>
+                </UCard>
+
+                <UCard
+                  v-for="(certificate_url, index) in addCertificates"
+                  :key="index"
+                  @click="openNewTab(certificate_url)"
+                  class="cursor-pointer hover:bg-gray-100"
+                >
+                  <div class="flex gap-2 items-center">
+                    <nuxt-icon name="file" class="text-primary" />
+                    <span class="text-primary">
+                      Certificate {{ merchant.certificates.length + index + 1 }}
+                    </span>
+                  </div>
                 </UCard>
               </div>
 
               <u-form-group
                 name="certificates"
-                label="Upload Certificates "
+                label="Add Certificate"
                 class="mt-4 mb-2"
               >
                 <!-- max size 6MB -->
                 <MultipleFileUpload
-                  title="Certificate"
+                  title="Add Certificate"
                   accept="application/pdf"
                   max-size="6291456"
                   @file-uploaded="setCertificate"
+                  class="mt-1"
                 />
               </u-form-group>
 
@@ -506,9 +532,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Loader -->
-    <PageLoader v-if="isPageLoading" />
 
     <ConfirmationModal :isOpen="isConfirmationModalOpen" :data="modalData" />
   </div>
@@ -537,6 +560,7 @@ const {
   updateMyMerchant,
   getMyMerchantServices,
   updateMyService,
+  updateMyMerchantFile,
 } = useMerchantService()
 const { updateMyProfile, updateMyPassword } = useUserService()
 const { getSkills } = useSkillService()
@@ -656,6 +680,7 @@ const languageList = ref([])
 const mainSkillQuery = ref('')
 const addtionalSkillQuery = ref('')
 const languageQuery = ref('')
+const addCertificates = ref([])
 
 // computed
 const mainSkillsList = computed(() => {
@@ -732,6 +757,25 @@ const checkIfJSON = (data) => {
   } catch (error) {
     return data
   }
+}
+
+const setCertificate = (files) => {
+  addCertificates.value = files
+}
+
+const removeCertificate = (index) => {
+  // show confirmation modal
+  modalData.value = {
+    title: 'Remove Certificate',
+    content: 'Are you sure you want to remove this certificate?',
+    confirmText: 'Yes',
+    cancelText: 'No',
+    callback: () => {
+      merchant.value.certificates.splice(index, 1)
+    },
+  }
+
+  isConfirmationModalOpen.value = true
 }
 
 const changeService = (callback) => {
@@ -1055,6 +1099,38 @@ const updateService = async () => {
     })
   } catch (error) {
     console.error('Update service failed:', error)
+
+    // show error message
+    toast.add({
+      title: 'Uh Oh!',
+      color: 'red',
+      icon: 'i-heroicons-exclamation-triangle',
+      description: getFirstErrorMessage(error.response.data.error),
+    })
+  }
+}
+
+// update certificate
+const updateCertificate = async () => {
+  try {
+    const mergeCertificates = [
+      ...merchant.value.certificates,
+      ...addCertificates.value,
+    ]
+
+    const { data } = await updateMyMerchantFile({
+      certificates: mergeCertificates,
+    })
+
+    // show success message
+    toast.add({
+      title: 'Success!',
+      color: 'green',
+      icon: 'i-heroicons-check-circle',
+      description: data.message,
+    })
+  } catch (error) {
+    console.error('Update merchant failed:', error)
 
     // show error message
     toast.add({

@@ -55,7 +55,14 @@
             },
           }"
         >
-          <UTable :rows="facilitators">
+          <UTable
+            :rows="facilitators"
+            :loading="isTableLoading"
+            :loading-state="{
+              icon: 'i-heroicons-arrow-path-20-solid',
+              label: 'Loading...',
+            }"
+          >
             <template #phone-data="{ row }">
               <!-- button wa.me -->
               <UButton
@@ -283,6 +290,7 @@ definePageMeta({
 })
 
 // state
+const isTableLoading = ref(true)
 const isModalOpen = ref(false)
 const modalData = ref({
   title: '',
@@ -366,6 +374,8 @@ const fetchFacilitators = async () => {
     })
   } catch (error) {
     console.error('Error fetching facilitators:', error)
+  } finally {
+    isTableLoading.value = false
   }
 }
 

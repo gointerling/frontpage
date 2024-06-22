@@ -30,6 +30,10 @@ export const useOrderService = () => {
       return $axios.post('/my/orders', data)
     },
 
+    updateMyOrder(id, data) {
+      return $axios.put(`/my/orders/${id}`, data)
+    },
+
     getMyMerchantOrders(params) {
       // default params and remove any null, empty or undefined values
       params = {
@@ -64,13 +68,21 @@ export const useOrderService = () => {
       return $axios.get('/orders', { params })
     },
 
+
+    // Merhcant and Admin
     updateClientOrderStatus(id, data) {
       const payload = {
         order_status: data
       }
       
       return $axios.put(`/orders/${id}/client-status`, payload)
+    },
+
+    updateMerchantOrder(id, data) {
+      return $axios.put(`/orders/${id}`, payload)
     }
+
+
 
     
     

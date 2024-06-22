@@ -61,12 +61,13 @@
             </li>
           </ul>
 
-          <button
-            class="px-4 py-2 mt-4 mb-2 text-sm font-medium text-white bg-accent rounded-full hover:bg-accent-700 focus:outline-none focus:bg-accent-500 transition duration-150 ease-in-out"
+          <UButton
+            :disabled="!data.services[0].language_sources"
+            class="px-4 py-2 mt-4 mb-2 text-sm font-medium text-white bg-accent rounded-full hover:bg-accent-700 focus:outline-none focus:bg-accent-500 transition duration-150 ease-in-out flex justify-center items-center"
             @click="emitOrder"
           >
             Order Now
-          </button>
+          </UButton>
         </div>
       </template>
     </UTabs>

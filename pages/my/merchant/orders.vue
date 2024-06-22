@@ -1,11 +1,11 @@
 <template>
   <div>
     <NuxtLayout name="merchant">
-      <div class="w-full pt-0 p-6 flex flex-col gap-2">
+      <div class="pt-0 p-6 flex flex-col gap-2">
         <UCard
           :ui="{
             body: {
-              base: 'flex justify-between items-center',
+              base: 'flex justify-between items-center w-full',
               background: '',
               padding: 'p-2 sm:p-4',
             },
@@ -18,15 +18,18 @@
             <UInputMenu
               :options="[
                 { label: 'All', value: 'all', color: 'gray' },
-                { label: 'Verified', value: 'verified', color: 'blue' },
+                { label: 'Completed', value: 'completed', color: 'orange' },
+                { label: 'In Progress', value: 'paid', color: 'blue' },
                 { label: 'Pending', value: 'pending', color: 'orange' },
+                { label: 'In Progress', value: 'waitingpaid', color: 'orange' },
+                { label: 'Failed', value: 'failed', color: 'orange' },
               ]"
               v-model="selectedStatus"
               placeholder="Pilih Status"
               by="value"
               option-attribute="label"
               :search-attributes="['label']"
-              @change="filterFacilitators"
+              @change="filterMerchantOrder"
               class="max-w-[180px]"
             />
             <UInput
@@ -34,7 +37,7 @@
               size="sm"
               color="white"
               :trailing="false"
-              placeholder="Search Facilitator"
+              placeholder="Search Order"
               v-model="searchQuery"
               @input="onSearchChange()"
             />
@@ -47,7 +50,18 @@
             },
           }"
         >
-          <UTable :rows="orders">
+          <UTable
+            :rows="orders"
+            :loading="isTableLoading"
+            :loading-state="{
+              icon: 'i-heroicons-arrow-path-20-solid',
+              label: 'Loading...',
+            }"
+            :ui="{
+              wrapper: 'max-w-full relative overflow-x-auto',
+              base: ' table-fixed overflow-x-auto',
+            }"
+          >
             <template #service-data="{ row }">
               <!-- button wa.me -->
               <div
@@ -97,6 +111,18 @@
               </div>
             </template>
 
+            <template #comments-data="{ row }">
+              <UButton
+                size="sm"
+                color="blue"
+                variant="soft"
+                :trailing="false"
+                @click="displayCommentModal(row)"
+              >
+                {{ row.comments.total }} Comments
+              </UButton>
+            </template>
+
             <template #status-data="{ row }">
               <UBadge
                 size="xs"
@@ -138,11 +164,11 @@
                     @click="
                       displayConfirmationModal(
                         'Hang On',
-                        'Are you sure you want to deactivate this facilitator?',
-                        'Deactivate',
+                        'Are you sure you want to accept this order?',
+                        'Accept Order',
                         'Cancel',
                         () => {
-                          updateUserStatus(row.user.id, 'inactive')
+                          updateUserStatus(row.user.id, 'waitingpaid')
                         }
                       )
                     "
@@ -150,7 +176,10 @@
                 </UTooltip>
 
                 <UTooltip
-                  v-if="row.actions.status === 'waitingpaid'"
+                  v-if="
+                    row.actions.status === 'waitingpaid' ||
+                    row.actions.status === 'paid'
+                  "
                   text="Upload Works"
                 >
                   <UButton
@@ -160,17 +189,7 @@
                     variant="outline"
                     :ui="{ rounded: 'rounded-full' }"
                     square
-                    @click="
-                      displayConfirmationModal(
-                        'Hang On',
-                        'Are you sure you want to deactivate this facilitator?',
-                        'Deactivate',
-                        'Cancel',
-                        () => {
-                          updateUserStatus(row.user.id, 'inactive')
-                        }
-                      )
-                    "
+                    @click="displayUploadFileModal(row.actions.id)"
                   />
                 </UTooltip>
 
@@ -209,9 +228,18 @@
     </NuxtLayout>
 
     <ConfirmationModal :isOpen="isModalOpen" :data="modalData" />
+    <CommentSidebar
+      :isOpen="isCommentModalOpen"
+      :data="selectedOrder"
+      @hide="hideCommentModal"
+      @refresh="handleRefresh"
+    />
   </div>
 </template>
 <script setup>
+import ConfirmationModal from '~/components/ConfirmationModal.vue'
+import CommentSidebar from '~/components/facilitators/CommentSidebar.vue'
+
 import { ref, computed, onMounted } from 'vue'
 import { useMerchantService } from '~/composables/useMerchantService'
 import { useOrderService } from '~/composables/useOrderService'
@@ -227,7 +255,10 @@ definePageMeta({
 })
 
 // state
+const isTableLoading = ref(true)
 const isModalOpen = ref(false)
+const isCommentModalOpen = ref(false)
+const isUploadModalOpen = ref(false)
 const modalData = ref({
   title: '',
   message: '',
@@ -242,6 +273,7 @@ const selectedStatus = ref({
   label: 'All',
   value: 'all',
 })
+const selectedOrder = ref(null)
 const searchQuery = ref('')
 const page = ref(1)
 const paginationsData = ref({
@@ -250,45 +282,6 @@ const paginationsData = ref({
   totalItems: 0,
   itemsPerPage: 10,
 })
-
-// Fetch facilitators
-const fetchFacilitators = async () => {
-  try {
-    await getMerchants({
-      page: page.value,
-      per_page: paginationsData.value.itemsPerPage,
-      status:
-        selectedStatus.value.value === 'all' ? '' : selectedStatus.value.value,
-      search: searchQuery.value,
-    }).then((response) => {
-      facilitators.value = response.data.data.data.map((user) => ({
-        user: {
-          id: user.id,
-          fullname: user.fullname,
-          email: user.email,
-        },
-        phone: user.phone,
-        type: user.merchants[0].type,
-        bank: {
-          bank: user.merchants[0].bank,
-          bankAccount: user.merchants[0].bank_account,
-        },
-        CV: user.merchants[0].cv_url,
-        portfolio: JSON.parse(user.merchants[0].portfolios),
-        certificate: JSON.parse(user.merchants[0].certificates),
-        status: user.merchants[0].status,
-      }))
-      paginationsData.value = {
-        page: response.data.data.current_page,
-        totalPage: response.data.data.last_page,
-        totalItems: response.data.data.total,
-        itemsPerPage: response.data.data.per_page,
-      }
-    })
-  } catch (error) {
-    console.error('Error fetching facilitators:', error)
-  }
-}
 
 const fetchMerchantOrders = async () => {
   try {
@@ -312,11 +305,19 @@ const fetchMerchantOrders = async () => {
           fullname: order.user.fullname,
           email: order.user.email,
         },
+        'order date': formatDate(order.created_at, 'dd MMM yyyy'),
+        estimated: `${order.service.time_estimated} ${order.service.time_estimated_unit}`,
         languages: {
           language_source: order.language_source,
           language_destination: order.language_destination,
         },
         price: order.price,
+        comments: {
+          total: checkIfJSON(order.comment_json)
+            ? order.comment_json.length
+            : 0,
+          data: order.comment_json || [],
+        },
         status: order.order_status,
         file: order.user_file_url,
         actions: {
@@ -327,20 +328,22 @@ const fetchMerchantOrders = async () => {
     })
   } catch (error) {
     console.error('Error fetching merchant orders:', error)
+  } finally {
+    isTableLoading.value = false
   }
 }
 
 // Watcher to fetch data when page changes
-watch(page, fetchFacilitators)
+watch(page, fetchMerchantOrders)
 
 // Filter facilitators based on search query
-const filterFacilitators = () => {
-  fetchFacilitators(page.value, selectedStatus.value.value, searchQuery.value)
+const filterMerchantOrder = () => {
+  fetchMerchantOrders(page.value, selectedStatus.value.value, searchQuery.value)
 }
 
 // Search change handler with manual debounce
 const onSearchChange = debounce(() => {
-  filterFacilitators()
+  filterMerchantOrder()
 }, 500)
 
 // debounce function
@@ -371,6 +374,34 @@ const formatPrice = (price) => {
     style: 'currency',
     currency: 'IDR',
   }).format(price)
+}
+
+const formatDate = (date) => {
+  return new Date(date).toLocaleDateString('id-ID', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
+const checkIfJSON = (data) => {
+  try {
+    return JSON.parse(data)
+  } catch (error) {
+    return data
+  }
+}
+
+const handleRefresh = (updatedData) => {
+  selectedOrder.value = updatedData
+  console.log('Refreshed data:', selectedOrder)
+}
+
+const hideCommentModal = () => {
+  isCommentModalOpen.value = false
+
+  // Refresh data
+  fetchMerchantOrders()
 }
 
 const copyToClipboard = (text) => {
@@ -412,34 +443,11 @@ const displayConfirmationModal = (
   isModalOpen.value = true
 }
 
-const updateUserStatus = async (userId, status) => {
-  await updateMerchantStatus(userId, status)
-    .then(() => {
-      // Close modal
-      isModalOpen.value = false
+const displayCommentModal = (data) => {
+  selectedOrder.value = data
+  console.log('selectedOrder', selectedOrder.value)
 
-      // Show toast
-      toast.add({
-        title: 'Success!',
-        color: 'green',
-        icon: 'i-heroicons-check-circle',
-        description: 'User status updated successfully!',
-      })
-
-      // Fetch facilitators
-      fetchFacilitators()
-    })
-    .catch((error) => {
-      console.error('Error updating user status:', error)
-
-      // Show toast
-      toast.add({
-        title: 'Uh Oh!',
-        color: 'red',
-        icon: 'i-heroicons-x-circle',
-        description: 'Error updating user status!',
-      })
-    })
+  isCommentModalOpen.value = true
 }
 
 const resolveOrderStatus = (status) => {

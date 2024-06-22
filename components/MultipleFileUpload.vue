@@ -11,7 +11,7 @@
 
     <button
       v-if="isUploadProgress"
-      class="px-4 py-2 border border-primary rounded hover:bg-primary flex items-center gap-1 group transition duration-200"
+      class="px-4 py-2 border border-primary rounded-lg hover:bg-primary flex items-center gap-1 group transition duration-200"
     >
       <span class="text-primary group-hover:text-white transition duration-200">
         Uploading...
@@ -22,7 +22,7 @@
       <button
         v-if="fileNames.length === 0"
         @click="triggerFileInput"
-        class="px-4 py-2 border border-primary rounded hover:bg-primary flex items-center gap-1 group transition duration-200"
+        class="px-4 py-2 border border-primary rounded-lg hover:bg-primary flex items-center gap-1 group transition duration-200"
       >
         <nuxt-icon
           name="file-add"
@@ -43,7 +43,7 @@
         >
           <button
             @click="clearFile(index)"
-            class="relative group flex items-center gap-1 px-4 py-2 border border-primary bg-slate-100 rounded transition duration-200 hover:bg-red-500"
+            class="relative group flex items-center gap-1 px-4 py-2 border border-primary bg-slate-100 rounded-lg transition duration-200 hover:bg-red-500"
           >
             <div
               class="absolute top-2 right-2 p-1 text-white bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition duration-200"
@@ -70,7 +70,7 @@
 
         <button
           @click="triggerFileInput"
-          class="px-4 py-2 border border-primary rounded hover:bg-primary flex items-center gap-1 group transition duration-200"
+          class="px-4 py-2 border border-primary rounded-lg hover:bg-primary flex items-center gap-1 group transition duration-200"
         >
           <nuxt-icon
             name="file-add"

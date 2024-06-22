@@ -117,7 +117,7 @@
                   size="sm"
                   imgClass="object-cover"
                 />
-                <span class="mx-2">{{ user?.fullname }}</span>
+                <span class="mx-2 capitalize">{{ user?.fullname }}</span>
                 <nuxt-icon name="chevron-simple-down" class="mx-4" filled />
               </button>
 

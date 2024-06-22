@@ -2,7 +2,10 @@
   <div class="p-4 w-100">
     <div>
       <h6 class="text-primary font-bold text-xl">Skills</h6>
-      <div class="flex flex-wrap gap-3 py-4">
+      <div
+        v-if="checkIfJSON(data.users[0].main_skills)"
+        class="flex flex-wrap gap-3 py-4"
+      >
         <UBadge
           :label="skill.name"
           v-for="skill in checkIfJSON(data.users[0].main_skills)"
@@ -10,12 +13,16 @@
           class="bg-[#E4F1F7] text-primary text-md shadow-md rounded-lg"
         />
       </div>
+
+      <div v-else>
+        <p class="text-md text-primary py-4">No Data</p>
+      </div>
     </div>
 
     <h6 class="text-primary font-bold text-xl">About</h6>
     <div class="flex gap-2 py-4">
       <p class="text-primary text-md">
-        {{ data.users[0].personal_description }}
+        {{ data.users[0].personal_description ?? 'No Data' }}
       </p>
     </div>
 
