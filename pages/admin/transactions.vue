@@ -125,6 +125,21 @@
               </div>
             </template>
 
+            <template #payment-data="{ row }">
+              <UButton
+                v-if="row.payment"
+                size="sm"
+                color="primary"
+                :trailing="false"
+                @click="openLink(row.payment)"
+              >
+                <nuxt-icon name="file" class="text-white" />
+                Proof of Payment
+              </UButton>
+
+              <span v-else class="text-gray-300"> No Payment Uploaded </span>
+            </template>
+
             <template #status-data="{ row }">
               <UBadge
                 size="xs"
@@ -276,6 +291,7 @@ const fetchMerchantOrders = async () => {
           language_destination: order.language_destination,
         },
         price: order.price,
+        payment: order.payment_file_url,
         status: order.order_status,
         actions: {
           id: order.id,

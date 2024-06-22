@@ -132,20 +132,20 @@
 
               <div
                 v-if="order.order_status === 'waitingpaid'"
-                class="flex flex-col text-right"
+                class="flex flex-col text-right items-end"
               >
-                <span class="font-thin text-primary text-md">
+                <span class="font-thin text-primary text-sm">
                   Amount to be transfer :
                 </span>
                 <h6 class="font-semibold text-primary text-lg my-1">
                   {{ formatPrice(order.price) }}
                 </h6>
 
-                <span class="font-thin text-primary text-md">
+                <span class="font-thin text-primary text-sm">
                   Gointering Account
                 </span>
                 <h6
-                  class="font-bold text-primary text-md text-xl py-1 flex gap-2 items-center"
+                  class="font-bold text-primary text-md text-xl py-2 flex gap-2 items-center"
                 >
                   {{ order.merchant.bank_account }} (BCA)
                   <UButton
@@ -159,7 +159,28 @@
                   </UButton>
                 </h6>
 
-                <img src="" alt="" />
+                <span class="font-thin text-primary text-sm mb-2">
+                  {{ order.payment_file_url ? 'Re' : '' }} Upload Proof of
+                  Payment
+                </span>
+                <FileUpload
+                  v-if="isReupload || !order.payment_file_url"
+                  title="Proof of Payment"
+                  accept="*"
+                  :center="true"
+                  max-size="6291456"
+                  @file-uploaded="updateProofOfPayment"
+                />
+
+                <UButton
+                  v-if="!isReupload && order.payment_file_url"
+                  color="primary"
+                  class="text-white"
+                  @click="isReupload = true"
+                >
+                  <UIcon name="i-heroicons-arrow-path" />
+                  Reupload
+                </UButton>
               </div>
 
               <div
@@ -183,7 +204,13 @@
               </div>
             </div>
 
-            <div class="mt-6">
+            <div
+              class="mt-6"
+              v-if="
+                order.order_status === 'paid' ||
+                order.order_status === 'completed'
+              "
+            >
               <h6 class="font-semibold mb-2">Discussions</h6>
 
               <UButton
@@ -408,6 +435,7 @@ const modalData = ref({
 // state
 const isPageLoading = ref(true)
 const isConfirmationModalOpen = ref(false)
+const isReupload = ref(false)
 const selectedTab = ref('order-history')
 
 // data
@@ -483,7 +511,7 @@ const resolveOrderStatus = (status) => {
     case 'waitingpaid':
       return {
         color: 'orange',
-        text: 'Waiting Payment',
+        text: 'Waiting Payment & Verification',
       }
 
     case 'failed':
@@ -588,8 +616,6 @@ const fetchDetailOrder = async () => {
     const { data } = await getDetailOrder(orderId)
 
     orders.value = [data.data.order]
-
-    console.log(data.data.order.comment_json)
 
     comments.value = checkIfJSON(data.data.order.comment_json) ?? []
   } catch (error) {
@@ -698,13 +724,40 @@ const updateComment = async (orderId, payload) => {
   }
 }
 
+const updateProofOfPayment = async (value) => {
+  const orderId = route.params.id
+
+  try {
+    const { data } = await updateMyOrder(orderId, {
+      payment_file_url: value,
+    })
+    // Show toast
+    toast.add({
+      title: 'Success!',
+      color: 'green',
+      icon: 'i-heroicons-check-circle',
+      description: 'Order updated successfully!',
+    })
+    // fetch updated order
+    await fetchDetailOrder()
+  } catch (error) {
+    console.error('Updating order failed:', error)
+    // Show toast
+    toast.add({
+      title: 'Failed!',
+      color: 'red',
+      icon: 'i-heroicons-x-circle',
+      description: 'Failed to update order!',
+    })
+  }
+}
+
 onMounted(async () => {
   // fetch user data
   if (useCookie('token').value) {
     await fetchUser()
     await fetchDetailOrder()
   }
-
   isPageLoading.value = false
 
   window.scrollTo({
