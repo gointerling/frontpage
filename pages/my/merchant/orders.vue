@@ -150,6 +150,7 @@
 
             <template #actions-data="{ row }">
               <div class="flex gap-1">
+                <!-- Accept Order -->
                 <UTooltip
                   v-if="row.actions.status === 'pending'"
                   text="Accept Order"
@@ -175,6 +176,7 @@
                   />
                 </UTooltip>
 
+                <!-- Upload Work -->
                 <UTooltip
                   v-if="
                     row.actions.status === 'waitingpaid' ||
@@ -189,29 +191,19 @@
                     variant="outline"
                     :ui="{ rounded: 'rounded-full' }"
                     square
-                    @click="displayUploadFileModal(row.actions.id)"
+                    @click="displayUploadFileModal(row)"
                   />
                 </UTooltip>
 
-                <UTooltip text="Verify" v-else>
+                <UTooltip v-else text="Check Result">
                   <UButton
-                    icon="i-heroicons-check"
+                    icon="i-heroicons-arrow-top-right-on-square"
                     size="2xs"
-                    color="emerald"
+                    color="blue"
                     variant="outline"
                     :ui="{ rounded: 'rounded-full' }"
                     square
-                    @click="
-                      displayConfirmationModal(
-                        'Verify Facilitator',
-                        'Are you sure you want to verify this facilitator?',
-                        'Verify',
-                        'Cancel',
-                        () => {
-                          updateUserStatus(row.user.id, 'verified')
-                        }
-                      )
-                    "
+                    @click="displayUploadFileModal(row)"
                   />
                 </UTooltip>
               </div>
@@ -231,7 +223,14 @@
     <CommentSidebar
       :isOpen="isCommentModalOpen"
       :data="selectedOrder"
-      @hide="hideCommentModal"
+      @hide="hideModal"
+      @refresh="handleRefresh"
+    />
+
+    <UploadResultSidebar
+      :isOpen="isUploadFileModalOpen"
+      :data="selectedOrder"
+      @hide="hideModal"
       @refresh="handleRefresh"
     />
   </div>
@@ -239,6 +238,7 @@
 <script setup>
 import ConfirmationModal from '~/components/ConfirmationModal.vue'
 import CommentSidebar from '~/components/facilitators/CommentSidebar.vue'
+import UploadResultSidebar from '~/components/facilitators/UploadResultSidebar.vue'
 
 import { ref, computed, onMounted } from 'vue'
 import { useMerchantService } from '~/composables/useMerchantService'
@@ -258,7 +258,7 @@ definePageMeta({
 const isTableLoading = ref(true)
 const isModalOpen = ref(false)
 const isCommentModalOpen = ref(false)
-const isUploadModalOpen = ref(false)
+const isUploadFileModalOpen = ref(false)
 const modalData = ref({
   title: '',
   message: '',
@@ -323,6 +323,8 @@ const fetchMerchantOrders = async () => {
         actions: {
           id: order.id,
           status: order.order_status,
+          result_file_url: order.result_file_url,
+          meet_url: order.meet_url,
         },
       }))
     })
@@ -397,8 +399,9 @@ const handleRefresh = (updatedData) => {
   console.log('Refreshed data:', selectedOrder)
 }
 
-const hideCommentModal = () => {
+const hideModal = () => {
   isCommentModalOpen.value = false
+  isUploadFileModalOpen.value = false
 
   // Refresh data
   fetchMerchantOrders()
@@ -445,9 +448,14 @@ const displayConfirmationModal = (
 
 const displayCommentModal = (data) => {
   selectedOrder.value = data
-  console.log('selectedOrder', selectedOrder.value)
 
   isCommentModalOpen.value = true
+}
+
+const displayUploadFileModal = (data) => {
+  selectedOrder.value = data
+
+  isUploadFileModalOpen.value = true
 }
 
 const resolveOrderStatus = (status) => {

@@ -69,7 +69,7 @@ export const useOrderService = () => {
     },
 
 
-    // Merhcant and Admin
+    // Merchant and Admin
     updateClientOrderStatus(id, data) {
       const payload = {
         order_status: data
@@ -78,7 +78,7 @@ export const useOrderService = () => {
       return $axios.put(`/orders/${id}/client-status`, payload)
     },
 
-    updateMerchantOrder(id, data) {
+    updateMerchantOrder(id, payload) {
       return $axios.put(`/orders/${id}`, payload)
     }
 
