@@ -68,13 +68,21 @@ export const useOrderService = () => {
       return $axios.get('/orders', { params })
     },
 
+
+    // Merhcant and Admin
     updateClientOrderStatus(id, data) {
       const payload = {
         order_status: data
       }
       
       return $axios.put(`/orders/${id}/client-status`, payload)
+    },
+
+    updateMerchantOrder(id, data) {
+      return $axios.put(`/orders/${id}`, payload)
     }
+
+
 
     
     

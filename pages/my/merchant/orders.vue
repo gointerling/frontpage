@@ -1,11 +1,11 @@
 <template>
   <div>
     <NuxtLayout name="merchant">
-      <div class="w-full pt-0 p-6 flex flex-col gap-2">
+      <div class="pt-0 p-6 flex flex-col gap-2">
         <UCard
           :ui="{
             body: {
-              base: 'flex justify-between items-center',
+              base: 'flex justify-between items-center w-full',
               background: '',
               padding: 'p-2 sm:p-4',
             },
@@ -57,6 +57,10 @@
               icon: 'i-heroicons-arrow-path-20-solid',
               label: 'Loading...',
             }"
+            :ui="{
+              wrapper: 'max-w-full relative overflow-x-auto',
+              base: ' table-fixed overflow-x-auto',
+            }"
           >
             <template #service-data="{ row }">
               <!-- button wa.me -->
@@ -107,6 +111,18 @@
               </div>
             </template>
 
+            <template #comments-data="{ row }">
+              <UButton
+                size="sm"
+                color="blue"
+                variant="soft"
+                :trailing="false"
+                @click="displayCommentModal(row)"
+              >
+                {{ row.comments.total }} Comments
+              </UButton>
+            </template>
+
             <template #status-data="{ row }">
               <UBadge
                 size="xs"
@@ -148,11 +164,11 @@
                     @click="
                       displayConfirmationModal(
                         'Hang On',
-                        'Are you sure you want to deactivate this facilitator?',
-                        'Deactivate',
+                        'Are you sure you want to accept this order?',
+                        'Accept Order',
                         'Cancel',
                         () => {
-                          updateUserStatus(row.user.id, 'inactive')
+                          updateUserStatus(row.user.id, 'waitingpaid')
                         }
                       )
                     "
@@ -173,17 +189,7 @@
                     variant="outline"
                     :ui="{ rounded: 'rounded-full' }"
                     square
-                    @click="
-                      displayConfirmationModal(
-                        'Hang On',
-                        'Are you sure you want to deactivate this facilitator?',
-                        'Deactivate',
-                        'Cancel',
-                        () => {
-                          updateUserStatus(row.user.id, 'inactive')
-                        }
-                      )
-                    "
+                    @click="displayUploadFileModal(row.actions.id)"
                   />
                 </UTooltip>
 
@@ -222,9 +228,18 @@
     </NuxtLayout>
 
     <ConfirmationModal :isOpen="isModalOpen" :data="modalData" />
+    <CommentSidebar
+      :isOpen="isCommentModalOpen"
+      :data="selectedOrder"
+      @hide="hideCommentModal"
+      @refresh="handleRefresh"
+    />
   </div>
 </template>
 <script setup>
+import ConfirmationModal from '~/components/ConfirmationModal.vue'
+import CommentSidebar from '~/components/facilitators/CommentSidebar.vue'
+
 import { ref, computed, onMounted } from 'vue'
 import { useMerchantService } from '~/composables/useMerchantService'
 import { useOrderService } from '~/composables/useOrderService'
@@ -242,6 +257,8 @@ definePageMeta({
 // state
 const isTableLoading = ref(true)
 const isModalOpen = ref(false)
+const isCommentModalOpen = ref(false)
+const isUploadModalOpen = ref(false)
 const modalData = ref({
   title: '',
   message: '',
@@ -256,6 +273,7 @@ const selectedStatus = ref({
   label: 'All',
   value: 'all',
 })
+const selectedOrder = ref(null)
 const searchQuery = ref('')
 const page = ref(1)
 const paginationsData = ref({
@@ -294,6 +312,12 @@ const fetchMerchantOrders = async () => {
           language_destination: order.language_destination,
         },
         price: order.price,
+        comments: {
+          total: checkIfJSON(order.comment_json)
+            ? order.comment_json.length
+            : 0,
+          data: order.comment_json || [],
+        },
         status: order.order_status,
         file: order.user_file_url,
         actions: {
@@ -360,6 +384,26 @@ const formatDate = (date) => {
   })
 }
 
+const checkIfJSON = (data) => {
+  try {
+    return JSON.parse(data)
+  } catch (error) {
+    return data
+  }
+}
+
+const handleRefresh = (updatedData) => {
+  selectedOrder.value = updatedData
+  console.log('Refreshed data:', selectedOrder)
+}
+
+const hideCommentModal = () => {
+  isCommentModalOpen.value = false
+
+  // Refresh data
+  fetchMerchantOrders()
+}
+
 const copyToClipboard = (text) => {
   navigator.clipboard.writeText(text)
 
@@ -397,6 +441,13 @@ const displayConfirmationModal = (
     callback,
   }
   isModalOpen.value = true
+}
+
+const displayCommentModal = (data) => {
+  selectedOrder.value = data
+  console.log('selectedOrder', selectedOrder.value)
+
+  isCommentModalOpen.value = true
 }
 
 const resolveOrderStatus = (status) => {

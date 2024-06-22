@@ -152,13 +152,38 @@
                   Your order has been received and is now being processed. Thank
                   you for your trust in using our services.
                 </p>
+
+                <div v-if="order.meeting_link" class="mt-4 flex flex-col gap-2">
+                  <span class="font-semibold text-sm pb-1">Meeting Link</span>
+
+                  <UButton
+                    color="primary"
+                    @click="openNewTab(comment.file_url)"
+                  >
+                    <UIcon name="i-heroicons-video-camera" />
+                    Open Meeting Url
+                  </UButton>
+                </div>
               </div>
             </div>
 
             <div class="mt-6">
               <h6 class="font-semibold mb-2">Discussions</h6>
 
-              <div v-for="comment in comments" :key="comment">
+              <UButton
+                v-if="commentlimit < comments.length"
+                block
+                color="primary"
+                variant="soft"
+                class="my-4 bg-blue-100 hover:bg-blue-200"
+                @click="commentlimit = comments.length"
+              >
+                <UIcon name="i-heroicons-chat-bubble-oval-left-ellipsis" />
+                Load Previous Comments
+              </UButton>
+
+              <!-- Comments -->
+              <div v-for="comment in filteredComments" :key="comment">
                 <!-- Others -->
                 <div v-if="comment.is_facilitator" class="pb-4">
                   <UCard
@@ -223,7 +248,7 @@
                         padding: 'p-4 sm:p-4',
                       },
                     }"
-                    class="flex gap-4 items-center w-ful ml-6 bg-blue-50"
+                    class="flex gap-4 items-center w-ful bg-blue-50"
                   >
                     <div class="flex gap-2 items-center">
                       <UAvatar
@@ -385,6 +410,7 @@ const user = ref({
 })
 
 const orders = ref([])
+const commentlimit = ref(3)
 const comments = ref([])
 const userComment = ref({
   user: {
@@ -410,6 +436,12 @@ const filteredNavs = computed(() => {
       (nav.scope === 'admin' && isAdmin) ||
       (nav.scope === 'merchant' && isMerchant)
   )
+})
+
+const filteredComments = computed(() => {
+  // limit only 3 last comments
+
+  return comments.value.slice(-(commentlimit.value ?? 3))
 })
 
 const resolveOrderStatus = (status) => {
