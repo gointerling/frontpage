@@ -98,18 +98,37 @@
                   </div>
                 </div>
               </div>
-              <UButton
-                v-if="order.order_status === 'completed'"
-                color="primary"
-                class="text-white mr-4"
-                @click="
-                  openNewTab(
-                    `https://gointering.com/api/v1/orders/${order.id}/download-result`
-                  )
-                "
-              >
-                Download Result
-              </UButton>
+              <div v-if="order.order_status === 'completed'">
+                <div
+                  v-if="order.result_file_url"
+                  class="mt-4 flex flex-col items-end gap-2"
+                >
+                  <span class="font-semibold text-sm pb-1">
+                    Download Result
+                  </span>
+
+                  <UButton
+                    color="primary"
+                    class="text-white"
+                    @click="openNewTab(order.result_file_url)"
+                  >
+                    <UIcon name="i-heroicons-arrow-down-tray" />
+                    Download
+                  </UButton>
+                </div>
+
+                <div
+                  v-if="order.meet_url"
+                  class="mt-4 flex flex-col items-end gap-2"
+                >
+                  <span class="font-semibold text-sm pb-1">Meeting Link</span>
+
+                  <UButton color="primary" @click="openNewTab(order.meet_url)">
+                    <UIcon name="i-heroicons-video-camera" />
+                    Open Meeting Url
+                  </UButton>
+                </div>
+              </div>
 
               <div
                 v-if="order.order_status === 'waitingpaid'"
@@ -153,13 +172,10 @@
                   you for your trust in using our services.
                 </p>
 
-                <div v-if="order.meeting_link" class="mt-4 flex flex-col gap-2">
+                <div v-if="order.meet_url" class="mt-4 flex flex-col gap-2">
                   <span class="font-semibold text-sm pb-1">Meeting Link</span>
 
-                  <UButton
-                    color="primary"
-                    @click="openNewTab(comment.file_url)"
-                  >
+                  <UButton color="primary" @click="openNewTab(order.meet_url)">
                     <UIcon name="i-heroicons-video-camera" />
                     Open Meeting Url
                   </UButton>

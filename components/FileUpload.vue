@@ -1,5 +1,5 @@
 <template>
-  <div class="file-upload">
+  <div class="file-upload" :class="center ? 'flex flex-col items-center' : ''">
     <input
       ref="fileInput"
       type="file"
@@ -80,6 +80,10 @@ const props = defineProps({
   isDisplayFile: {
     type: Boolean,
     default: true,
+  },
+  center: {
+    type: Boolean,
+    default: false,
   },
 })
 

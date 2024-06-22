@@ -212,7 +212,7 @@
 import { ref, watch } from 'vue'
 
 import { useOrderService } from '~/composables/useOrderService'
-const { updateMyOrder } = useOrderService()
+const { updateMerchantOrder } = useOrderService()
 
 const route = useRoute()
 const router = useRouter()
@@ -354,7 +354,7 @@ const updateComment = async (payload) => {
   comment_payload.push(payload)
 
   try {
-    const { data } = await updateMyOrder(orderId, {
+    const { data } = await updateMerchantOrder(orderId, {
       comment_json: comment_payload,
     })
     // Show toast
