@@ -256,8 +256,7 @@
           </UTable>
           <UPagination
             v-model="page"
-            :max="5"
-            :page-count="paginationsData.itemsPerPage"
+            :page-count="1"
             :total="paginationsData.totalPage"
           />
         </UCard>
@@ -338,7 +337,8 @@ const fetchFacilitators = async () => {
         selectedStatus.value.value === 'all' ? '' : selectedStatus.value.value,
       search: searchQuery.value,
     }).then((response) => {
-      facilitators.value = response.data.data.data.map((user) => ({
+      facilitators.value = response.data.data.data.map((user, index) => ({
+        id: index + 1,
         user: {
           id: user.id,
           fullname: user.fullname,
@@ -356,6 +356,7 @@ const fetchFacilitators = async () => {
         status: user.merchants[0].status,
         actions: actions,
       }))
+
       paginationsData.value = {
         page: response.data.data.current_page,
         totalPage: response.data.data.last_page,

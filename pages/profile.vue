@@ -77,7 +77,7 @@
               </div>
               <div class="flex justify-between">
                 <span class="font-semibold">Email</span>
-                <UInput v-model="payload.email" class="w-7/12" />
+                <UInput v-model="payload.email" class="w-7/12" readonly />
               </div>
               <div class="flex justify-between">
                 <span class="font-semibold">Phone</span>

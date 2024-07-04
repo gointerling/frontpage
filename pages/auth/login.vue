@@ -237,10 +237,10 @@ const route = useRoute()
 const { as, type } = useRoute().query
 
 // data
-const email = ref('sir.alex@example.com')
-const password = ref('password123')
+const email = ref('')
+const password = ref('')
 const confirmPassword = ref('')
-const fullname = ref('Sir Alex')
+const fullname = ref('')
 const token = useCookie('token')
 
 // state data

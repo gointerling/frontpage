@@ -12,6 +12,12 @@ export const useFileService = () => {
       formData.append('file_name', fileName)
       return $axios.post('/files', formData)
     },
+    uploadAdsFile(file, fileName) {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('file_name', fileName)
+      return $axios.post('/files/ads', formData)
+    },
     deleteFile(id) {
       return $axios.delete(`/files/${id}`)
     }

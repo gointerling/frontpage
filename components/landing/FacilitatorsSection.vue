@@ -40,7 +40,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .bg-facilitator {
   background-image: url('/assets/images/facilitators-bg.png');
   background-size: contain;

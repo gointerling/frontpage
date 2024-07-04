@@ -16,17 +16,12 @@
           <!-- search and filter -->
           <div class="flex gap-2">
             <UInputMenu
-              :options="[
-                { label: 'All', value: 'all', color: 'gray' },
-                { label: 'Verified', value: 'verified', color: 'blue' },
-                { label: 'Pending', value: 'pending', color: 'orange' },
-              ]"
+              :options="statusList"
               v-model="selectedStatus"
               placeholder="Pilih Status"
               by="value"
               option-attribute="label"
               :search-attributes="['label']"
-              @change="filterMerchantOrder"
               class="max-w-[180px]"
             />
             <UInput
@@ -34,9 +29,8 @@
               size="sm"
               color="white"
               :trailing="false"
-              placeholder="Search Facilitator"
+              placeholder="Search Transactions"
               v-model="searchQuery"
-              @input="onSearchChange()"
             />
           </div>
         </UCard>
@@ -204,10 +198,10 @@
               </div>
             </template>
           </UTable>
+
           <UPagination
             v-model="page"
-            :max="5"
-            :page-count="paginationsData.itemsPerPage"
+            :page-count="1"
             :total="paginationsData.totalPage"
           />
         </UCard>
@@ -224,6 +218,8 @@ import { useOrderService } from '~/composables/useOrderService'
 
 const { getMerchants, updateMerchantStatus } = useMerchantService()
 const { getAllOrders, updateClientOrderStatus } = useOrderService()
+
+import { useDebounceFn } from '@vueuse/core'
 
 // components
 const toast = useToast()
@@ -258,16 +254,25 @@ const paginationsData = ref({
   itemsPerPage: 10,
 })
 
+const statusList = [
+  { label: 'All', value: 'all', color: 'gray' },
+  { label: 'Completed', value: 'completed', color: 'orange' },
+  { label: 'Paid', value: 'paid', color: 'blue' },
+  { label: 'Pending', value: 'pending', color: 'orange' },
+  { label: 'Waiting Payment', value: 'waitingpaid', color: 'orange' },
+  { label: 'Failed', value: 'failed', color: 'orange' },
+]
+
 const fetchMerchantOrders = async () => {
   try {
     await getAllOrders({
       page: page.value,
       per_page: paginationsData.value.itemsPerPage,
-      status:
+      order_status:
         selectedStatus.value.value === 'all' ? '' : selectedStatus.value.value,
       search: searchQuery.value,
     }).then((response) => {
-      orders.value = response.data.data.orders.map((order, index) => ({
+      orders.value = response.data.data.orders.data.map((order, index) => ({
         no: index + 1,
         service: {
           id: order.service.id,
@@ -279,12 +284,14 @@ const fetchMerchantOrders = async () => {
           id: order.user.id,
           fullname: order.user.fullname,
           email: order.user.email,
+          photo: order.user.photo,
         },
 
         facilitator: {
           id: order.merchant_user.id,
           fullname: order.merchant_user.fullname,
           email: order.merchant_user.email,
+          photo: order.merchant_user.photo,
         },
         languages: {
           language_source: order.language_source,
@@ -298,6 +305,11 @@ const fetchMerchantOrders = async () => {
           status: order.order_status,
         },
       }))
+
+      // set paginations
+
+      paginationsData.value.totalPage = response.data.data.orders.last_page
+      paginationsData.value.totalItems = response.data.data.orders.total
     })
   } catch (error) {
     console.error('Error fetching merchant orders:', error)
@@ -309,33 +321,30 @@ const fetchMerchantOrders = async () => {
 // Watcher to fetch data when page changes
 watch(page, fetchMerchantOrders)
 
+watch(
+  selectedStatus,
+  () => {
+    fetchMerchantOrders()
+  },
+  {
+    deep: true,
+  }
+)
+
+watch(
+  searchQuery,
+  useDebounceFn(() => {
+    fetchMerchantOrders()
+  }, 300),
+  {
+    deep: true,
+  }
+)
+
 // Filter facilitators based on search query
 const filterMerchantOrder = () => {
   filterMerchantOrder(page.value, selectedStatus.value.value, searchQuery.value)
 }
-
-// Search change handler with manual debounce
-const onSearchChange = debounce(() => {
-  filterMerchantOrder()
-}, 500)
-
-// debounce function
-function debounce(func, wait, immediate) {
-  let timeout
-  return function () {
-    const context = this
-    const args = arguments
-    const later = function () {
-      timeout = null
-      if (!immediate) func.apply(context, args)
-    }
-    const callNow = immediate && !timeout
-    clearTimeout(timeout)
-    timeout = setTimeout(later, wait)
-    if (callNow) func.apply(context, args)
-  }
-}
-
 // Open link in new tab
 const openLink = (url) => {
   // Open link in new tab
@@ -429,7 +438,7 @@ const resolveOrderStatus = (status) => {
     case 'paid':
       return {
         color: 'blue',
-        text: 'In Progress By Facilitator',
+        text: 'Paid',
       }
 
     case 'pending':

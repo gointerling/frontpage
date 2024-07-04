@@ -16,14 +16,7 @@
           <!-- search and filter -->
           <div class="flex gap-2">
             <UInputMenu
-              :options="[
-                { label: 'All', value: 'all', color: 'gray' },
-                { label: 'Completed', value: 'completed', color: 'orange' },
-                { label: 'In Progress', value: 'paid', color: 'blue' },
-                { label: 'Pending', value: 'pending', color: 'orange' },
-                { label: 'In Progress', value: 'waitingpaid', color: 'orange' },
-                { label: 'Failed', value: 'failed', color: 'orange' },
-              ]"
+              :options="statusList"
               v-model="selectedStatus"
               placeholder="Pilih Status"
               by="value"
@@ -39,7 +32,6 @@
               :trailing="false"
               placeholder="Search Order"
               v-model="searchQuery"
-              @input="onSearchChange()"
             />
           </div>
         </UCard>
@@ -90,11 +82,11 @@
               </span>
             </template>
 
-            <template #buyer-data="{ row }">
+            <template #client-data="{ row }">
               <div class="flex gap-3 items-center">
                 <UAvatar
-                  :src="row.buyer.photo"
-                  :alt="row.buyer.fullname"
+                  :src="row.client.photo"
+                  :alt="row.client.fullname"
                   size="sm"
                   variant="rounded-full"
                   imgClass="object-cover"
@@ -102,10 +94,10 @@
 
                 <div class="flex flex-col">
                   <span class="font-semibold text-primary">
-                    {{ row.buyer.fullname }}
+                    {{ row.client.fullname }}
                   </span>
                   <span class="text-sm text-gray-600">
-                    {{ row.buyer.email }}
+                    {{ row.client.email }}
                   </span>
                 </div>
               </div>
@@ -178,10 +170,7 @@
 
                 <!-- Upload Work -->
                 <UTooltip
-                  v-if="
-                    row.actions.status === 'waitingpaid' ||
-                    row.actions.status === 'paid'
-                  "
+                  v-if="row.actions.status === 'paid'"
                   text="Upload Works"
                 >
                   <UButton
@@ -195,7 +184,10 @@
                   />
                 </UTooltip>
 
-                <UTooltip v-else text="Check Result">
+                <UTooltip
+                  v-if="row.actions.status === 'completed'"
+                  text="Check Result"
+                >
                   <UButton
                     icon="i-heroicons-arrow-top-right-on-square"
                     size="2xs"
@@ -211,8 +203,7 @@
           </UTable>
           <UPagination
             v-model="page"
-            :max="5"
-            :page-count="paginationsData.itemsPerPage"
+            :page-count="1"
             :total="paginationsData.totalPage"
           />
         </UCard>
@@ -239,6 +230,8 @@
 import ConfirmationModal from '~/components/ConfirmationModal.vue'
 import CommentSidebar from '~/components/facilitators/CommentSidebar.vue'
 import UploadResultSidebar from '~/components/facilitators/UploadResultSidebar.vue'
+
+import { useDebounceFn } from '@vueuse/core'
 
 import { ref, computed, onMounted } from 'vue'
 import { useMerchantService } from '~/composables/useMerchantService'
@@ -283,12 +276,21 @@ const paginationsData = ref({
   itemsPerPage: 10,
 })
 
+const statusList = [
+  { label: 'All', value: 'all', color: 'gray' },
+  { label: 'Completed', value: 'completed', color: 'orange' },
+  { label: 'Paid', value: 'paid', color: 'blue' },
+  { label: 'Pending', value: 'pending', color: 'orange' },
+  { label: 'Waiting Payment', value: 'waitingpaid', color: 'orange' },
+  { label: 'Failed', value: 'failed', color: 'orange' },
+]
+
 const fetchMerchantOrders = async () => {
   try {
     await getMyMerchantOrders({
       page: page.value,
       per_page: paginationsData.value.itemsPerPage,
-      status:
+      order_status:
         selectedStatus.value.value === 'all' ? '' : selectedStatus.value.value,
       search: searchQuery.value,
     }).then((response) => {
@@ -300,7 +302,7 @@ const fetchMerchantOrders = async () => {
           type: order.service.type,
         },
 
-        buyer: {
+        client: {
           id: order.user.id,
           fullname: order.user.fullname,
           email: order.user.email,
@@ -338,31 +340,26 @@ const fetchMerchantOrders = async () => {
 // Watcher to fetch data when page changes
 watch(page, fetchMerchantOrders)
 
+watch(
+  selectedStatus,
+  () => {
+    fetchMerchantOrders()
+  },
+  {
+    deep: true,
+  }
+)
+
+watch(
+  searchQuery,
+  useDebounceFn(() => {
+    fetchMerchantOrders()
+  }, 300)
+)
+
 // Filter facilitators based on search query
 const filterMerchantOrder = () => {
   fetchMerchantOrders(page.value, selectedStatus.value.value, searchQuery.value)
-}
-
-// Search change handler with manual debounce
-const onSearchChange = debounce(() => {
-  filterMerchantOrder()
-}, 500)
-
-// debounce function
-function debounce(func, wait, immediate) {
-  let timeout
-  return function () {
-    const context = this
-    const args = arguments
-    const later = function () {
-      timeout = null
-      if (!immediate) func.apply(context, args)
-    }
-    const callNow = immediate && !timeout
-    clearTimeout(timeout)
-    timeout = setTimeout(later, wait)
-    if (callNow) func.apply(context, args)
-  }
 }
 
 // Open link in new tab
@@ -481,7 +478,7 @@ const resolveOrderStatus = (status) => {
     case 'waitingpaid':
       return {
         color: 'orange',
-        text: 'Approved',
+        text: 'Waiting',
       }
 
     case 'failed':

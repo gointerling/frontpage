@@ -66,8 +66,6 @@ onMounted(async () => {
 
   isPageLoading.value = false
 
-  adsOpen.value = true
-
   window.scrollTo({
     top: 0,
     behavior: 'smooth',

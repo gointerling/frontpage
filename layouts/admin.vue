@@ -3,7 +3,7 @@
     <div v-show="!isPageLoading" class="flex">
       <SideDrawer :navs="navs" :isSmallSize="isSmallSize" title="Admin" />
 
-      <div class="flex flex-col w-full bg-slate-100">
+      <div class="flex flex-col bg-slate-100" :class="dynamicWidth">
         <nav class="p-6 w-full flex justify-between">
           <div class="flex gap-3 items-center">
             <UButton class="p-2 bg-gray-300" @click="toggleDrawerSize">
@@ -111,7 +111,7 @@ const navs = [
     to: '/admin/transactions',
   },
   {
-    label: 'Facilitator',
+    label: 'Facilitators',
     icon: 'i-heroicons-building-storefront',
     to: '/admin/merchants',
   },
@@ -125,7 +125,14 @@ const navs = [
     icon: 'i-heroicons-megaphone',
     to: '/admin/ads',
   },
+  {
+    label: 'Settings',
+    icon: 'i-heroicons-cog',
+    to: '/admin/settings',
+  },
 ]
+
+const dynamicWidth = ref('w-11/12')
 
 // fetch user data on mount
 const fetchUser = async () => {
@@ -149,6 +156,10 @@ const signOut = () => {
 const navigateTo = (to) => {
   router.push(to)
 }
+
+watch(isSmallSize, (newVal) => {
+  dynamicWidth.value = newVal ? 'w-11/12' : 'w-8/12'
+})
 
 // on mount
 onMounted(async () => {

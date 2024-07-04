@@ -87,6 +87,9 @@
                   @click="
                     navigateTo({
                       name: 'my-client-orders',
+                      query: {
+                        section: 'order-history',
+                      },
                     })
                   "
                 >
@@ -148,6 +151,9 @@
                   @click="
                     navigateTo({
                       name: 'my-client-orders',
+                      query: {
+                        section: 'order-history',
+                      },
                     })
                   "
                   class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

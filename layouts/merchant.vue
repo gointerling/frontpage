@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div v-show="!isPageLoading" class="flex">
+  <div class="h-[0px]">
+    <div v-if="!isPageLoading" class="flex h-screen">
       <SideDrawer :navs="navs" :isSmallSize="isSmallSize" title="Dash" />
 
       <div class="flex flex-col w-full bg-slate-100">
@@ -65,7 +65,7 @@
     </div>
 
     <!-- Loader -->
-    <PageLoader v-if="isPageLoading" />
+    <PageLoader v-else />
   </div>
 </template>
 

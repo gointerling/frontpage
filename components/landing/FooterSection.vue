@@ -32,6 +32,7 @@
               <nuxt-link
                 :to="{
                   name: 'ads-setup',
+                  query: { section: 'fill-data' },
                 }"
                 class="text-gray-500 hover:text-primary"
               >
