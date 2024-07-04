@@ -132,12 +132,28 @@
                 </span>
               </div>
 
+              <span v-else-if="row.status === 'inactive'" class="text-gray-300">
+                Iklan Tidak Aktif
+              </span>
+              <span v-else class="text-gray-300"> Kosong </span>
+            </template>
+
+            <template #payment-data="{ row }">
+              <div
+                v-if="row.payment"
+                class="flex flex-col gap-1 items-start capitalize"
+              >
+                <UButton @click="openLink(row.payment)">
+                  Bukti transfer
+                </UButton>
+              </div>
+
               <span v-else class="text-gray-300"> Kosong </span>
             </template>
 
             <template #status-data="{ row }">
               <div
-                v-if="row.valid"
+                v-if="row.status"
                 class="flex flex-col gap-1 items-start capitalize"
               >
                 <UBadge
@@ -175,7 +191,7 @@
                         'Activate',
                         'Cancel',
                         () => {
-                          updateAdsStatus(row.actions.id, 'active')
+                          updateClientAdsStatus(row.actions.id, 'active');
                         }
                       )
                     "
@@ -199,7 +215,7 @@
                         'Deactivate',
                         'Cancel',
                         () => {
-                          updateAdsStatus(row.actions.id, 'inactive')
+                          updateClientAdsStatus(row.actions.id, 'inactive');
                         }
                       )
                     "
@@ -222,55 +238,54 @@
   </div>
 </template>
 <script setup>
-import { useAdvertisementService } from '~/composables/useAdvertisementService'
-import { useOrderService } from '~/composables/useOrderService'
+import { useAdvertisementService } from "~/composables/useAdvertisementService";
+import { useOrderService } from "~/composables/useOrderService";
 
-const { getAllAds } = useAdvertisementService()
-const { getAllOrders, updateClientOrderStatus } = useOrderService()
+const { getAllAds, updateAdsStatus } = useAdvertisementService();
 
-import { useDebounceFn } from '@vueuse/core'
+import { useDebounceFn } from "@vueuse/core";
 
 // components
-const toast = useToast()
+const toast = useToast();
 
 definePageMeta({
   layout: false,
-})
+});
 
 // state
-const isTableLoading = ref(true)
-const isModalOpen = ref(false)
+const isTableLoading = ref(true);
+const isModalOpen = ref(false);
 const modalData = ref({
-  title: '',
-  message: '',
+  title: "",
+  message: "",
   callback: null,
-})
+});
 
 // data
-const pageTitle = 'Advertisement List'
-const facilitators = ref([])
-const advertisements = ref([])
+const pageTitle = "Advertisement List";
+const facilitators = ref([]);
+const advertisements = ref([]);
 const selectedStatus = ref({
-  label: 'All',
-  value: 'all',
-})
-const searchQuery = ref('')
-const page = ref(1)
+  label: "All",
+  value: "all",
+});
+const searchQuery = ref("");
+const page = ref(1);
 const paginationsData = ref({
   page: 1,
   totalPage: 1,
   totalItems: 0,
   itemsPerPage: 10,
-})
+});
 
 const statusList = [
-  { label: 'All', value: 'all', color: 'gray' },
-  { label: 'Completed', value: 'completed', color: 'orange' },
-  { label: 'Paid', value: 'paid', color: 'blue' },
-  { label: 'Pending', value: 'pending', color: 'orange' },
-  { label: 'Waiting Payment', value: 'waitingpaid', color: 'orange' },
-  { label: 'Failed', value: 'failed', color: 'orange' },
-]
+  { label: "All", value: "all", color: "gray" },
+  { label: "Completed", value: "completed", color: "orange" },
+  { label: "Paid", value: "paid", color: "blue" },
+  { label: "Pending", value: "pending", color: "orange" },
+  { label: "Waiting Payment", value: "waitingpaid", color: "orange" },
+  { label: "Failed", value: "failed", color: "orange" },
+];
 
 const fetchAds = async () => {
   try {
@@ -278,7 +293,7 @@ const fetchAds = async () => {
       page: page.value,
       per_page: paginationsData.value.itemsPerPage,
       order_status:
-        selectedStatus.value.value === 'all' ? '' : selectedStatus.value.value,
+        selectedStatus.value.value === "all" ? "" : selectedStatus.value.value,
       search: searchQuery.value,
     }).then((response) => {
       advertisements.value = response.data.data.advertisements.data.map(
@@ -292,6 +307,7 @@ const fetchAds = async () => {
           },
           package: advertisement.package,
           valid: advertisement.valid_until_date,
+          payment: advertisement.payment_file_url,
           status: advertisement.status,
 
           actions: {
@@ -299,102 +315,139 @@ const fetchAds = async () => {
             status: advertisement.status,
           },
         })
-      )
+      );
 
       // set paginations
 
       paginationsData.value.totalPage =
-        response.data.data.advertisements.last_page
-      paginationsData.value.totalItems = response.data.data.advertisements.total
-    })
+        response.data.data.advertisements.last_page;
+      paginationsData.value.totalItems =
+        response.data.data.advertisements.total;
+    });
   } catch (error) {
-    console.error('Error fetching merchant advertisements:', error)
+    console.error("Error fetching merchant advertisements:", error);
   } finally {
-    isTableLoading.value = false
+    isTableLoading.value = false;
   }
-}
+};
+
+const updateClientAdsStatus = async (orderId, status) => {
+  await updateAdsStatus(orderId, {
+    status,
+  })
+    .then(() => {
+      // Close modal
+      isModalOpen.value = false;
+
+      // Show toast
+      toast.add({
+        title: "Success!",
+        color: "green",
+        icon: "i-heroicons-check-circle",
+        description: "Advertisement status updated!",
+      });
+
+      // Fetch facilitators
+      fetchAds();
+    })
+    .catch((error) => {
+      console.error("Error updating advertisement status:", error);
+
+      // Show toast
+      toast.add({
+        title: "Uh Oh!",
+        color: "red",
+        icon: "i-heroicons-x-circle",
+        description: "Error updating advertisement status!",
+      });
+    });
+};
 
 // Watcher to fetch data when page changes
-watch(page, fetchAds)
+watch(page, fetchAds);
 
 watch(
   selectedStatus,
   () => {
-    fetchAds()
+    fetchAds();
   },
   {
     deep: true,
   }
-)
+);
 
 watch(
   searchQuery,
   useDebounceFn(() => {
-    fetchAds()
+    fetchAds();
   }, 300),
   {
     deep: true,
   }
-)
+);
 
 // Filter facilitators based on search query
 const filterMerchantOrder = () => {
-  filterMerchantOrder(page.value, selectedStatus.value.value, searchQuery.value)
-}
+  filterMerchantOrder(
+    page.value,
+    selectedStatus.value.value,
+    searchQuery.value
+  );
+};
 // Open link in new tab
 const openLink = (url) => {
   // Open link in new tab
-  window.open(url, '_blank')
-}
+  window.open(url, "_blank");
+};
 
 const formatPrice = (price) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-  }).format(price)
-}
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+  }).format(price);
+};
 
 const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('id-ID', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
+  return new Date(date).toLocaleDateString("id-ID", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
 
 const minDay = (date) => {
-  const today = new Date()
-  const validDate = new Date(date)
+  const today = new Date();
+  const validDate = new Date(date);
 
-  const diffTime = validDate - today
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  const diffTime = validDate - today;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  return diffDays
-}
+  return diffDays;
+};
 
 const copyToClipboard = (text) => {
-  navigator.clipboard.writeText(text)
+  navigator.clipboard.writeText(text);
 
   // Show toast
   toast.add({
-    title: 'Copied!',
-    color: 'green',
-    icon: 'i-heroicons-check-circle',
-    description: 'No Rekening copied to clipboard!',
-  })
-}
+    title: "Copied!",
+    color: "green",
+    icon: "i-heroicons-check-circle",
+    description: "No Rekening copied to clipboard!",
+  });
+};
 
 const resolveStatusColor = (status) => {
-  if (status === 'verified') {
-    return 'blue'
-  } else if (status === 'active') {
-    return 'blue'
-  } else if (status === 'pending') {
-    return 'orange'
+  if (status === "verified") {
+    return "blue";
+  } else if (status === "active") {
+    return "blue";
+  } else if (status === "pending") {
+    return "orange";
   } else {
-    return 'gray'
+    return "gray";
   }
-}
+};
 
 const displayConfirmationModal = (
   title,
@@ -409,42 +462,42 @@ const displayConfirmationModal = (
     confirmText,
     cancelText,
     callback,
-  }
-  isModalOpen.value = true
-}
+  };
+  isModalOpen.value = true;
+};
 
 const acceptPayment = async (orderId) => {
-  await updateClientOrderStatus(orderId, 'paid')
+  await updateClientOrderStatus(orderId, "paid")
     .then(() => {
       // Close modal
-      isModalOpen.value = false
+      isModalOpen.value = false;
 
       // Show toast
       toast.add({
-        title: 'Success!',
-        color: 'green',
-        icon: 'i-heroicons-check-circle',
-        description: 'Payment status updated!',
-      })
+        title: "Success!",
+        color: "green",
+        icon: "i-heroicons-check-circle",
+        description: "Payment status updated!",
+      });
 
       // Fetch facilitators
-      fetchAds()
+      fetchAds();
     })
     .catch((error) => {
-      console.error('Error updating payment status:', error)
+      console.error("Error updating payment status:", error);
 
       // Show toast
       toast.add({
-        title: 'Uh Oh!',
-        color: 'red',
-        icon: 'i-heroicons-x-circle',
-        description: 'Error updating payment status!',
-      })
-    })
-}
+        title: "Uh Oh!",
+        color: "red",
+        icon: "i-heroicons-x-circle",
+        description: "Error updating payment status!",
+      });
+    });
+};
 
 // Mounted lifecycle hook
 onMounted(() => {
-  fetchAds()
-})
+  fetchAds();
+});
 </script>

@@ -107,110 +107,112 @@
   </div>
 </template>
 <script setup>
-import FileUpload from '~/components/FileUpload.vue'
+import FileUpload from "~/components/FileUpload.vue";
 
-import { useSettingService } from '~/composables/useSettingService'
-const { getSetting, updateSetting } = useSettingService()
+import { useSettingService } from "~/composables/useSettingService";
+const { getSetting, updateSetting } = useSettingService();
 
-import { useDebounceFn } from '@vueuse/core'
+import { useDebounceFn } from "@vueuse/core";
 
 // components
-const toast = useToast()
+const toast = useToast();
 
 definePageMeta({
   layout: false,
-})
+});
 
 // state
-const isPageLoading = ref(true)
-const isButtonLoading = ref(false)
-const isModalOpen = ref(false)
+const isPageLoading = ref(true);
+const isButtonLoading = ref(false);
+const isModalOpen = ref(false);
 const modalData = ref({
-  title: '',
-  message: '',
+  title: "",
+  message: "",
   callback: null,
-})
+});
 
 // data
-const pageTitle = 'Settings'
+const pageTitle = "Settings";
 const bankList = [
-  { id: 'bca', name: 'BCA' },
-  { id: 'bni', name: 'BNI' },
-  { id: 'bri', name: 'BRI' },
-  { id: 'mandiri', name: 'Mandiri' },
-]
+  { id: "bca", name: "BCA" },
+  { id: "bni", name: "BNI" },
+  { id: "bri", name: "BRI" },
+  { id: "mandiri", name: "Mandiri" },
+];
 
 const payload = ref({
-  title: '',
-  logo: 'https://dev-api.gointerling.com/storage/uploads/oEwc2avbfrCEn3Gb4CSaytNjGcul3UGqHxES7wrA.svg',
-  bank: '',
-  bank_account: '',
-})
+  title: "",
+  logo: "https://dev-api.gointerling.com/storage/uploads/oEwc2avbfrCEn3Gb4CSaytNjGcul3UGqHxES7wrA.svg",
+  bank: "",
+  bank_account: "",
+  bank_account_name: "",
+});
 
 const setAppsLogo = (file) => {
-  payload.value.logo = file
-}
+  payload.value.logo = file;
+};
 
 watch(
   () => payload.value,
   () => {
-    if (payload.value.logo === '') {
+    if (payload.value.logo === "") {
       payload.value.logo =
-        'https://dev-api.gointerling.com/storage/uploads/oEwc2avbfrCEn3Gb4CSaytNjGcul3UGqHxES7wrA.svg'
+        "https://dev-api.gointerling.com/storage/uploads/oEwc2avbfrCEn3Gb4CSaytNjGcul3UGqHxES7wrA.svg";
     }
   },
   { deep: true }
-)
+);
 
 const fetchSetting = async () => {
   try {
-    const { data } = await getSetting()
+    const { data } = await getSetting();
 
-    payload.value = data.data.setting
+    payload.value = data.data.setting;
 
     // set bank value
     payload.value.bank = bankList.find(
       (bank) => bank.id === data.data.setting.bank
-    )
+    );
   } catch (error) {
-    console.error('Error fetching merchant orders:', error)
+    console.error("Error fetching merchant orders:", error);
   } finally {
-    isPageLoading.value = false
+    isPageLoading.value = false;
   }
-}
+};
 
 const updateAppsSetting = async () => {
-  isButtonLoading.value = true
+  isButtonLoading.value = true;
   try {
     const payloadData = {
       title: payload.value.title,
       logo: payload.value.logo,
       bank: payload.value.bank.id,
       bank_account: `${payload.value.bank_account}`,
-    }
-    const { data } = await updateSetting(payloadData)
+      bank_account_name: payload.value.bank_account_name,
+    };
+    const { data } = await updateSetting(payloadData);
 
     toast.add({
-      title: 'Success!',
-      color: 'green',
-      icon: 'i-heroicons-check-circle',
-      description: 'Setting updated successfully!',
-    })
+      title: "Success!",
+      color: "green",
+      icon: "i-heroicons-check-circle",
+      description: "Setting updated successfully!",
+    });
   } catch (error) {
-    console.error('Error updating setting:', error)
+    console.error("Error updating setting:", error);
     toast.add({
-      title: 'Error',
-      color: 'red',
-      description: 'Failed to update setting.',
-      type: 'error',
-    })
+      title: "Error",
+      color: "red",
+      description: "Failed to update setting.",
+      type: "error",
+    });
   } finally {
-    isButtonLoading.value = false
+    isButtonLoading.value = false;
   }
-}
+};
 
 // Mounted lifecycle hook
 onMounted(() => {
-  fetchSetting()
-})
+  fetchSetting();
+});
 </script>
