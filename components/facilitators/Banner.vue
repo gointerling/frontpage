@@ -8,7 +8,7 @@
     <div
       class="flex gap-2 px-4 sm:px-6 lg:px-36 items-center sm:justify-between justify-center sm:mb-12"
     >
-      <button class="flex gap-2 cursor-pointer z-10" @click="backTo()">
+      <button class="flex gap-2 cursor-pointer" @click="backTo()">
         <nuxt-icon name="back" filled class="text-2xl" />
         Back
       </button>
@@ -41,11 +41,15 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isHistoricalBack: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const backTo = () => {
   // back to specific page
-  router.push('/')
+  router.go(-1)
 }
 </script>
 

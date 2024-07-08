@@ -344,7 +344,7 @@ const fetchFacilitators = async () => {
           fullname: user.fullname,
           email: user.email,
         },
-        phone: user.phone,
+        phone: convertPhone(user.phone ?? ''),
         type: user.merchants[0].type,
         bank: {
           bank: user.merchants[0].bank,
@@ -369,6 +369,18 @@ const fetchFacilitators = async () => {
   } finally {
     isTableLoading.value = false
   }
+}
+
+const convertPhone = (phone) => {
+  // remove non numeric characters
+  phone = phone.replace(/\D/g, '')
+
+  // change phone format to 62
+  if (phone.startsWith('0')) {
+    return `62${phone.slice(1)}`
+  }
+
+  return phone
 }
 
 // Watcher to fetch data when page changes

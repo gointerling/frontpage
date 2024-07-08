@@ -1,7 +1,10 @@
 <template>
   <div class="h-[0px]">
     <div v-if="!isPageLoading" class="flex h-screen">
-      <SideDrawer :navs="navs" :isSmallSize="isSmallSize" title="Dash" />
+      <!-- SideDrawer with sticky positioning -->
+      <div class="sticky top-0 h-screen">
+        <SideDrawer :navs="navs" :isSmallSize="isSmallSize" title="Dash" />
+      </div>
 
       <div class="flex flex-col w-full bg-slate-100">
         <nav class="p-6 w-full flex justify-between">
@@ -49,7 +52,6 @@
             </button>
             <button
               class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              href="#"
               @click="signOut"
             >
               <nuxt-icon name="logout" class="text-2xl"></nuxt-icon>
@@ -166,3 +168,10 @@ onMounted(async () => {
   })
 })
 </script>
+
+<style scoped>
+.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+}
+</style>

@@ -7,7 +7,7 @@
         is-title-visible
         is-linear-gradient
         :banner-title="'Premium Package'"
-        class="min-h-[150px] sm:min-h-[200px] md:min-h-[250px]"
+        class="min-h-[150px] sm:min-h-[200px] md:min-h-[250px] pt-60"
       />
 
       <!-- grid 3 -->

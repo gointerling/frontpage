@@ -2,14 +2,16 @@
   <div>
     <!-- Loader -->
     <PageLoader v-if="isPageLoading" />
-    <div v-else class="w-100 flex flex-col items-center">
+    <div v-else class="flex flex-col items-center w-full">
       <Navbar :user="user" @logout="logout" class="w-full" />
 
-      <div class="flex justify-between items-stretch w-10/12 my-16 gap-16 px-8">
+      <div
+        class="flex flex-col md:flex-row justify-between items-stretch w-11/12 my-8 md:my-16 gap-8 md:gap-16 px-4 md:px-8 pt-8 md:pt-16"
+      >
         <!-- side nav -->
-        <div class="w-2/12">
-          <h6 class="font-semibold">My Profile</h6>
-          <div class="flex flex-col items-start mt-4">
+        <div class="w-full md:w-2/12 mb-8 md:mb-0">
+          <h6 class="font-semibold text-center md:text-left">My Profile</h6>
+          <div class="flex flex-col items-center md:items-start mt-4">
             <UButton
               v-for="(nav, index) in filteredNavs"
               :key="index"
@@ -24,11 +26,13 @@
           </div>
         </div>
 
-        <div v-if="selectedTab === 'profile'" class="w-10/12">
+        <div v-if="selectedTab === 'profile'" class="w-full md:w-10/12">
           <!-- Personal info -->
           <h6 class="font-semibold mb-3">Personal Information</h6>
           <UCard>
-            <div class="flex justify-start gap-6 items-center mb-6">
+            <div
+              class="flex flex-col md:flex-row justify-start gap-6 items-center mb-6"
+            >
               <div class="relative">
                 <UAvatar
                   :alt="payload.fullname ?? ''"
@@ -67,30 +71,34 @@
             </div>
 
             <div class="flex flex-col gap-4">
-              <div class="flex justify-between">
+              <div class="flex flex-col md:flex-row justify-between">
                 <span class="font-semibold">Name</span>
-                <UInput v-model="payload.fullname" class="w-7/12" />
+                <UInput v-model="payload.fullname" class="w-full md:w-7/12" />
               </div>
-              <div class="flex justify-between">
+              <div class="flex flex-col md:flex-row justify-between">
                 <span class="font-semibold">Street Address</span>
-                <UInput v-model="payload.address" class="w-7/12" />
+                <UInput v-model="payload.address" class="w-full md:w-7/12" />
               </div>
-              <div class="flex justify-between">
+              <div class="flex flex-col md:flex-row justify-between">
                 <span class="font-semibold">Email</span>
-                <UInput v-model="payload.email" class="w-7/12" readonly />
+                <UInput
+                  v-model="payload.email"
+                  class="w-full md:w-7/12"
+                  readonly
+                />
               </div>
-              <div class="flex justify-between">
+              <div class="flex flex-col md:flex-row justify-between">
                 <span class="font-semibold">Phone</span>
-                <UInput v-model="payload.phone" class="w-7/12" />
+                <UInput v-model="payload.phone" class="w-full md:w-7/12" />
               </div>
-              <div class="flex justify-between">
+              <div class="flex flex-col md:flex-row justify-between">
                 <span class="font-semibold">About Yourself</span>
                 <UTextarea
                   v-model="payload.personal_description"
-                  class="w-7/12"
+                  class="w-full md:w-7/12"
                 />
               </div>
-              <div class="flex justify-between">
+              <div class="flex flex-col md:flex-row justify-between">
                 <span class="font-semibold">Skills</span>
                 <USelectMenu
                   v-model="payload.main_skills"
@@ -102,7 +110,7 @@
                   multiple
                   trailing
                   by="id"
-                  class="w-7/12"
+                  class="w-full md:w-7/12"
                 >
                   <UButton color="gray" class="flex-1 justify-between">
                     <div
@@ -131,7 +139,7 @@
                   </UButton>
                 </USelectMenu>
               </div>
-              <div class="flex justify-between">
+              <div class="flex flex-col md:flex-row justify-between">
                 <span class="font-semibold">Additional Skills</span>
                 <USelectMenu
                   v-model="payload.additional_skills"
@@ -143,7 +151,7 @@
                   multiple
                   trailing
                   by="id"
-                  class="w-7/12"
+                  class="w-full md:w-7/12"
                 >
                   <UButton color="gray" class="flex-1 justify-between">
                     <div
@@ -238,18 +246,23 @@
                   </button>
                 </div>
               </u-form-group>
-            </div>
-            <div class="flex justify-end">
-              <!-- save button -->
-              <UButton @click="updatePassword" class="mt-4 bg-accent">
-                <nuxt-icon name="floppy" class="text-white" />
-                Change Password
-              </UButton>
+
+              <div class="flex justify-end">
+                <!-- save button -->
+                <UButton
+                  @click="updatePassword"
+                  class="mt-4 bg-accent"
+                  :disabled="!newPassword || !confirmPassword"
+                >
+                  <nuxt-icon name="floppy" class="text-white" />
+                  Save
+                </UButton>
+              </div>
             </div>
           </UCard>
         </div>
 
-        <div v-if="selectedTab === 'account'" class="w-10/12">
+        <div v-if="selectedTab === 'account'" class="w-full md:w-10/12">
           <h6 class="font-semibold mb-3">Account Information</h6>
 
           <UCard>
@@ -289,7 +302,7 @@
           </UCard>
         </div>
 
-        <div v-if="selectedTab === 'service'" class="w-10/12">
+        <div v-if="selectedTab === 'service'" class="w-full md:w-10/12">
           <h6 class="font-semibold mb-3">Service Information</h6>
 
           <UCard class="mb-4">
@@ -456,7 +469,7 @@
           </UCard>
         </div>
 
-        <div v-if="selectedTab === 'certificate'" class="w-10/12">
+        <div v-if="selectedTab === 'certificate'" class="w-full md:w-10/12">
           <h6 class="font-semibold mb-3">Certificates</h6>
 
           <UCard>
@@ -502,6 +515,88 @@
                       Certificate {{ merchant.certificates.length + index + 1 }}
                     </span>
                   </div>
+                </UCard>
+              </div>
+
+              <u-form-group
+                name="certificates"
+                label="Add Certificate"
+                class="mt-4 mb-2"
+              >
+                <!-- max size 6MB -->
+                <MultipleFileUpload
+                  title="Add Certificate"
+                  accept="application/pdf"
+                  max-size="6291456"
+                  @file-uploaded="setCertificate"
+                  class="mt-1"
+                />
+              </u-form-group>
+
+              <div class="flex justify-end">
+                <!-- save button -->
+                <UButton @click="updateCertificate" class="mt-4 bg-accent">
+                  <nuxt-icon name="floppy" class="text-white" />
+                  Save
+                </UButton>
+              </div>
+            </div>
+          </UCard>
+        </div>
+
+        <div v-if="selectedTab === 'subscription'" class="w-full md:w-10/12">
+          <h6 class="font-semibold mb-3">Subscription</h6>
+
+          <UCard>
+            <div class="flex flex-col gap-2">
+              <label
+                class="text-sm font-medium text-gray-700 dark:text-gray-200"
+              >
+                Current Subscription
+              </label>
+              <div v-if="merchant.certificates" class="flex gap-3 flex-wrap">
+                <UCard
+                  v-for="(certificate_url, index) in merchant.certificates"
+                  :key="index"
+                  class="relative cursor-pointer hover:bg-gray-100 group"
+                >
+                  <div class="flex gap-2 items-center">
+                    <nuxt-icon name="file" class="text-primary" />
+                    <span class="text-primary">
+                      Certificate {{ index + 1 }}
+                    </span>
+                  </div>
+                  <!-- Remove button -->
+                  <button
+                    @click.stop="removeCertificate(index)"
+                    class="absolute w-full h-full top-0 left-0 bg-red-500 text-white px-2 py-1 rounded hidden group-hover:block"
+                  >
+                    <div class="flex justify-center items-center gap-2">
+                      <nuxt-icon name="circle-x" class="text-white" />
+                      <span>Remove</span>
+                    </div>
+                  </button>
+                </UCard>
+
+                <UCard
+                  v-for="(certificate_url, index) in addCertificates"
+                  :key="index"
+                  @click="openNewTab(certificate_url)"
+                  class="cursor-pointer hover:bg-gray-100"
+                >
+                  <div class="flex gap-2 items-center">
+                    <nuxt-icon name="file" class="text-primary" />
+                    <span class="text-primary">
+                      Certificate {{ merchant.certificates.length + index + 1 }}
+                    </span>
+                  </div>
+                </UCard>
+              </div>
+
+              <div v-else class="flex gap-3 flex-wrap">
+                <!-- No data -->
+                <UCard class="flex justify-center items-center w-full">
+                  <span class="text-gray-400">No subscription data</span>
                 </UCard>
               </div>
 
@@ -593,6 +688,12 @@ const navs = [
     label: 'Certificates',
     icon: 'badge',
     scope: 'merchant',
+  },
+  {
+    key: 'subscription',
+    label: 'Subscription',
+    icon: 'star',
+    scope: 'all',
   },
 ]
 
@@ -925,10 +1026,25 @@ const getFirstErrorMessage = (errors) => {
   return null
 }
 
+const convertPhone = (phone) => {
+  // remove non numeric characters
+  phone = phone.replace(/\D/g, '')
+
+  // change phone format to 62
+  if (phone.startsWith('0')) {
+    return `62${phone.slice(1)}`
+  }
+
+  return phone
+}
+
 // update profile
 const updateProfile = async () => {
   try {
-    const { data } = await updateMyProfile(payload.value)
+    const { data } = await updateMyProfile({
+      ...payload.value,
+      phone: convertPhone(payload.value.phone),
+    })
 
     const userData = {
       ...useCookie('token').value.user,

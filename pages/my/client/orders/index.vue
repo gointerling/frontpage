@@ -2,12 +2,14 @@
   <div>
     <!-- Loader -->
     <PageLoader v-if="isPageLoading" />
-    <div v-else class="w-100 flex flex-col items-center">
+    <div v-else class="w-full flex flex-col items-center">
       <Navbar :user="user" @logout="logout" class="w-full" />
 
-      <div class="flex justify-between items-stretch w-10/12 my-16 gap-16 px-8">
+      <div
+        class="flex flex-col md:flex-row justify-between items-stretch w-11/12 my-16 gap-8 px-4 md:px-8 pt-16"
+      >
         <!-- side nav -->
-        <div class="w-2/12">
+        <div class="w-full md:w-3/12">
           <h6 class="font-semibold">Client Dashboard</h6>
           <div class="flex flex-col items-start mt-4">
             <UButton
@@ -25,14 +27,14 @@
         </div>
 
         <!-- Content Wrapper -->
-        <div class="w-10/12">
+        <div class="w-full md:w-9/12">
           <div v-if="selectedTab === 'order-history'" class="w-full">
             <!-- Personal info -->
             <h6 class="font-semibold mb-3">
               My Order History ({{ totalData ?? 0 }})
             </h6>
 
-            <div class="flex gap-2 mb-4 justify-between">
+            <div class="flex flex-col md:flex-row gap-2 mb-4 justify-between">
               <UInputMenu
                 :options="[
                   { label: 'All', value: '', color: 'gray' },
@@ -118,7 +120,9 @@
                         </div>
                       </div>
                     </template>
-                    <div class="flex gap-3 justify-between items-center">
+                    <div
+                      class="flex flex-col md:flex-row gap-3 justify-between items-center"
+                    >
                       <div class="flex gap-3">
                         <div class="">
                           <UAvatar
@@ -132,7 +136,9 @@
                           <span class="font-semibold text-primary">
                             {{ order.merchant_user.fullname }}
                           </span>
-                          <div class="flex gap-2 text-xs text-gray-700">
+                          <div
+                            class="flex flex-wrap gap-2 text-xs text-gray-700"
+                          >
                             <span>{{ order.service.name }}</span>
                             <span
                               >({{ order.language_source.name }} -
@@ -190,7 +196,7 @@
               My Ads History ({{ totalData ?? 0 }})
             </h6>
 
-            <div class="flex gap-2 mb-4 justify-between">
+            <div class="flex flex-col md:flex-row gap-2 mb-4 justify-between">
               <UInputMenu
                 :options="[
                   { label: 'All', value: '', color: 'gray' },
@@ -245,18 +251,24 @@
                     <template #header>
                       <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2 capitalize">
-                          <UIcon name="i-heroicons-calendar" />
-                          <span class="font-semibold"> advertisement </span>
+                          <UIcon name="i-heroicons-language" />
+                          <span class="font-semibold">
+                            {{ advertisement.type }}
+                          </span>
                         </div>
                         <div class="flex justify-between items-center gap-2">
                           <UBadge
                             variant="soft"
                             :color="
-                              resolveOrderStatus(advertisement.status).color
+                              resolveAdvertisementStatus(
+                                advertisement.ad_status
+                              ).color
                             "
                           >
                             <span class="capitalize">{{
-                              resolveOrderStatus(advertisement.status).text
+                              resolveAdvertisementStatus(
+                                advertisement.ad_status
+                              ).text
                             }}</span>
                           </UBadge>
                           <UButton variant="link">
@@ -268,27 +280,37 @@
                         </div>
                       </div>
                     </template>
-                    <div class="flex gap-3 justify-between items-center">
+                    <div
+                      class="flex flex-col md:flex-row gap-3 justify-between items-center"
+                    >
                       <div class="flex gap-3">
                         <div class="">
                           <UAvatar
-                            :alt="advertisement.name"
-                            :src="advertisement.image_url"
+                            :alt="advertisement.merchant_user.fullname"
+                            :src="advertisement.merchant_user.photo"
                             size="lg"
                             imgClass="object-cover"
                           />
                         </div>
                         <div class="flex flex-col">
                           <span class="font-semibold text-primary">
-                            {{ advertisement.name }}
+                            {{ advertisement.merchant_user.fullname }}
                           </span>
-                          <div class="flex gap-2 text-xs text-gray-700">
-                            <span>{{ advertisement.package.name }}</span>
+                          <div
+                            class="flex flex-wrap gap-2 text-xs text-gray-700"
+                          >
+                            <span>{{ advertisement.service.name }}</span>
+                            <span
+                              >({{ advertisement.language_source.name }} -
+                              {{
+                                advertisement.language_destination.name
+                              }})</span
+                            >
                             <span>x 1</span>
                           </div>
 
                           <span class="font-semibold text-primary text-md">
-                            {{ formatPrice(advertisement.package.price) }}
+                            {{ formatPrice(advertisement.price) }}
                           </span>
                         </div>
                       </div>
@@ -297,11 +319,8 @@
                         class="text-white mr-4"
                         @click="
                           navigateTo({
-                            name: 'ads-setup',
-                            query: {
-                              section: 'payment',
-                              transaction_id: advertisement.id,
-                            },
+                            name: 'my-client-ads-id',
+                            params: { id: advertisement.id },
                           })
                         "
                       >
@@ -313,7 +332,7 @@
                   <div class="flex flex-col" v-if="advertisements.length === 0">
                     <div class="flex flex-col items-center justify-center">
                       <nuxt-icon name="search" class="text-4xl text-gray-400" />
-                      <span class="text-gray-400">No orders found</span>
+                      <span class="text-gray-400">No advertisements found</span>
                     </div>
                   </div>
 
@@ -335,248 +354,246 @@
         </div>
       </div>
     </div>
-
-    <ConfirmationModal :isOpen="isConfirmationModalOpen" :data="modalData" />
   </div>
 </template>
 
 <script setup>
 // components
-import PageLoader from "~/components/PageLoader.vue";
-import Navbar from "~/components/Navbar.vue";
-import ServiceTab from "~/components/profile/ServiceTab.vue";
+import PageLoader from '~/components/PageLoader.vue'
+import Navbar from '~/components/Navbar.vue'
+import ServiceTab from '~/components/profile/ServiceTab.vue'
 
 // imports
-import { ref, onMounted } from "vue";
-const toast = useToast();
-const route = useRoute();
-const router = useRouter();
+import { ref, onMounted } from 'vue'
+const toast = useToast()
+const route = useRoute()
+const router = useRouter()
 
 // services
-import { useMerchantService } from "~/composables/useMerchantService";
-import { useOrderService } from "~/composables/useOrderService";
-import { useAdvertisementService } from "~/composables/useAdvertisementService";
+import { useMerchantService } from '~/composables/useMerchantService'
+import { useOrderService } from '~/composables/useOrderService'
+import { useAdvertisementService } from '~/composables/useAdvertisementService'
 
-import { useDebounceFn } from "@vueuse/core";
+import { useDebounceFn } from '@vueuse/core'
 
-const { getMyOrders } = useOrderService();
-const { getMyAds } = useAdvertisementService();
+const { getMyOrders } = useOrderService()
+const { getMyAds } = useAdvertisementService()
 
 // navs
-const fileInput = ref(null);
+const fileInput = ref(null)
 const navs = [
   {
-    key: "order-history",
-    label: "Order History",
-    icon: "user-circle",
-    scope: "all",
+    key: 'order-history',
+    label: 'Order History',
+    icon: 'user-circle',
+    scope: 'all',
   },
   {
-    key: "ads-history",
-    label: "Ads History",
-    icon: "ads-report",
-    scope: "all",
+    key: 'ads-history',
+    label: 'Ads History',
+    icon: 'ads-report',
+    scope: 'all',
   },
-];
+]
 
 const modalData = ref({
-  title: "",
-  content: "",
-  confirmText: "",
-  cancelText: "",
+  title: '',
+  content: '',
+  confirmText: '',
+  cancelText: '',
   callback: null,
-});
+})
 
 // state
-const isPageLoading = ref(true);
-const isConfirmationModalOpen = ref(false);
-const isButtonLoading = ref(false);
-const isContentLoading = ref(false);
-const selectedTab = ref("order-history");
+const isPageLoading = ref(true)
+const isConfirmationModalOpen = ref(false)
+const isButtonLoading = ref(false)
+const isContentLoading = ref(false)
+const selectedTab = ref('order-history')
 
 // data
 const user = ref({
-  fullname: "",
-  photo: "",
-  email: "",
-  phone: "",
-  address: "",
-  role: "",
-  personal_description: "",
+  fullname: '',
+  photo: '',
+  email: '',
+  phone: '',
+  address: '',
+  role: '',
+  personal_description: '',
   main_skills: [],
   additional_skills: [],
   is_admin: false,
   is_facilitator: false,
-});
+})
 
-const orders = ref([]);
-const advertisements = ref([]);
-const perPage = ref(5);
-const isLastPage = ref(false);
-const totalData = ref(0);
+const orders = ref([])
+const advertisements = ref([])
+const perPage = ref(5)
+const isLastPage = ref(false)
+const totalData = ref(0)
 const selectedStatus = ref({
-  label: "All",
-  value: "",
-  color: "gray",
-});
-const searchQuery = ref("");
+  label: 'All',
+  value: '',
+  color: 'gray',
+})
+const searchQuery = ref('')
 
 const filteredNavs = computed(() => {
-  if (!user.value) return [];
+  if (!user.value) return []
 
-  const isAdmin = user.value.is_admin ?? false;
-  const isMerchant = user.value.is_facilitator ?? false;
+  const isAdmin = user.value.is_admin ?? false
+  const isMerchant = user.value.is_facilitator ?? false
 
   return navs.filter(
     (nav) =>
-      nav.scope === "all" ||
-      (nav.scope === "admin" && isAdmin) ||
-      (nav.scope === "merchant" && isMerchant)
-  );
-});
+      nav.scope === 'all' ||
+      (nav.scope === 'admin' && isAdmin) ||
+      (nav.scope === 'merchant' && isMerchant)
+  )
+})
 
 // methods
 // resolve order status
 const resolveOrderStatus = (status) => {
   switch (status) {
-    case "completed":
+    case 'completed':
       return {
-        color: "green",
-        text: "Completed",
-      };
+        color: 'green',
+        text: 'Completed',
+      }
 
-    case "active":
+    case 'active':
       return {
-        color: "blue",
-        text: "Active",
-      };
+        color: 'blue',
+        text: 'Active',
+      }
 
-    case "paid":
+    case 'paid':
       return {
-        color: "blue",
-        text: "In Progress",
-      };
+        color: 'blue',
+        text: 'In Progress',
+      }
 
-    case "pending":
+    case 'pending':
       return {
-        color: "orange",
-        text: "Pending",
-      };
+        color: 'orange',
+        text: 'Pending',
+      }
 
-    case "waitingpaid":
+    case 'waitingpaid':
       return {
-        color: "orange",
-        text: "Waiting Payment & Verication",
-      };
+        color: 'orange',
+        text: 'Waiting Payment & Verication',
+      }
 
-    case "failed":
+    case 'failed':
       return {
-        color: "red",
-        text: "Failed",
-      };
+        color: 'red',
+        text: 'Failed',
+      }
 
     default:
       return {
-        color: "gray",
-        text: "Unknown",
-      };
+        color: 'gray',
+        text: 'Unknown',
+      }
   }
-};
+}
 
 const openNewTab = (url) => {
-  window.open(url, "_blank");
-};
+  window.open(url, '_blank')
+}
 
 const navigateTo = (route) => {
-  router.push(route);
-};
+  router.push(route)
+}
 
 // logout
 const logout = () => {
-  console.log("Logging out...");
-  useCookie("token").value = null;
+  console.log('Logging out...')
+  useCookie('token').value = null
   user.value = {
-    fullname: "",
-    photo: "",
-    email: "",
-    phone: "",
-    address: "",
-    role: "",
-    personal_description: "",
+    fullname: '',
+    photo: '',
+    email: '',
+    phone: '',
+    address: '',
+    role: '',
+    personal_description: '',
     main_skills: [],
     additional_skills: [],
     is_admin: false,
     is_facilitator: false,
-  };
-};
+  }
+}
 
 // check if json
 const checkIfJSON = (data) => {
   try {
-    return JSON.parse(data);
+    return JSON.parse(data)
   } catch (error) {
-    return data;
+    return data
   }
-};
+}
 
 const formatPrice = (price) => {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-  }).format(price);
-};
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+  }).format(price)
+}
 
 const loadMore = async () => {
-  isButtonLoading.value = true;
-  perPage.value = perPage.value + 5;
+  isButtonLoading.value = true
+  perPage.value = perPage.value + 5
 
-  fetchAll();
-};
+  fetchAll()
+}
 
 const fetchAll = async () => {
-  if (selectedTab.value === "order-history") {
-    await fetchMyOrders();
+  if (selectedTab.value === 'order-history') {
+    await fetchMyOrders()
   }
 
-  if (selectedTab.value === "ads-history") {
-    await fetchMyAds();
+  if (selectedTab.value === 'ads-history') {
+    await fetchMyAds()
   }
-};
+}
 
 const resetFilter = () => {
-  searchQuery.value = "";
-  perPage.value = 5;
-  isLastPage.value = false;
+  searchQuery.value = ''
+  perPage.value = 5
+  isLastPage.value = false
 
   // set to first array of status
-  selectedStatus.value = { label: "All", value: "", color: "gray" };
-};
+  selectedStatus.value = { label: 'All', value: '', color: 'gray' }
+}
 
 const changeData = async (nav) => {
-  selectedTab.value = nav;
+  selectedTab.value = nav
 
   // set query params
   router.push({
     query: {
       section: nav,
     },
-  });
+  })
 
-  isContentLoading.value = true;
+  isContentLoading.value = true
 
-  resetFilter();
+  resetFilter()
 
-  fetchAll();
-};
+  fetchAll()
+}
 
 // fetch user data on mount
 const fetchUser = async () => {
   try {
-    user.value = useCookie("token").value.user || null;
+    user.value = useCookie('token').value.user || null
   } catch (error) {
-    console.error("Fetching user failed:", error);
+    console.error('Fetching user failed:', error)
   }
-};
+}
 
 const fetchMyOrders = async () => {
   try {
@@ -585,22 +602,22 @@ const fetchMyOrders = async () => {
       per_page: perPage.value,
       order_status: selectedStatus.value.value,
       search: searchQuery.value,
-    });
+    })
 
-    orders.value = data.data.orders.data;
+    orders.value = data.data.orders.data
 
     // check if last page
     isLastPage.value =
-      data.data.orders.current_page === data.data.orders.last_page;
+      data.data.orders.current_page === data.data.orders.last_page
 
-    totalData.value = data.data.orders.total;
+    totalData.value = data.data.orders.total
   } catch (error) {
-    console.error("Fetching orders failed:", error);
+    console.error('Fetching orders failed:', error)
   } finally {
-    isButtonLoading.value = false;
-    isContentLoading.value = false;
+    isButtonLoading.value = false
+    isContentLoading.value = false
   }
-};
+}
 
 const fetchMyAds = async () => {
   try {
@@ -609,72 +626,72 @@ const fetchMyAds = async () => {
       per_page: perPage.value,
       search: searchQuery.value,
       status: selectedStatus.value.value,
-    });
+    })
 
-    advertisements.value = data.data.advertisements.data;
+    advertisements.value = data.data.advertisements.data
 
     // check if last page
     isLastPage.value =
       data.data.advertisements.current_page ===
-      data.data.advertisements.last_page;
+      data.data.advertisements.last_page
 
-    totalData.value = data.data.advertisements.total;
+    totalData.value = data.data.advertisements.total
   } catch (error) {
-    console.error("Fetching orders failed:", error);
+    console.error('Fetching orders failed:', error)
   } finally {
-    isButtonLoading.value = false;
-    isContentLoading.value = false;
+    isButtonLoading.value = false
+    isContentLoading.value = false
   }
-};
+}
 
 const getFirstErrorMessage = (errors) => {
   for (const field in errors) {
     if (errors[field].length > 0) {
-      return errors[field][0];
+      return errors[field][0]
     }
   }
-  return null;
-};
+  return null
+}
 
 // watch for changes
 watch(selectedStatus, async (newVal) => {
-  fetchAll();
-});
+  fetchAll()
+})
 
 watch(
   searchQuery,
   useDebounceFn(async () => {
-    fetchAll();
+    fetchAll()
   }, 300),
   {
     immediate: true,
   }
-);
+)
 
 onMounted(async () => {
   // set selected tab
-  selectedTab.value = route.query.section ?? "order-history";
+  selectedTab.value = route.query.section ?? 'order-history'
 
   // fetch user data
-  if (useCookie("token").value) {
-    await fetchUser();
+  if (useCookie('token').value) {
+    await fetchUser()
 
-    if (selectedTab.value === "order-history") {
-      await fetchMyOrders();
+    if (selectedTab.value === 'order-history') {
+      await fetchMyOrders()
     }
 
-    if (selectedTab.value === "ads-history") {
-      await fetchMyAds();
+    if (selectedTab.value === 'ads-history') {
+      await fetchMyAds()
     }
   }
 
   // set page loading to false
 
-  isPageLoading.value = false;
+  isPageLoading.value = false
 
   window.scrollTo({
     top: 0,
-    behavior: "smooth",
-  });
-});
+    behavior: 'smooth',
+  })
+})
 </script>

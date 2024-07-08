@@ -2,7 +2,7 @@
   <div>
     <div v-show="!isPageLoading">
       <Navbar :user="user" @logout="logout" />
-      <HeroSection />
+      <HeroSection class="pt-60" />
       <StatsSection />
       <TranslatorSearchSection />
       <WelcomeSection />

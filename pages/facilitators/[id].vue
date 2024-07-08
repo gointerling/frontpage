@@ -3,7 +3,7 @@
     <PageLoader v-if="isPageLoading" />
     <div v-else class="w-100">
       <Navbar :user="user" @logout="logout" />
-      <Banner class="min-h-[250px]" />
+      <Banner is-title-visible is-historical-back class="min-h-[250px] pt-60" />
       <div class="p-8 lg:px-36">
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-3 -mt-20">

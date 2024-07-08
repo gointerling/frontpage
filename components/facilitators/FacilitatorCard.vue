@@ -25,7 +25,7 @@
           imgClass="object-cover"
           class="-mt-10"
         />
-        <h2 class="font-semibold py-2">
+        <h2 class="font-semibold py-2 capitalize">
           {{ props.data.merchants[0].users[0].fullname }}
         </h2>
 

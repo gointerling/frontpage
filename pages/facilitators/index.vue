@@ -4,7 +4,7 @@
     <div v-else class="w-100">
       <Navbar :user="user" @logout="logout" />
       <!-- <Banner class="min-h-[250px]" /> -->
-      <div class="p-8 lg:px-36">
+      <div class="p-8 lg:px-36 pt-20">
         <div class="flex justify-center py-8 gap-2">
           <input
             v-model="searchQuery"

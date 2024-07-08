@@ -1,7 +1,10 @@
 <template>
   <div>
     <div v-show="!isPageLoading" class="flex">
-      <SideDrawer :navs="navs" :isSmallSize="isSmallSize" title="Admin" />
+      <!-- SideDrawer with sticky positioning -->
+      <div class="sticky top-0 h-screen">
+        <SideDrawer :navs="navs" :isSmallSize="isSmallSize" title="Admin" />
+      </div>
 
       <div class="flex flex-col bg-slate-100" :class="dynamicWidth">
         <nav class="p-6 w-full flex justify-between">
@@ -49,7 +52,6 @@
             </button>
             <button
               class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              href="#"
               @click="signOut"
             >
               <nuxt-icon name="logout" class="text-2xl"></nuxt-icon>
@@ -75,7 +77,7 @@ import SideDrawer from '~/components/admin/SideDrawer.vue'
 import PageLoader from '~/components/PageLoader.vue'
 
 // imports
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 // router
 const route = useRoute()
@@ -116,19 +118,24 @@ const navs = [
     to: '/admin/merchants',
   },
   {
-    label: 'Users',
-    icon: 'i-heroicons-users',
-    to: '/admin/users',
-  },
-  {
     label: 'Ads',
     icon: 'i-heroicons-megaphone',
     to: '/admin/ads',
   },
   {
+    label: 'Users',
+    icon: 'i-heroicons-users',
+    to: '/admin/users',
+  },
+  {
     label: 'Settings',
     icon: 'i-heroicons-cog',
     to: '/admin/settings',
+  },
+  {
+    label: 'Packages',
+    icon: 'i-heroicons-sparkles',
+    to: '/admin/packages',
   },
 ]
 
@@ -158,7 +165,7 @@ const navigateTo = (to) => {
 }
 
 watch(isSmallSize, (newVal) => {
-  dynamicWidth.value = newVal ? 'w-11/12' : 'w-8/12'
+  dynamicWidth.value = newVal ? 'w-full' : 'w-11/12'
 })
 
 // on mount
@@ -179,3 +186,10 @@ onMounted(async () => {
   })
 })
 </script>
+
+<style scoped>
+.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+}
+</style>

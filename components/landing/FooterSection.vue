@@ -55,8 +55,9 @@
               <nuxt-link
                 href="https://wa.me/6281568277818"
                 class="text-gray-500 hover:text-primary"
-                >081568277818</nuxt-link
               >
+                081568277818
+              </nuxt-link>
             </li>
             <li class="flex flex-col">
               <span class="text-gray-900 font-semibold">Email</span>
@@ -64,8 +65,9 @@
               <nuxt-link
                 href="mailto:gointerling@gmail.com"
                 class="text-gray-500 hover:text-primary"
-                >gointerling@gmail.com</nuxt-link
               >
+                gointerling@gmail.com
+              </nuxt-link>
             </li>
           </ul>
         </div>
