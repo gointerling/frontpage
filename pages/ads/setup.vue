@@ -6,37 +6,56 @@
       <Banner
         :is-title-visible="true"
         :banner-title="'Advertising Form on Gointerling Website'"
-        class="min-h-[250px]"
+        class="min-h-[250px] pt-44 sm:pt-60"
       />
 
       <div
         class="flex-grow p-6 lg:px-36 flex flex-col gap-6 bg-no-repeat bg-cover bg-bottom mt-8"
         :style="{ backgroundImage: `url(${imgBackground})` }"
       >
-        <section v-if="section === 'fill-data'" class="flex flex-col">
-          <div class="flex flex-col gap-4 p-8 px-24 rounded-md">
-            <div class="flex gap-4 justify-between items-center">
-              <span class="flex-g font-medium">Name</span>
-              <UInput v-model="payload.name" class="w-3/4" />
+        <section
+          v-if="section === 'fill-data'"
+          class="flex flex-col px-8 sm:px-40"
+        >
+          <div class="flex flex-col gap-4 p-8 sm:px-32 rounded-md">
+            <div
+              class="flex flex-col sm:flex-row gap-4 items-start sm:items-center"
+            >
+              <span class="flex-grow font-medium text-left sm:text-right"
+                >Name</span
+              >
+              <UInput v-model="payload.name" class="w-full sm:w-10/12" />
             </div>
-            <div class="flex gap-4 justify-between items-center">
-              <span class="flex-g font-medium">Tagline</span>
-              <UInput v-model="payload.tagline" class="w-3/4" />
+            <div
+              class="flex flex-col sm:flex-row gap-4 items-start sm:items-center"
+            >
+              <span class="flex-grow font-medium text-left sm:text-right"
+                >Tagline</span
+              >
+              <UInput v-model="payload.tagline" class="w-full sm:w-10/12" />
             </div>
-            <div class="flex gap-4 justify-between items-center">
-              <span class="flex-g font-medium">Description</span>
-              <div class="w-3/4">
+            <div
+              class="flex flex-col sm:flex-row gap-4 items-start sm:items-center"
+            >
+              <span class="flex-grow font-medium text-left sm:text-right"
+                >Description</span
+              >
+              <div class="w-full sm:w-10/12">
                 <UTextarea v-model="payload.description" class="w-full" />
-                <label class="text-xs text-gray-500"> Maks. 50 Words </label>
+                <label class="text-xs text-gray-500">Maks. 50 Words</label>
               </div>
             </div>
-            <div class="flex gap-4 justify-between items-center">
-              <span class="flex-g font-medium">Package</span>
+            <div
+              class="flex flex-col sm:flex-row gap-4 items-start sm:items-center"
+            >
+              <span class="flex-grow font-medium text-left sm:text-right"
+                >Package</span
+              >
               <USelectMenu
                 v-model="payload.package"
                 :options="packageList"
                 placeholder="Select Package"
-                class="w-3/4"
+                class="w-full sm:w-10/12"
               >
                 <template #label>
                   <div class="flex gap-1 items-center">
@@ -65,12 +84,12 @@
                         >Paket {{ adsPackage.duration }} Bulan</span
                       >
                       <span class="truncate"
-                        >Harga {{ formatPrice(adsPackage.price) }}
-                      </span>
+                        >Harga {{ formatPrice(adsPackage.price) }}</span
+                      >
                       <span class="truncate"
                         >Ukuran {{ adsPackage.size_x }} x
-                        {{ adsPackage.size_y }}
-                      </span>
+                        {{ adsPackage.size_y }}</span
+                      >
 
                       <span class="truncate">
                         Penayangan di {{ getShowArray(adsPackage.route_json) }}
@@ -80,28 +99,26 @@
                 </template>
               </USelectMenu>
             </div>
-            <div class="flex gap-4 justify-between items-center">
-              <span class="flex-g font-medium">Upload Image</span>
-              <!-- <UInput
-                type="file"
-                icon="i-heroicons-folder"
-                class="w-3/4"
-                accept="image/*"
-                v-model="file"
-                @change="handleFileChange"
-              /> -->
+            <div
+              class="flex flex-col sm:flex-row gap-4 items-start sm:items-center"
+            >
+              <span class="flex-grow font-medium text-left sm:text-right"
+                >Upload Image</span
+              >
 
               <FileUploadInline
-                class="w-3/4"
+                class="w-full sm:w-10/12"
                 title="Ads Banner"
                 accept="images/*"
                 max-size="6291456"
                 @file-uploaded="setAdsImage"
               />
             </div>
-            <div class="flex gap-4 justify-end items-center">
+            <div
+              class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-end"
+            >
               <UButton
-                class="w-3/4 bg-accent"
+                class="w-full sm:w-10/12 bg-accent"
                 block
                 @click="submitAds"
                 :disabled="isDisabled"
@@ -113,10 +130,11 @@
         </section>
 
         <section v-if="section === 'payment'">
-          <div class="flex gap-8 p-8 px-24 rounded-md w-full justify-center">
+          <div
+            class="flex flex-col md:flex-row gap-8 p-8 sm:px-24 rounded-md w-full justify-center"
+          >
             <div class="flex gap-4 flex-col">
-              <span class="flex-g font-medium">Preview</span>
-              <!-- <img :src="payload.image_url" class="max-w-[600px]" /> -->
+              <span class="flex-grow font-medium">Preview</span>
 
               <UCard
                 :ui="{
@@ -124,12 +142,12 @@
                     padding: '',
                   },
                 }"
-                class="w-[600px] relative"
+                class="w-full sm:w-[600px] relative"
               >
                 <img
                   :src="payload.image_url"
                   alt=""
-                  class="w-full h-full max-w-[600px] object-cover rounded-lg"
+                  class="w-full h-full object-cover rounded-lg"
                 />
                 <div
                   class="absolute top-0 left-0 w-full h-full flex flex-col justify-between p-6 transition-opacity duration-300 ease-in-out opacity-0 hover:opacity-100 bg-gradient-to-r from-transparent via-transparent via-10% to-primary rounded-lg z-10"
@@ -163,7 +181,7 @@
               v-if="payload.status === 'active'"
               class="w-full flex items-start justify-start flex-col gap-1"
             >
-              <span class="flex-g font-medium">Advertisement Detail</span>
+              <span class="flex-grow font-medium">Advertisement Detail</span>
 
               <div
                 class="h-full flex items-start justify-start flex-col gap-1 mt-2"
@@ -202,7 +220,7 @@
                   {{
                     payload.valid_until_date
                       ? new Date(payload.valid_until_date).toLocaleDateString()
-                      : '-'
+                      : "-"
                   }}
                 </h6>
               </div>
@@ -212,7 +230,7 @@
               v-else
               class="w-full flex items-start justify-start flex-col gap-1"
             >
-              <span class="flex-g font-medium">Payment Detail</span>
+              <span class="flex-grow font-medium">Payment Detail</span>
 
               <div
                 class="h-full flex items-start justify-start flex-col gap-1 mt-2 flex-grow"
@@ -244,51 +262,33 @@
                 </h6>
 
                 <span class="font-thin text-primary text-sm">
-                  {{ isReupload ? 'Re' : '' }} Upload Proof of Payment
+                  {{ isReupload ? "Re" : "" }} Upload Proof of Payment
                 </span>
 
                 <div v-if="isReupload" class="flex gap-2">
                   <UButton
                     color="primary"
                     class="text-white py-3 rounded-lg my-1"
-                    @click="isReupload = false"
+                    @click="toggleIsReupload"
                   >
-                    <UIcon name="i-heroicons-arrow-path" />
-                    Reupload
+                    Cancel
                   </UButton>
-
                   <UButton
-                    v-if="isReupload"
-                    class="text-white py-3 rounded-lg my-1 bg-accent hover:bg-accent-700"
-                    @click="
-                      navigateTo({
-                        name: 'my-client-orders',
-                        query: { section: 'ads-history' },
-                      })
-                    "
+                    color="primary"
+                    class="text-white py-3 rounded-lg my-1"
+                    @click="toggleIsReupload"
                   >
-                    <UIcon name="i-heroicons-megaphone" />
-
-                    Other Ads History
+                    Re-Upload
                   </UButton>
                 </div>
 
-                <FileUpload
-                  v-else
+                <FileUploadInline
+                  class="w-full my-4"
                   title="Proof of Payment"
-                  accept="*"
+                  accept="image/*"
                   max-size="6291456"
-                  @file-uploaded="updateProofOfPayment"
-                  class="my-1"
+                  @file-uploaded="uploadProofOfPayment"
                 />
-
-                <span
-                  v-if="payload.payment_file_url"
-                  class="text-xs text-gray-500 max-w-xs"
-                >
-                  *Your transaction will be processed. Please wait for the
-                  verification process.
-                </span>
               </div>
             </div>
           </div>
@@ -299,64 +299,64 @@
 </template>
 
 <script setup>
-import FileUploadInline from '~/components/FileUploadInline.vue'
+import FileUploadInline from "~/components/FileUploadInline.vue";
 
 // services
-import { useAdvertisementService } from '~/composables/useAdvertisementService'
-import { useFileService } from '~/composables/useFileService'
-import { useSettingService } from '~/composables/useSettingService'
+import { useAdvertisementService } from "~/composables/useAdvertisementService";
+import { useFileService } from "~/composables/useFileService";
+import { useSettingService } from "~/composables/useSettingService";
 
 const { getAdsPackages, setMyAds, getAdsDetail, updateMyAdsProofOfPayment } =
-  useAdvertisementService()
-const { uploadAdsFile } = useFileService()
-const { getSettingBank } = useSettingService()
+  useAdvertisementService();
+const { uploadAdsFile } = useFileService();
+const { getSettingBank } = useSettingService();
 
-import PageLoader from '~/components/PageLoader.vue'
-import Navbar from '~/components/Navbar.vue'
-import Banner from '~/components/facilitators/Banner.vue'
+import PageLoader from "~/components/PageLoader.vue";
+import Navbar from "~/components/Navbar.vue";
+import Banner from "~/components/facilitators/Banner.vue";
 
-import imgBackground from '@/assets/images/back-ads.svg'
+import imgBackground from "@/assets/images/back-ads.svg";
 
-const router = useRouter()
-const route = useRoute()
-const toast = useToast()
+const router = useRouter();
+const route = useRoute();
+const toast = useToast();
 
-const id = ref(route.params.id)
+const id = ref(route.params.id);
 
 // state
-const isPageLoading = ref(true)
-const isReupload = ref(false)
-const isDisabled = ref(true)
+const isPageLoading = ref(true);
+const isReupload = ref(false);
+const isDisabled = ref(true);
 
 // data
-const user = ref(null)
-const section = ref('fill-data')
-const packageList = ref([])
-const bank = ref(null)
+const user = ref(null);
+const section = ref("fill-data");
+const packageList = ref([]);
+const bank = ref(null);
 const payload = ref({
   name: null,
   tagline: null,
   description: null,
   package: {},
   image_url: null,
-  status: 'pending',
-})
+  status: "pending",
+});
 
 // Watcher to truncate description to 50 words
 watch(
   () => payload.value.description,
   (newDescription) => {
-    payload.value.description = truncateWords(newDescription, 50)
+    payload.value.description = truncateWords(newDescription, 50);
   }
-)
+);
 
 // Watcher to update route query when section changes
 watch(
   () => section.value,
   (newSection) => {
-    router.push({ query: { ...route.query, section: newSection } })
+    router.push({ query: { ...route.query, section: newSection } });
   }
-)
+);
 
 watch(
   () => payload.value,
@@ -367,104 +367,104 @@ watch(
       payload.value.description &&
       payload.value.package &&
       payload.value.image_url
-    )
+    );
   },
   { deep: true }
-)
+);
 
 // Utility function to count and truncate words
 const truncateWords = (text, maxWords) => {
-  const words = text.split(/\s+/)
+  const words = text.split(/\s+/);
 
   if (words.length > maxWords) {
-    return words.slice(0, maxWords).join(' ')
+    return words.slice(0, maxWords).join(" ");
   }
-  return text
-}
+  return text;
+};
 
 const getShowArray = (routesRaw) => {
-  const routes = JSON.parse(routesRaw)
-  return routes.map((route) => route.name).join(', ')
-}
+  const routes = JSON.parse(routesRaw);
+  return routes.map((route) => route.name).join(", ");
+};
 
 const formatPrice = (price) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-  }).format(price)
-}
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+  }).format(price);
+};
 
 const copyToClipboard = (text) => {
-  navigator.clipboard.writeText(text)
+  navigator.clipboard.writeText(text);
 
   // Show toast
   toast.add({
-    title: 'Copied!',
-    color: 'green',
-    icon: 'i-heroicons-check-circle',
-    description: 'Bank Account copied to clipboard!',
-  })
-}
+    title: "Copied!",
+    color: "green",
+    icon: "i-heroicons-check-circle",
+    description: "Bank Account copied to clipboard!",
+  });
+};
 
 const setAdsImage = (file) => {
-  payload.value.image_url = file
-}
+  payload.value.image_url = file;
+};
 
 const fetchUser = async () => {
   try {
-    user.value = useCookie('token').value.user || null
+    user.value = useCookie("token").value.user || null;
   } catch (error) {
-    console.error('Fetching user failed:', error)
+    console.error("Fetching user failed:", error);
   }
-}
+};
 
 const logout = () => {
-  useCookie('token').value = null
-  user.value = null
-}
+  useCookie("token").value = null;
+  user.value = null;
+};
 
 const getQueryParam = () => {
   if (route.query.section) {
-    section.value = route.query.section
+    section.value = route.query.section;
   } else {
-    section.value = 'fill-data'
+    section.value = "fill-data";
   }
-}
+};
 
 const getFirstErrorMessage = (error) => {
   if (error.errors) {
-    return error.errors[Object.keys(error.errors)[0]][0]
+    return error.errors[Object.keys(error.errors)[0]][0];
   }
-  return error.message
-}
+  return error.message;
+};
 
 const resolveAdsStatus = (status) => {
   switch (status) {
-    case 'active':
+    case "active":
       return {
-        color: 'green',
-        text: 'Active',
-      }
+        color: "green",
+        text: "Active",
+      };
 
-    case 'inactive':
+    case "inactive":
       return {
-        color: 'gray',
-        text: 'Inactive',
-      }
+        color: "gray",
+        text: "Inactive",
+      };
 
-    case 'pending':
+    case "pending":
       return {
-        color: 'orange',
-        text: 'Pending',
-      }
+        color: "orange",
+        text: "Pending",
+      };
 
     default:
       return {
-        color: 'gray',
-        text: 'Unknown',
-      }
+        color: "gray",
+        text: "Unknown",
+      };
   }
-}
+};
 
 // watch(
 //   route,
@@ -476,57 +476,57 @@ const resolveAdsStatus = (status) => {
 
 const fetchAdsPackages = async () => {
   try {
-    const { data } = await getAdsPackages()
-    packageList.value = data.data.packages
-    payload.value.package = packageList.value[0]
+    const { data } = await getAdsPackages();
+    packageList.value = data.data.packages;
+    payload.value.package = packageList.value[0];
   } catch (err) {
-    console.error(err)
+    console.error(err);
     toast.add({
-      title: 'Uh Oh!',
-      color: 'red',
-      icon: 'i-heroicons-exclamation-triangle',
+      title: "Uh Oh!",
+      color: "red",
+      icon: "i-heroicons-exclamation-triangle",
       description: getFirstErrorMessage(err.response.data.error),
-    })
+    });
   }
-}
+};
 
 const fetchSettingBank = async () => {
   try {
-    const { data } = await getSettingBank()
+    const { data } = await getSettingBank();
 
-    bank.value = data.data.setting
+    bank.value = data.data.setting;
   } catch (error) {
-    console.error('Error fetching merchant orders:', error)
+    console.error("Error fetching merchant orders:", error);
   } finally {
-    isPageLoading.value = false
+    isPageLoading.value = false;
   }
-}
+};
 
 const fetchAdsDetail = async (id) => {
-  isPageLoading.value = true
+  isPageLoading.value = true;
   try {
-    const { data } = await getAdsDetail(id)
+    const { data } = await getAdsDetail(id);
     payload.value = {
       ...data.data.advertisement,
       package: packageList.value.find(
         (pkg) => pkg.id === data.data.advertisement.package_id
       ),
-    }
+    };
 
     // set isReupload to true if payment_file_url is not null
 
     if (
       data.data.advertisement.payment_file_url &&
-      data.data.advertisement.status === 'pending'
+      data.data.advertisement.status === "pending"
     ) {
-      isReupload.value = true
+      isReupload.value = true;
     }
   } catch (error) {
-    console.error('Error fetching ads detail:', error)
+    console.error("Error fetching ads detail:", error);
   } finally {
-    isPageLoading.value = false
+    isPageLoading.value = false;
   }
-}
+};
 
 const submitAds = async () => {
   await setMyAds({
@@ -534,29 +534,29 @@ const submitAds = async () => {
     package_id: payload.value.package.id,
   })
     .then((response) => {
-      payload.value.id = response.data.data.advertisement.id
+      payload.value.id = response.data.data.advertisement.id;
 
-      route.query.transaction_id = response.data.data.advertisement.id
+      route.query.transaction_id = response.data.data.advertisement.id;
 
-      section.value = 'payment'
+      section.value = "payment";
 
       toast.add({
-        title: 'Success!',
-        color: 'green',
-        icon: 'i-heroicons-check-circle',
-        description: 'Please continue to the payment process!',
-      })
+        title: "Success!",
+        color: "green",
+        icon: "i-heroicons-check-circle",
+        description: "Please continue to the payment process!",
+      });
     })
     .catch((err) => {
-      console.error(err)
+      console.error(err);
       toast.add({
-        title: 'Uh Oh!',
-        color: 'red',
-        icon: 'i-heroicons-exclamation-triangle',
+        title: "Uh Oh!",
+        color: "red",
+        icon: "i-heroicons-exclamation-triangle",
         description: getFirstErrorMessage(err.response.data.error),
-      })
-    })
-}
+      });
+    });
+};
 
 const updateProofOfPayment = (fileUrl) => {
   updateMyAdsProofOfPayment(payload.value.id, {
@@ -564,43 +564,43 @@ const updateProofOfPayment = (fileUrl) => {
   })
     .then(() => {
       toast.add({
-        title: 'Success!',
-        color: 'green',
-        icon: 'i-heroicons-check-circle',
-        description: 'Proof of payment uploaded successfully!',
-      })
+        title: "Success!",
+        color: "green",
+        icon: "i-heroicons-check-circle",
+        description: "Proof of payment uploaded successfully!",
+      });
 
-      isReupload.value = true
+      isReupload.value = true;
     })
     .catch((err) => {
-      console.error(err)
+      console.error(err);
       toast.add({
-        title: 'Uh Oh!',
-        color: 'red',
-        icon: 'i-heroicons-exclamation-triangle',
+        title: "Uh Oh!",
+        color: "red",
+        icon: "i-heroicons-exclamation-triangle",
         description: getFirstErrorMessage(err.response.data.error),
-      })
-    })
-}
+      });
+    });
+};
 
 onMounted(async () => {
   // fetch user data
-  if (useCookie('token').value) {
-    await fetchUser()
+  if (useCookie("token").value) {
+    await fetchUser();
   }
 
-  getQueryParam()
-  await fetchAdsPackages()
-  await fetchSettingBank()
+  getQueryParam();
+  await fetchAdsPackages();
+  await fetchSettingBank();
 
   // if query param is payment, fetch ads detail
-  if (route.query.section === 'payment') {
-    const transaction_id = route.query.transaction_id
-    await fetchAdsDetail(transaction_id)
+  if (route.query.section === "payment") {
+    const transaction_id = route.query.transaction_id;
+    await fetchAdsDetail(transaction_id);
   }
 
-  isPageLoading.value = false
-})
+  isPageLoading.value = false;
+});
 </script>
 
 <style>

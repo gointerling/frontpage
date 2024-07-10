@@ -6,27 +6,27 @@
     ]"
   >
     <div
-      class="flex gap-2 px-4 sm:px-6 lg:px-36 items-center sm:justify-between justify-center sm:mb-12"
+      class="flex gap-2 px-4 sm:px-6 lg:px-36 items-center sm:justify-between justify-between sm:mb-12"
     >
       <button class="flex gap-2 cursor-pointer" @click="backTo()">
         <nuxt-icon name="back" filled class="text-2xl" />
-        Back
+        <span class="hidden sm:block"> Back </span>
       </button>
       <h6
-        class="text-center sm:text-left text-4xl font-semibold uppercase text-primary mt-4 sm:mt-0"
+        class="text-center sm:text-left text-xl sm:text-4xl font-semibold uppercase text-primary sm:mt-0"
       >
         {{ bannerTitle }}
       </h6>
       <div v-if="isTitleVisible" class="flex gap-2 opacity-0">
         <nuxt-icon name="back" filled class="text-2xl opacity-0" />
-        Back
+        <span class="hidden sm:block"> Back </span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-const router = useRouter()
+const router = useRouter();
 
 const props = defineProps({
   isTitleVisible: {
@@ -35,7 +35,7 @@ const props = defineProps({
   },
   bannerTitle: {
     type: String,
-    default: 'Facilitators',
+    default: "Facilitators",
   },
   isLinearGradient: {
     type: Boolean,
@@ -45,12 +45,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-})
+});
 
 const backTo = () => {
   // back to specific page
-  router.go(-1)
-}
+  router.go(-1);
+};
 </script>
 
 <style>
@@ -61,13 +61,13 @@ const backTo = () => {
       rgba(234, 234, 234, 0.276) 55%,
       rgba(255, 255, 255, 1) 100%
     ),
-    url('/assets/images/facilitators-blue-bg.png');
+    url("/assets/images/facilitators-blue-bg.png");
   background-size: cover;
   background-position: center;
 }
 
 .banner-container {
-  background-image: url('/assets/images/facilitators-blue-bg.png');
+  background-image: url("/assets/images/facilitators-blue-bg.png");
   background-size: cover;
   background-position: center;
 }

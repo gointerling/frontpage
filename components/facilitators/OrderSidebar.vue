@@ -4,8 +4,8 @@
     fullscreen
     prevent-close
     :ui="{
-      base: '!w-[500px] absolute top-0 right-0 h-screen bg-white dark:bg-gray-800 rounded-l-3xl',
-      rounded: 'rounded-l-3xl rounded-r-0',
+      base: 'w-full lg:w-[500px] absolute top-0 right-0 h-screen bg-white dark:bg-gray-800 lg:rounded-l-3xl',
+      rounded: 'rounded-none lg:rounded-l-3xl',
     }"
   >
     <UCard
@@ -13,7 +13,7 @@
         base: 'h-full',
         ring: '',
         divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-        rounded: 'rounded-l-3xl rounded-r-0',
+        rounded: 'rounded-none lg:rounded-l-3xl',
         body: {
           base: 'h-full',
           padding: 'px-6 py-5 sm:p-10',
@@ -55,9 +55,9 @@
 
           <div class="flex flex-col w-full">
             <label class="text-primary">Category</label>
-            <span class="text-xl font-semibold text-primary capitalize">
-              {{ props.data.merchants[0].type }}
-            </span>
+            <span class="text-xl font-semibold text-primary capitalize">{{
+              props.data.merchants[0].type
+            }}</span>
           </div>
 
           <div
@@ -115,14 +115,14 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from "vue";
 
-import { useOrderService } from '~/composables/useOrderService'
-const { setMyOrder } = useOrderService()
+import { useOrderService } from "~/composables/useOrderService";
+const { setMyOrder } = useOrderService();
 
-const route = useRoute()
-const router = useRouter()
-const toast = useToast()
+const route = useRoute();
+const router = useRouter();
+const toast = useToast();
 
 // define props
 const props = defineProps({
@@ -133,85 +133,85 @@ const props = defineProps({
   data: {
     type: Object,
     default: () => ({
-      title: 'Sidebar Title',
-      content: 'Sidebar Content',
-      confirmText: 'Continue',
-      cancelText: 'Cancel',
+      title: "Sidebar Title",
+      content: "Sidebar Content",
+      confirmText: "Continue",
+      cancelText: "Cancel",
       callback: () => {},
     }),
   },
-})
+});
 
 const fromLanguageList = computed(() => {
   return props.data.language_sources.filter(
     (lang) => lang.id !== payload.value.to.id
-  )
-})
+  );
+});
 
 const toLanguageList = computed(() => {
   return props.data.language_destinations.filter(
     (lang) => lang.id !== payload.value.from.id
-  )
-})
+  );
+});
 
 const payload = ref({
   price: 0,
-  type: 'Translator',
+  type: "Translator",
   from: {},
   to: {},
-  file_url: '',
-})
+  file_url: "",
+});
 
 // emit event to update the prop value
-const emit = defineEmits(['update:isOpen'])
+const emit = defineEmits(["update:isOpen"]);
 
 // internal state to handle the modal visibility
-const internalIsOpen = ref(props.isOpen)
+const internalIsOpen = ref(props.isOpen);
 
 // watch for changes in the prop to update the internal state
 watch(
   () => props.isOpen,
   (newVal) => {
-    internalIsOpen.value = newVal
+    internalIsOpen.value = newVal;
 
     if (!newVal) {
-      hideSidebar()
+      hideSidebar();
     }
   }
-)
+);
 
 // watch for changes in the internal state to emit the event
 watch(internalIsOpen, (newVal) => {
-  emit('update:isOpen', newVal)
-})
+  emit("update:isOpen", newVal);
+});
 
 const hideSidebar = () => {
-  internalIsOpen.value = false
+  internalIsOpen.value = false;
 
-  emit('hide')
-}
+  emit("hide");
+};
 
 const setOrderFile = (file) => {
-  payload.value.file_url = file
-}
+  payload.value.file_url = file;
+};
 
 // methods for handling confirmation and cancellation
 const confirm = () => {
-  props.data.callback(true)
-  internalIsOpen.value = false
-}
+  props.data.callback(true);
+  internalIsOpen.value = false;
+};
 
 const cancel = () => {
-  props.data.callback(false)
-  internalIsOpen.value = false
-}
+  props.data.callback(false);
+  internalIsOpen.value = false;
+};
 
 const formatPrice = (price) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-  }).format(price)
-}
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+  }).format(price);
+};
 
 const setPayload = () => {
   // Initialize the payload object
@@ -222,79 +222,79 @@ const setPayload = () => {
     language_source: payload.value.from,
     language_destination: payload.value.to,
     user_file_url: payload.value.file_url,
-  }
+  };
 
   // Function to check if a value is null or empty
   const isNullOrEmpty = (value) => {
-    return value === null || value === undefined || value === ''
-  }
+    return value === null || value === undefined || value === "";
+  };
 
   // Mapping of field names to human-readable names
   const fieldNames = {
-    service_id: 'Service ID',
-    merchant_id: 'Merchant ID',
-    merchant_user_id: 'Merchant User ID',
-    language_source: 'Source Language',
-    language_destination: 'Destination Language',
-    user_file_url: 'Upload File',
-  }
+    service_id: "Service ID",
+    merchant_id: "Merchant ID",
+    merchant_user_id: "Merchant User ID",
+    language_source: "Source Language",
+    language_destination: "Destination Language",
+    user_file_url: "Upload File",
+  };
 
   // Validate data fields
   const fieldsToValidate = [
-    'service_id',
-    'merchant_id',
-    'merchant_user_id',
-    'language_source',
-    'language_destination',
-    'user_file_url',
-  ]
+    "service_id",
+    "merchant_id",
+    "merchant_user_id",
+    "language_source",
+    "language_destination",
+    "user_file_url",
+  ];
 
   for (const field of fieldsToValidate) {
     if (isNullOrEmpty(data[field])) {
       toast.add({
-        title: 'Uh Oh!',
-        color: 'red',
-        icon: 'i-heroicons-exclamation-triangle',
+        title: "Uh Oh!",
+        color: "red",
+        icon: "i-heroicons-exclamation-triangle",
         description: `${fieldNames[field]} cannot be empty`,
-      })
-      return null
+      });
+      return null;
     }
   }
 
   // If all fields are valid, return the data
-  return data
-}
+  return data;
+};
 
 const setOrder = async () => {
   try {
-    const { data } = await setMyOrder(setPayload())
+    const { data } = await setMyOrder(setPayload());
 
     toast.add({
-      title: 'Success!',
-      color: 'green',
-      icon: 'i-heroicons-check-circle',
-      description: 'Your order have been successfully listed!',
-    })
+      title: "Success!",
+      color: "green",
+      icon: "i-heroicons-check-circle",
+      description: "Your order have been successfully listed!",
+    });
 
     // close the side bar
-    hideSidebar()
+    hideSidebar();
 
     // route to order
     router.push({
-      name: 'my-client-orders-id',
+      name: "my-client-orders-id",
       params: {
         id: data.data.order.id,
       },
-    })
+    });
   } catch (err) {
-    console.error('Creating order failed:', err)
+    console.error("Creating order failed:", err);
 
     toast.add({
-      title: 'Uh Oh!',
-      color: 'red',
-      icon: 'i-heroicons-exclamation-triangle',
+      title: "Uh Oh!",
+      color: "red",
+      icon: "i-heroicons-exclamation-triangle",
       description: err.response.data.message,
-    })
+    });
   }
-}
+};
 </script>

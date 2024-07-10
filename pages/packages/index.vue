@@ -7,12 +7,12 @@
         is-title-visible
         is-linear-gradient
         :banner-title="'Premium Package'"
-        class="min-h-[150px] sm:min-h-[200px] md:min-h-[250px] pt-60"
+        class="min-h-[150px] sm:min-h-[200px] md:min-h-[250px] pt-44 sm:pt-60"
       />
 
       <!-- grid 3 -->
       <div
-        class="grid grid-cols-1 gap-8 px-4 sm:grid-cols-2 md:grid-cols-3 sm:gap-10 md:gap-12 sm:px-10 md:px-20 lg:px-52"
+        class="grid grid-cols-1 gap-8 px-4 py-4 sm:grid-cols-2 md:grid-cols-3 sm:gap-10 md:gap-12 sm:px-10 md:px-20 lg:px-52 sm:py-12"
       >
         <UCard
           v-for="packageItem in packageList"
@@ -50,7 +50,7 @@
 
             <img
               src="@/assets/images/crown.png"
-              class="absolute"
+              class="absolute hidden sm:block"
               :class="`${packageItem.position} ${packageItem.rotation}`"
             />
 
@@ -65,105 +65,105 @@
 <script setup>
 // services
 
-import PageLoader from '~/components/PageLoader.vue'
-import Navbar from '~/components/Navbar.vue'
-import Banner from '~/components/facilitators/Banner.vue'
+import PageLoader from "~/components/PageLoader.vue";
+import Navbar from "~/components/Navbar.vue";
+import Banner from "~/components/facilitators/Banner.vue";
 
-const router = useRouter()
-const route = useRoute()
-const toast = useToast()
+const router = useRouter();
+const route = useRoute();
+const toast = useToast();
 
-const id = ref(route.params.id)
+const id = ref(route.params.id);
 
 // state
-const isPageLoading = ref(true)
-const isReupload = ref(false)
+const isPageLoading = ref(true);
+const isReupload = ref(false);
 
 // data
-const user = ref(null)
-const section = ref('fill-data')
-const bank = ref(null)
+const user = ref(null);
+const section = ref("fill-data");
+const bank = ref(null);
 const packageList = ref([
   {
     id: 1,
-    name: '1 Month',
+    name: "1 Month",
     list: [
-      'Can open a stall on the website according to the tang package they choose.',
-      'Online lias life shop',
+      "Can open a stall on the website according to the tang package they choose.",
+      "Online lias life shop",
     ],
-    color: '#59A2FB',
-    rotation: '-rotate-12',
+    color: "#59A2FB",
+    rotation: "-rotate-12",
     position:
-      'top-[-50px] sm:top-[-75px] md:top-[-100px] left-[-50px] sm:left-[-75px] md:left-[-100px]',
+      "top-[-50px] sm:top-[-75px] md:top-[-100px] left-[-50px] sm:left-[-75px] md:left-[-100px]",
   },
   {
     id: 2,
-    name: '3 Month',
+    name: "3 Month",
     list: [
-      'Can open a stall on the website according to the tang package they choose.',
-      'Online lias life shop',
-      'Reviews appear',
+      "Can open a stall on the website according to the tang package they choose.",
+      "Online lias life shop",
+      "Reviews appear",
     ],
-    color: '#ED7155',
-    rotation: 'rotate-[10deg] sm:rotate-[15deg] md:rotate-[20deg]',
+    color: "#ED7155",
+    rotation: "rotate-[10deg] sm:rotate-[15deg] md:rotate-[20deg]",
     position:
-      'bottom-[-30px] sm:bottom-[-45px] md:bottom-[-60px] left-[-10px] sm:left-[-15px] md:left-[-20px]',
+      "bottom-[-30px] sm:bottom-[-45px] md:bottom-[-60px] left-[-10px] sm:left-[-15px] md:left-[-20px]",
   },
   {
     id: 3,
-    name: '6 Month',
+    name: "6 Month",
     list: [
-      'Can open a stall on the website according to the tang package they choose.',
-      'Online lias life shop',
-      'Reviews and ratings appear',
-      'Advertised (the shop appears at the top or most recommended)',
-      'Free shipping',
+      "Can open a stall on the website according to the tang package they choose.",
+      "Online lias life shop",
+      "Reviews and ratings appear",
+      "Advertised (the shop appears at the top or most recommended)",
+      "Free shipping",
     ],
-    color: '#7DCAE8',
-    rotation: 'rotate-[15deg] sm:rotate-[25deg] md:rotate-[30deg]',
+    color: "#7DCAE8",
+    rotation: "rotate-[15deg] sm:rotate-[25deg] md:rotate-[30deg]",
     position:
-      'top-[50px] sm:top-[75px] md:top-[100px] right-[-65px] sm:right-[-97px] md:right-[-130px]',
+      "top-[50px] sm:top-[75px] md:top-[100px] right-[-65px] sm:right-[-97px] md:right-[-130px]",
   },
-])
+]);
 
 const fetchUser = async () => {
   try {
-    user.value = useCookie('token').value.user || null
+    user.value = useCookie("token").value.user || null;
   } catch (error) {
-    console.error('Fetching user failed:', error)
+    console.error("Fetching user failed:", error);
   }
-}
+};
 
 const logout = () => {
-  useCookie('token').value = null
-  user.value = null
-}
+  useCookie("token").value = null;
+  user.value = null;
+};
 
 const getQueryParam = () => {
   if (route.query.section) {
-    section.value = route.query.section
+    section.value = route.query.section;
   } else {
-    section.value = 'fill-data'
+    section.value = "fill-data";
   }
-}
+};
 
 const getFirstErrorMessage = (error) => {
   if (error.errors) {
-    return error.errors[Object.keys(error.errors)[0]][0]
+    return error.errors[Object.keys(error.errors)[0]][0];
   }
-  return error.message
-}
+  return error.message;
+};
 
 onMounted(async () => {
   // fetch user data
-  if (useCookie('token').value) {
-    await fetchUser()
+  if (useCookie("token").value) {
+    await fetchUser();
   }
 
-  getQueryParam()
+  getQueryParam();
 
-  isPageLoading.value = false
-})
+  isPageLoading.value = false;
+});
 </script>
 
 <style>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="!isSmallScreen" class="bg-gray-50 bg-facilitator py-16">
+    <div v-if="!isSmallScreen" class="bg-gray-50 bg-facilitator pt-16">
       <div
         class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center gap-8"
       >
@@ -46,41 +46,41 @@
 </template>
 
 <script>
-import heroImage from '@/assets/images/facilitators.svg'
+import heroImage from "@/assets/images/facilitators.svg";
 
 export default {
   data() {
     return {
       heroImage,
       isSmallScreen: false,
-    }
+    };
   },
   methods: {
     navigateTo(route) {
-      this.$router.push(route)
+      this.$router.push(route);
     },
     checkScreenSize() {
-      this.isSmallScreen = window.innerWidth < 1024
+      this.isSmallScreen = window.innerWidth < 1024;
     },
   },
   mounted() {
-    this.checkScreenSize()
-    window.addEventListener('resize', this.checkScreenSize)
+    this.checkScreenSize();
+    window.addEventListener("resize", this.checkScreenSize);
   },
   beforeDestroy() {
-    window.removeEventListener('resize', this.checkScreenSize)
+    window.removeEventListener("resize", this.checkScreenSize);
   },
-}
+};
 </script>
 
 <style scoped>
 .bg-facilitator {
-  background-image: url('/assets/images/facilitators-bg.png');
-  background-size: contain;
+  background-image: url("/assets/images/facilitators-bg.png");
+  background-size: cover;
   background-position: center;
 }
 .bg-facilitator-mobile {
-  background-image: url('/assets/images/facilitators-bg.png');
+  background-image: url("/assets/images/facilitators-bg.png");
   background-size: cover;
   background-position: center;
 }

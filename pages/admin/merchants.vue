@@ -74,16 +74,29 @@
 
             <template #user-data="{ row }">
               <div class="flex gap-3 items-center">
-                <UAvatar
-                  :src="row.user.photo"
-                  :alt="row.user.fullname"
-                  size="sm"
-                  variant="rounded-full"
-                  imgClass="object-cover"
-                />
+                <data class="cursor-pointer" @click="openLink(row.user.photo)">
+                  <UAvatar
+                    :src="row.user.photo"
+                    :alt="row.user.fullname"
+                    size="sm"
+                    variant="rounded-full"
+                    imgClass="object-cover"
+                  />
+                </data>
 
                 <div class="flex flex-col">
                   <span class="font-semibold text-primary">
+                    <UBadge
+                      size="xs"
+                      :label="row.user.type"
+                      :color="
+                        row.user.type === 'interpreter' ? 'emerald' : 'blue'
+                      "
+                      variant="subtle"
+                      class="capitalize"
+                    />
+                  </span>
+                  <span class="font-semibold text-primary py-1 capitalize">
                     {{ row.user.fullname }}
                   </span>
                   <span class="text-sm text-gray-600">
@@ -135,15 +148,71 @@
               />
             </template>
 
+            <template #subscription-data="{ row }">
+              <div class="flex gap-1 flex-col">
+                <span class="font-semibold text-primary">
+                  {{ row.subscription.name }}
+                  (
+                  {{ resolveDuration(row.subscription.duration) }}
+                  )
+                </span>
+                <span>
+                  {{
+                    checkSubsriptionStatus(
+                      row.subscription.pivot.is_valid,
+                      row.subscription.pivot.is_trial
+                    )
+                  }}
+                </span>
+                <div v-if="row.subscription.pivot.is_valid">
+                  <span
+                    v-if="
+                      isExpired(row.subscription.pivot.valid_until) ===
+                      'expired'
+                    "
+                    class="text-sm text-red-500"
+                  >
+                    Expired
+                    <b>
+                      : {{ formatDate(row.subscription.pivot.valid_until) }}
+                    </b>
+                  </span>
+                  <span
+                    v-else
+                    :class="
+                      isExpired(row.subscription.pivot.valid_until) ===
+                      'near-expired'
+                        ? 'text-orange-500'
+                        : 'text-green-500'
+                    "
+                  >
+                    Valid Until :
+                    {{ formatDate(row.subscription.pivot.valid_until) }}
+                  </span>
+                </div>
+
+                <div v-else class="text-gray-300">
+                  <UButton
+                    variant="soft"
+                    color="blue"
+                    icon="i-heroicons-document-check"
+                  >
+                    Verify Subscription
+                  </UButton>
+                </div>
+              </div>
+            </template>
+
             <template #CV-data="{ row }">
               <UButton
                 v-if="row.CV"
                 size="sm"
-                color="primary"
+                color="accent"
                 :trailing="false"
                 @click="openLink(row.CV)"
               >
                 <nuxt-icon name="file" class="text-white" />
+
                 Open CV
               </UButton>
 
@@ -162,7 +231,7 @@
                   v-for="(portfolioLink, index) in row.portfolio"
                   :key="index"
                   size="sm"
-                  color="primary"
+                  color="accent"
                   :trailing="false"
                   @click="openLink(portfolioLink)"
                 >
@@ -190,7 +259,7 @@
                   v-for="(certificateLink, index) in row.certificate"
                   :key="index"
                   size="sm"
-                  color="primary"
+                  color="accent"
                   :trailing="false"
                   @click="openLink(certificateLink)"
                 >
@@ -223,7 +292,7 @@
                         'Deactivate',
                         'Cancel',
                         () => {
-                          updateUserStatus(row.user.id, 'inactive')
+                          updateUserStatus(row.user.id, 'inactive');
                         }
                       )
                     "
@@ -245,7 +314,7 @@
                         'Verify',
                         'Cancel',
                         () => {
-                          updateUserStatus(row.user.id, 'verified')
+                          updateUserStatus(row.user.id, 'verified');
                         }
                       )
                     "
@@ -267,65 +336,65 @@
   </div>
 </template>
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useMerchantService } from '~/composables/useMerchantService'
+import { ref, computed, onMounted } from "vue";
+import { useMerchantService } from "~/composables/useMerchantService";
 
-const { getMerchants, updateMerchantStatus } = useMerchantService()
+const { getMerchants, updateMerchantStatus } = useMerchantService();
 
 // components
-const toast = useToast()
+const toast = useToast();
 
 definePageMeta({
   layout: false,
-})
+});
 
 // state
-const isTableLoading = ref(true)
-const isModalOpen = ref(false)
+const isTableLoading = ref(true);
+const isModalOpen = ref(false);
 const modalData = ref({
-  title: '',
-  message: '',
+  title: "",
+  message: "",
   callback: null,
-})
+});
 
 // data
-const pageTitle = 'Facilitators List'
-const facilitators = ref([])
+const pageTitle = "Facilitators List";
+const facilitators = ref([]);
 const selectedStatus = ref({
-  label: 'All',
-  value: 'all',
-})
-const searchQuery = ref('')
-const page = ref(1)
+  label: "All",
+  value: "all",
+});
+const searchQuery = ref("");
+const page = ref(1);
 const paginationsData = ref({
   page: 1,
   totalPage: 1,
   totalItems: 0,
   itemsPerPage: 10,
-})
+});
 
 const actions = [
   [
     {
-      key: 'completed',
-      label: 'Completed',
-      icon: 'i-heroicons-check',
+      key: "completed",
+      label: "Completed",
+      icon: "i-heroicons-check",
       callback: () => {
-        console.log('completed')
+        console.log("completed");
       },
     },
   ],
   [
     {
-      key: 'uncompleted',
-      label: 'In Progress',
-      icon: 'i-heroicons-arrow-path',
+      key: "uncompleted",
+      label: "In Progress",
+      icon: "i-heroicons-arrow-path",
       callback: () => {
-        console.log('uncompleted')
+        console.log("uncompleted");
       },
     },
   ],
-]
+];
 
 // Fetch facilitators
 const fetchFacilitators = async () => {
@@ -334,7 +403,7 @@ const fetchFacilitators = async () => {
       page: page.value,
       per_page: paginationsData.value.itemsPerPage,
       status:
-        selectedStatus.value.value === 'all' ? '' : selectedStatus.value.value,
+        selectedStatus.value.value === "all" ? "" : selectedStatus.value.value,
       search: searchQuery.value,
     }).then((response) => {
       facilitators.value = response.data.data.data.map((user, index) => ({
@@ -343,9 +412,12 @@ const fetchFacilitators = async () => {
           id: user.id,
           fullname: user.fullname,
           email: user.email,
+          photo: user.photo,
+          type: user.merchants[0].type,
         },
-        phone: convertPhone(user.phone ?? ''),
-        type: user.merchants[0].type,
+        phone: convertPhone(user.phone ?? ""),
+        // type: user.merchants[0].type,
+        subscription: user.merchants[0].subscription_packages[0] ?? {},
         bank: {
           bank: user.merchants[0].bank,
           bankAccount: user.merchants[0].bank_account,
@@ -355,91 +427,143 @@ const fetchFacilitators = async () => {
         certificate: JSON.parse(user.merchants[0].certificates),
         status: user.merchants[0].status,
         actions: actions,
-      }))
+      }));
 
       paginationsData.value = {
         page: response.data.data.current_page,
         totalPage: response.data.data.last_page,
         totalItems: response.data.data.total,
         itemsPerPage: response.data.data.per_page,
-      }
-    })
+      };
+    });
   } catch (error) {
-    console.error('Error fetching facilitators:', error)
+    console.error("Error fetching facilitators:", error);
   } finally {
-    isTableLoading.value = false
+    isTableLoading.value = false;
   }
-}
+};
 
 const convertPhone = (phone) => {
   // remove non numeric characters
-  phone = phone.replace(/\D/g, '')
+  phone = phone.replace(/\D/g, "");
 
   // change phone format to 62
-  if (phone.startsWith('0')) {
-    return `62${phone.slice(1)}`
+  if (phone.startsWith("0")) {
+    return `62${phone.slice(1)}`;
   }
 
-  return phone
-}
+  return phone;
+};
+
+const formatDate = (date) => {
+  console.log(date);
+  return new Date(date).toLocaleDateString("id-ID", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
+const resolveDuration = (duration) => {
+  if (duration > 1) {
+    return duration + " Months";
+  } else {
+    return duration + " Month";
+  }
+};
+
+const isExpired = (date) => {
+  // expired
+  if (new Date(date) < new Date()) {
+    return "expired";
+  }
+
+  // near to expired 1 week
+  if (
+    new Date(date) < new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
+  ) {
+    return "near-expired";
+  }
+
+  return "valid";
+};
+
+const checkSubsriptionStatus = (isValid, isTrial) => {
+  if (isTrial && isValid) {
+    return "Trial";
+  }
+
+  if (isValid) {
+    return "Active";
+  }
+
+  return "Pending";
+};
 
 // Watcher to fetch data when page changes
-watch(page, fetchFacilitators)
+watch(page, fetchFacilitators);
 
 // Filter facilitators based on search query
 const filterFacilitators = () => {
-  fetchFacilitators(page.value, selectedStatus.value.value, searchQuery.value)
-}
+  fetchFacilitators(page.value, selectedStatus.value.value, searchQuery.value);
+};
 
 // Search change handler with manual debounce
 const onSearchChange = debounce(() => {
-  filterFacilitators()
-}, 500)
+  filterFacilitators();
+}, 500);
 
 // debounce function
 function debounce(func, wait, immediate) {
-  let timeout
+  let timeout;
   return function () {
-    const context = this
-    const args = arguments
+    const context = this;
+    const args = arguments;
     const later = function () {
-      timeout = null
-      if (!immediate) func.apply(context, args)
-    }
-    const callNow = immediate && !timeout
-    clearTimeout(timeout)
-    timeout = setTimeout(later, wait)
-    if (callNow) func.apply(context, args)
-  }
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    const callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
 }
 
 // Open link in new tab
 const openLink = (url) => {
-  // Open link in new tab
-  window.open(url, '_blank')
-}
+  // Open link in new tab if not empty
+  if (url) window.open(url, "_blank");
+  else
+    toast.add({
+      title: "Uh Oh!",
+      color: "red",
+      icon: "i-heroicons-x-circle",
+      description: "Link is empty!",
+    });
+};
 
 const copyToClipboard = (text) => {
-  navigator.clipboard.writeText(text)
+  navigator.clipboard.writeText(text);
 
   // Show toast
   toast.add({
-    title: 'Copied!',
-    color: 'green',
-    icon: 'i-heroicons-check-circle',
-    description: 'No Rekening copied to clipboard!',
-  })
-}
+    title: "Copied!",
+    color: "green",
+    icon: "i-heroicons-check-circle",
+    description: "No Rekening copied to clipboard!",
+  });
+};
 
 const resolveStatusColor = (status) => {
-  if (status === 'verified') {
-    return 'blue'
-  } else if (status === 'pending') {
-    return 'orange'
+  if (status === "verified") {
+    return "blue";
+  } else if (status === "pending") {
+    return "orange";
   } else {
-    return 'gray'
+    return "gray";
   }
-}
+};
 
 const displayConfirmationModal = (
   title,
@@ -454,42 +578,42 @@ const displayConfirmationModal = (
     confirmText,
     cancelText,
     callback,
-  }
-  isModalOpen.value = true
-}
+  };
+  isModalOpen.value = true;
+};
 
 const updateUserStatus = async (userId, status) => {
   await updateMerchantStatus(userId, status)
     .then(() => {
       // Close modal
-      isModalOpen.value = false
+      isModalOpen.value = false;
 
       // Show toast
       toast.add({
-        title: 'Success!',
-        color: 'green',
-        icon: 'i-heroicons-check-circle',
-        description: 'User status updated successfully!',
-      })
+        title: "Success!",
+        color: "green",
+        icon: "i-heroicons-check-circle",
+        description: "User status updated successfully!",
+      });
 
       // Fetch facilitators
-      fetchFacilitators()
+      fetchFacilitators();
     })
     .catch((error) => {
-      console.error('Error updating user status:', error)
+      console.error("Error updating user status:", error);
 
       // Show toast
       toast.add({
-        title: 'Uh Oh!',
-        color: 'red',
-        icon: 'i-heroicons-x-circle',
-        description: 'Error updating user status!',
-      })
-    })
-}
+        title: "Uh Oh!",
+        color: "red",
+        icon: "i-heroicons-x-circle",
+        description: "Error updating user status!",
+      });
+    });
+};
 
 // Mounted lifecycle hook
 onMounted(() => {
-  fetchFacilitators()
-})
+  fetchFacilitators();
+});
 </script>

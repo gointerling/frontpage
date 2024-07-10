@@ -6,6 +6,17 @@
       <!-- <Banner class="min-h-[250px]" /> -->
       <div class="p-8 lg:px-36 pt-20">
         <div class="flex justify-center py-8 gap-2">
+          <UButton
+            v-if="isSmallScreen"
+            :icon="
+              isFilterShow
+                ? 'i-heroicons-x-mark'
+                : 'i-heroicons-adjustments-horizontal'
+            "
+            class="p-2 px-4 bg-accent ring-accent text-white rounded-lg hover:bg-accnet-700 transition duration-300"
+            @click="isFilterShow = !isFilterShow"
+          >
+          </UButton>
           <input
             v-model="searchQuery"
             type="text"
@@ -20,7 +31,10 @@
           </button>
         </div>
         <div class="grid grid-cols-12 gap-6">
-          <div class="col-span-3">
+          <div
+            class="md:block col-span-3"
+            :class="isFilterShow ? ' block col-span-full' : 'hidden'"
+          >
             <!-- side filter -->
             <UCard
               class="rounded-xl"
@@ -268,7 +282,7 @@
               </template>
             </UCard>
           </div>
-          <div class="col-span-9 flex flex-col justify-between">
+          <div class="col-span-12 md:col-span-9 flex flex-col justify-between">
             <!-- card -->
             <div v-if="!isItemsLoading" class="h-full">
               <div
@@ -276,7 +290,7 @@
                 class="grid grid-cols-12 gap-4 h-fit overflow-y-visible"
               >
                 <FacilitatorCard
-                  class="col-span-6"
+                  class="col-span-12 sm:col-span-6"
                   v-for="service in serviceList"
                   :key="service.id"
                   :data="service"
@@ -345,286 +359,310 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import PageLoader from '~/components/PageLoader.vue'
-import Navbar from '~/components/Navbar.vue'
-import FacilitatorCard from '~/components/facilitators/FacilitatorCard.vue'
-import OrderSidebar from '~/components/facilitators/OrderSidebar.vue'
+import { ref, computed, onMounted, watch } from "vue";
+import PageLoader from "~/components/PageLoader.vue";
+import Navbar from "~/components/Navbar.vue";
+import FacilitatorCard from "~/components/facilitators/FacilitatorCard.vue";
+import OrderSidebar from "~/components/facilitators/OrderSidebar.vue";
 
-import emptyState from '~/assets/images/empty.svg'
+import emptyState from "~/assets/images/empty.svg";
 
-import { useMasterDataService } from '~/composables/useMasterDataService'
-import { useMerchantService } from '~/composables/useMerchantService'
-import { useSkillService } from '~/composables/useSkillService'
+import { useMasterDataService } from "~/composables/useMasterDataService";
+import { useMerchantService } from "~/composables/useMerchantService";
+import { useSkillService } from "~/composables/useSkillService";
 
-const { getLanguages } = useMasterDataService()
-const { getSkills } = useSkillService()
-const { getServices } = useMerchantService()
+const { getLanguages } = useMasterDataService();
+const { getSkills } = useSkillService();
+const { getServices } = useMerchantService();
 
-const route = useRoute()
-const router = useRouter()
-const toast = useToast()
+const route = useRoute();
+const router = useRouter();
+const toast = useToast();
 
 // state
-const isPageLoading = ref(true)
-const isItemsLoading = ref(false)
-const isFilterLoading = ref(false)
-const isOrderSidebarOpen = ref(false)
+const isPageLoading = ref(true);
+const isItemsLoading = ref(false);
+const isFilterLoading = ref(false);
+const isOrderSidebarOpen = ref(false);
+const isFilterShow = ref(false);
+const isSmallScreen = ref(false);
 
 // data
-const user = ref(null)
-const selectedMerchant = ref(null)
-const languageList = ref([])
-const skillList = ref([])
-const page = ref(1)
+const user = ref(null);
+const selectedMerchant = ref(null);
+const languageList = ref([]);
+const skillList = ref([]);
+const page = ref(1);
 const paginationsData = ref({
   totalPage: 1,
   totalItems: 0,
   itemsPerPage: 4,
-})
-const serviceList = ref([])
-const searchQuery = ref('')
+});
+const serviceList = ref([]);
+const searchQuery = ref("");
 
 // filter
 const filter = ref({
-  category: '',
-  from: '',
-  to: '',
+  category: "",
+  from: "",
+  to: "",
   mainSkills: [],
   additionalSkills: [],
   fileExtensions: [],
   priceFrom: 0,
   priceTo: 1000000,
-  workingHours: '',
-})
+  workingHours: "",
+});
 
 const openOrderSidebar = (service) => {
-  selectedMerchant.value = service
-  isOrderSidebarOpen.value = true
-}
+  selectedMerchant.value = service;
+  isOrderSidebarOpen.value = true;
+};
 
 const fromLanguageList = computed(() => {
   // filter out the selected language and map only the id and name
-  return languageList.value.filter((lang) => lang.id !== filter.value.to.id)
-})
+  return languageList.value.filter((lang) => lang.id !== filter.value.to.id);
+});
 
 const toLanguageList = computed(() => {
   // filter out the selected language and map only the id and name
-  return languageList.value.filter((lang) => lang.id !== filter.value.from.id)
-})
+  return languageList.value.filter((lang) => lang.id !== filter.value.from.id);
+});
 
 const mainSkillList = computed(() => {
-  return skillList.value.filter((skill) => skill.skill_type === 'main')
-})
+  return skillList.value.filter((skill) => skill.skill_type === "main");
+});
 
 const additionalSkillList = computed(() => {
-  return skillList.value.filter((skill) => skill.skill_type === 'additional')
-})
+  return skillList.value.filter((skill) => skill.skill_type === "additional");
+});
 
 const processedFilter = computed(() => {
   // make the filter object simpler like become
-  const processed = { ...filter.value }
+  const processed = { ...filter.value };
 
   // convert array to string
-  processed.main_skills = filter.value.mainSkills.join(',')
-  processed.additional_skills = filter.value.additionalSkills.join(',')
-  processed.price_from = filter.value.priceFrom
-  processed.price_to = filter.value.priceTo
-  processed.from = filter.value.from.id
-  processed.to = filter.value.to.id
-  processed.file_extensions = filter.value.fileExtensions.id
-  processed.working_hours = filter.value.workingHours
+  processed.main_skills = filter.value.mainSkills.join(",");
+  processed.additional_skills = filter.value.additionalSkills.join(",");
+  processed.price_from = filter.value.priceFrom;
+  processed.price_to = filter.value.priceTo;
+  processed.from = filter.value.from.id;
+  processed.to = filter.value.to.id;
+  processed.file_extensions = filter.value.fileExtensions.id;
+  processed.working_hours = filter.value.workingHours;
 
   // remove unused key
-  delete processed.mainSkills
-  delete processed.additionalSkills
-  delete processed.priceFrom
-  delete processed.priceTo
-  delete processed.fileExtensions
-  delete processed.workingHours
+  delete processed.mainSkills;
+  delete processed.additionalSkills;
+  delete processed.priceFrom;
+  delete processed.priceTo;
+  delete processed.fileExtensions;
+  delete processed.workingHours;
 
-  return processed
-})
+  return processed;
+});
 
 const toggleCategory = (category) => {
-  filter.value.category = category
+  filter.value.category = category;
 
-  fetchSkillList()
+  fetchSkillList();
 
   // reset the filter
-  filter.value.mainSkills = []
-  filter.value.additionalSkills = []
-}
+  filter.value.mainSkills = [];
+  filter.value.additionalSkills = [];
+};
 
 const priceFormat = (price) => {
-  return new Intl.NumberFormat('id-ID').format(price)
-}
+  return new Intl.NumberFormat("id-ID").format(price);
+};
 
 const currentEntries = computed(() => {
-  const start = (page.value - 1) * paginationsData.value.itemsPerPage + 1
+  const start = (page.value - 1) * paginationsData.value.itemsPerPage + 1;
   const end = Math.min(
     page.value * paginationsData.value.itemsPerPage,
     paginationsData.value.totalItems
-  )
-  return { start, end }
-})
+  );
+  return { start, end };
+});
 
 const fetchUser = async () => {
   try {
-    user.value = useCookie('token').value.user || null
+    user.value = useCookie("token").value.user || null;
   } catch (error) {
-    console.error('Fetching user failed:', error)
+    console.error("Fetching user failed:", error);
   }
-}
+};
 
 const fetchLanguageList = async () => {
-  isFilterLoading.value = true
+  isFilterLoading.value = true;
   try {
-    const { data } = await getLanguages({ page: 1, per_page: 10000 })
+    const { data } = await getLanguages({ page: 1, per_page: 10000 });
 
     // return only the data id and name
     languageList.value = data.data.data.map((lang) => ({
       id: lang.id,
       name: lang.name,
-    }))
+    }));
   } catch (error) {
-    console.error('Fetching language list failed:', error)
+    console.error("Fetching language list failed:", error);
   }
-  isFilterLoading.value = false
-}
+  isFilterLoading.value = false;
+};
 
 const fetchSkillList = async () => {
-  isFilterLoading.value = true
+  isFilterLoading.value = true;
   try {
     const { data } = await getSkills({
       page: 1,
       per_page: 10000,
       merchant_type: filter.value.category,
-    })
-    skillList.value = data.data.data
+    });
+    skillList.value = data.data.data;
   } catch (error) {
-    console.error('Fetching skill list failed:', error)
+    console.error("Fetching skill list failed:", error);
   }
-  isFilterLoading.value = false
-}
+  isFilterLoading.value = false;
+};
 
 const fetchServices = async () => {
-  isItemsLoading.value = true
+  isItemsLoading.value = true;
   try {
     const { data } = await getServices({
       page: page.value,
       per_page: paginationsData.value.itemsPerPage,
       search: searchQuery.value,
       ...processedFilter.value,
-    })
+    });
 
-    serviceList.value = data.data.services.data
-    paginationsData.value.totalPage = data.data.services.last_page
-    paginationsData.value.totalItems = data.data.services.total
+    serviceList.value = data.data.services.data;
+    paginationsData.value.totalPage = data.data.services.last_page;
+    paginationsData.value.totalItems = data.data.services.total;
   } catch (err) {
-    console.error('Fetching services failed:', err)
+    console.error("Fetching services failed:", err);
   } finally {
-    isItemsLoading.value = false
+    isItemsLoading.value = false;
   }
-}
+};
 
 const logout = () => {
-  useCookie('token').value = null
-  user.value = null
-}
+  useCookie("token").value = null;
+  user.value = null;
+};
 
 const convertAllFilterToQuery = () => {
-  const query = {}
+  const query = {};
 
   // convert all filter to query and if contain object just get the id and if array join with comma, if undefined just ignore
   for (const key in filter.value) {
     if (filter.value[key]) {
       if (Array.isArray(filter.value[key])) {
-        query[key] = filter.value[key].join(',')
-      } else if (typeof filter.value[key] === 'object') {
-        query[key] = filter.value[key].id
+        query[key] = filter.value[key].join(",");
+      } else if (typeof filter.value[key] === "object") {
+        query[key] = filter.value[key].id;
       } else {
-        query[key] = filter.value[key]
+        query[key] = filter.value[key];
       }
     }
   }
 
   // add search query
   if (searchQuery.value) {
-    query.search = searchQuery.value
+    query.search = searchQuery.value;
   }
 
-  console.log('query:', query)
-  return query
-}
+  console.log("query:", query);
+  return query;
+};
 
 const applyFilter = async () => {
-  const query = convertAllFilterToQuery()
-  router.push({ query })
-  await fetchServices()
-}
+  const query = convertAllFilterToQuery();
+  router.push({ query });
+  await fetchServices();
+};
 
 const debounce = (func, wait) => {
-  let timeout
+  let timeout;
   return function (...args) {
-    const context = this
-    clearTimeout(timeout)
+    const context = this;
+    clearTimeout(timeout);
     timeout = setTimeout(() => {
-      timeout = null
-      func.apply(context, args)
-    }, wait)
-  }
-}
+      timeout = null;
+      func.apply(context, args);
+    }, wait);
+  };
+};
 
 const clearLanguageFilter = () => {
-  filter.value.from = ''
-  filter.value.to = ''
-}
+  filter.value.from = "";
+  filter.value.to = "";
+};
 
 // watch
 // watch(filter, applyFilter, { deep: true })
 
+watch(isSmallScreen, (val) => {
+  if (val) {
+    isFilterShow.value = false;
+  } else {
+    isFilterShow.value = true;
+  }
+});
+
 watch(
   page,
   async () => {
-    await fetchServices()
+    await fetchServices();
   },
   {
     immediate: true,
   }
-)
+);
 
 watch(
   searchQuery,
   debounce(async () => {
-    page.value = 1
-    await fetchServices()
+    page.value = 1;
+    await fetchServices();
   }, 500),
   {
     immediate: true,
   }
-)
+);
 
 onMounted(async () => {
   // if have seach query in url
   if (route.query.search) {
-    searchQuery.value = route.query.search
+    searchQuery.value = route.query.search;
   }
 
-  const query = convertAllFilterToQuery()
-  router.push({ query })
+  const query = convertAllFilterToQuery();
+  router.push({ query });
 
-  await fetchLanguageList()
-  await fetchSkillList()
-  await fetchServices()
+  await fetchLanguageList();
+  await fetchSkillList();
+  await fetchServices();
 
-  if (useCookie('token').value) {
-    await fetchUser()
+  if (useCookie("token").value) {
+    await fetchUser();
   }
 
-  isPageLoading.value = false
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-})
+  isPageLoading.value = false;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  // check if screen is small
+  if (window.innerWidth < 768) {
+    isSmallScreen.value = true;
+  }
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth < 768) {
+      isSmallScreen.value = true;
+    } else {
+      isSmallScreen.value = false;
+      isFilterShow.value = false;
+    }
+  });
+});
 </script>
 
 <style>
