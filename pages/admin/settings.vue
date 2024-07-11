@@ -108,6 +108,7 @@
 </template>
 <script setup>
 import FileUpload from "~/components/FileUpload.vue";
+import ConfirmationModal from "~/components/ConfirmationModal.vue";
 
 import { useSettingService } from "~/composables/useSettingService";
 const { getSetting, updateSetting } = useSettingService();

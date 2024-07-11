@@ -139,7 +139,7 @@
                   variant="subtle"
                   class="capitalize"
                 >
-                  {{ row.admin ? 'Admin' : 'User' }}
+                  {{ row.admin ? "Admin" : "User" }}
                 </UBadge>
               </div>
             </template>
@@ -171,7 +171,7 @@
                         'Deactivate',
                         'Cancel',
                         () => {
-                          updateUserStatus(row.user.id, 'inactive')
+                          updateUserStatus(row.user.id, 'inactive');
                         }
                       )
                     "
@@ -193,7 +193,7 @@
                         'Verify',
                         'Cancel',
                         () => {
-                          updateUserStatus(row.user.id, 'verified')
+                          updateUserStatus(row.user.id, 'verified');
                         }
                       )
                     "
@@ -215,48 +215,48 @@
   </div>
 </template>
 <script setup>
-import { useMerchantService } from '~/composables/useMerchantService'
-import { useUserService } from '~/composables/useUserService'
+import { useMerchantService } from "~/composables/useMerchantService";
+import { useUserService } from "~/composables/useUserService";
 
-const { getMerchants, updateMerchantStatus } = useUserService()
-const { getUsers } = useUserService()
+const { getMerchants, updateMerchantStatus } = useUserService();
+const { getUsers } = useUserService();
 
 // components
-const toast = useToast()
+const toast = useToast();
 
 definePageMeta({
   layout: false,
-})
+});
 
 // state
-const isTableLoading = ref(true)
-const isModalOpen = ref(false)
+const isTableLoading = ref(true);
+const isModalOpen = ref(false);
 const modalData = ref({
-  title: '',
-  message: '',
+  title: "",
+  message: "",
   callback: null,
-})
+});
 
 // data
-const pageTitle = 'Users List'
-const data = ref([])
+const pageTitle = "Users List";
+const data = ref([]);
 const selectedStatus = ref({
-  label: 'All',
-  value: 'all',
-})
+  label: "All",
+  value: "all",
+});
 
 const selectedRole = ref({
-  label: 'All',
-  value: 'all',
-})
-const searchQuery = ref('')
-const page = ref(1)
+  label: "All",
+  value: "all",
+});
+const searchQuery = ref("");
+const page = ref(1);
 const paginationsData = ref({
   page: 1,
   totalPage: 1,
   totalItems: 0,
   itemsPerPage: 10,
-})
+});
 
 // Fetch data
 const fetchData = async () => {
@@ -265,9 +265,9 @@ const fetchData = async () => {
       page: page.value,
       per_page: paginationsData.value.itemsPerPage,
       status:
-        selectedStatus.value.value === 'all' ? '' : selectedStatus.value.value,
+        selectedStatus.value.value === "all" ? "" : selectedStatus.value.value,
       is_admin:
-        selectedRole.value.value === 'all' ? null : selectedRole.value.value,
+        selectedRole.value.value === "all" ? null : selectedRole.value.value,
       search: searchQuery.value,
     }).then((response) => {
       data.value = response.data.data.users.data.map((user, index) => ({
@@ -276,8 +276,9 @@ const fetchData = async () => {
           id: user.id,
           fullname: user.fullname,
           email: user.email,
+          photo: user.photo,
         },
-        phone: convertPhone(user.phone ?? ''),
+        phone: convertPhone(user.phone ?? ""),
         address: user.address,
         admin: user.is_admin,
         status: user.status,
@@ -285,93 +286,94 @@ const fetchData = async () => {
           id: user.id,
           status: user.status,
         },
-      }))
+      }));
 
       paginationsData.value = {
         page: response.data.data.users.current_page,
         totalPage: response.data.data.users.last_page,
         totalItems: response.data.data.users.total,
         itemsPerPage: response.data.data.users.per_page,
-      }
-    })
+      };
+    });
   } catch (error) {
-    console.error('Error fetching users:', error)
+    console.error("Error fetching users:", error);
   } finally {
-    isTableLoading.value = false
+    isTableLoading.value = false;
   }
-}
+};
 
 const convertPhone = (phone) => {
   // remove non numeric characters
-  phone = phone.replace(/\D/g, '')
+  phone = phone.replace(/\D/g, "");
 
   // change phone format to 62
-  if (phone.startsWith('0')) {
-    return `62${phone.slice(1)}`
+  if (phone.startsWith("0")) {
+    return `62${phone.slice(1)}`;
   }
 
-  return phone
-}
+  return phone;
+};
 
 // Watcher to fetch data when page changes
-watch(page, fetchData)
+watch(page, fetchData);
 
 // Filter users based on search query
 const filterData = () => {
-  fetchData()
-}
+  page.value = 1;
+  fetchData();
+};
 
 // Search change handler with manual debounce
 const onSearchChange = debounce(() => {
-  filterData()
-}, 500)
+  filterData();
+}, 500);
 
 // debounce function
 function debounce(func, wait, immediate) {
-  let timeout
+  let timeout;
   return function () {
-    const context = this
-    const args = arguments
+    const context = this;
+    const args = arguments;
     const later = function () {
-      timeout = null
-      if (!immediate) func.apply(context, args)
-    }
-    const callNow = immediate && !timeout
-    clearTimeout(timeout)
-    timeout = setTimeout(later, wait)
-    if (callNow) func.apply(context, args)
-  }
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    const callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
 }
 
 // Open link in new tab
 const openLink = (url) => {
   // Open link in new tab
-  window.open(url, '_blank')
-}
+  window.open(url, "_blank");
+};
 
 const copyToClipboard = (text) => {
-  navigator.clipboard.writeText(text)
+  navigator.clipboard.writeText(text);
 
   // Show toast
   toast.add({
-    title: 'Copied!',
-    color: 'green',
-    icon: 'i-heroicons-check-circle',
-    description: 'No Rekening copied to clipboard!',
-  })
-}
+    title: "Copied!",
+    color: "green",
+    icon: "i-heroicons-check-circle",
+    description: "No Rekening copied to clipboard!",
+  });
+};
 
 const resolveStatusColor = (status) => {
-  if (status === 'verified') {
-    return 'blue'
-  } else if (status === 'active') {
-    return 'green'
-  } else if (status === 'pending') {
-    return 'orange'
+  if (status === "verified") {
+    return "blue";
+  } else if (status === "active") {
+    return "green";
+  } else if (status === "pending") {
+    return "orange";
   } else {
-    return 'gray'
+    return "gray";
   }
-}
+};
 
 const displayConfirmationModal = (
   title,
@@ -386,42 +388,42 @@ const displayConfirmationModal = (
     confirmText,
     cancelText,
     callback,
-  }
-  isModalOpen.value = true
-}
+  };
+  isModalOpen.value = true;
+};
 
 const updateUserStatus = async (userId, status) => {
   await updateMerchantStatus(userId, status)
     .then(() => {
       // Close modal
-      isModalOpen.value = false
+      isModalOpen.value = false;
 
       // Show toast
       toast.add({
-        title: 'Success!',
-        color: 'green',
-        icon: 'i-heroicons-check-circle',
-        description: 'User status updated successfully!',
-      })
+        title: "Success!",
+        color: "green",
+        icon: "i-heroicons-check-circle",
+        description: "User status updated successfully!",
+      });
 
       // Fetch user data
-      fetchData()
+      fetchData();
     })
     .catch((error) => {
-      console.error('Error updating user status:', error)
+      console.error("Error updating user status:", error);
 
       // Show toast
       toast.add({
-        title: 'Uh Oh!',
-        color: 'red',
-        icon: 'i-heroicons-x-circle',
-        description: 'Error updating user status!',
-      })
-    })
-}
+        title: "Uh Oh!",
+        color: "red",
+        icon: "i-heroicons-x-circle",
+        description: "Error updating user status!",
+      });
+    });
+};
 
 // Mounted lifecycle hook
 onMounted(async () => {
-  await fetchData()
-})
+  await fetchData();
+});
 </script>

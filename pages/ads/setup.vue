@@ -80,16 +80,16 @@
                     </div>
                     <div class="flex flex-col">
                       <span class="truncate">{{ adsPackage.name }}</span>
-                      <span class="truncate"
-                        >Paket {{ adsPackage.duration }} Bulan</span
-                      >
+                      <span class="truncate">
+                        Paket {{ adsPackage.duration }} Bulan
+                      </span>
                       <span class="truncate"
                         >Harga {{ formatPrice(adsPackage.price) }}</span
                       >
-                      <span class="truncate"
-                        >Ukuran {{ adsPackage.size_x }} x
-                        {{ adsPackage.size_y }}</span
-                      >
+                      <span class="truncate">
+                        Ukuran {{ adsPackage.size_x }} x
+                        {{ adsPackage.size_y }}
+                      </span>
 
                       <span class="truncate">
                         Penayangan di {{ getShowArray(adsPackage.route_json) }}

@@ -1,4 +1,4 @@
-// composables/useAdvertisementService.js
+// composables/useSettingService.js
 
 import { useNuxtApp } from '#app'
 
