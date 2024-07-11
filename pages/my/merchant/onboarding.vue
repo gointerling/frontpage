@@ -26,38 +26,39 @@
 </template>
 
 <script setup>
-import heroImage from '@/assets/images/facilitators-sm.svg'
+import heroImage from "@/assets/images/facilitators-sm.svg";
 
 // import components
-import PageLoader from '~/components/PageLoader.vue'
-import MerchantForm from '~/components/facilitators/MerchantForm.vue'
+import PageLoader from "~/components/PageLoader.vue";
+import MerchantForm from "~/components/facilitators/MerchantForm.vue";
 
 // import services
-import { useMerchantService } from '~/composables/useMerchantService'
+import { useMerchantService } from "~/composables/useMerchantService";
 
 // services
-const { getMyMerchants } = useMerchantService()
+const { getMyMerchants } = useMerchantService();
 
 // component setup
-const isPageLoading = ref(true)
-const merchant_id = ref(null)
+const isPageLoading = ref(true);
+const merchant_id = ref(null);
 
 // mounted
 onMounted(async () => {
   // get my merchants
   await getMyMerchants().then((result) => {
-    const merchantStatus = result.data.data.user.merchants[0].status
-    const isFirstTime = result.data.data.user.merchants[0].is_first_time
+    const merchantStatus = result.data.data.user.merchants[0].status;
+    const isFirstTime = result.data.data.user.merchants[0].is_first_time;
 
     // check if merchant status is not onboarding
-    useCookie('token').value.user.merchant_status = merchantStatus
+    useCookie("token").value.user.merchant_status = merchantStatus;
+    useCookie("token").value.user.is_first_time = isFirstTime;
 
     // set merchant id
-    merchant_id.value = result.data.data.user.merchants[0].id
+    merchant_id.value = result.data.data.user.merchants[0].id;
 
-    isPageLoading.value = false
-  })
-})
+    isPageLoading.value = false;
+  });
+});
 </script>
 
 <style></style>

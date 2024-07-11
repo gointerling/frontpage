@@ -1,16 +1,24 @@
 <template>
   <div>
     <div v-show="!isPageLoading" class="flex">
-      <SideDrawer :navs="navs" :isSmallSize="isSmallSize" title="Admin" />
+      <!-- SideDrawer with sticky positioning -->
+      <div class="sticky top-0 h-screen">
+        <SideDrawer
+          is-admin
+          :navs="navs"
+          :isSmallSize="isSmallSize"
+          title="Admin"
+        />
+      </div>
 
-      <div class="flex flex-col w-full bg-slate-100">
+      <div class="flex flex-col bg-slate-100" :class="dynamicWidth">
         <nav class="p-6 w-full flex justify-between">
           <div class="flex gap-3 items-center">
             <UButton class="p-2 bg-gray-300" @click="toggleDrawerSize">
               <nuxt-icon name="sidebar" class="text-white" />
             </UButton>
             <span class="font-semibold">
-              {{ menuTitle || 'Admin Dashboard' }}
+              {{ menuTitle || "Admin Dashboard" }}
             </span>
           </div>
 
@@ -24,7 +32,7 @@
               size="sm"
               imgClass="object-cover"
             />
-            <span class="mx-2">{{ user.fullname ?? '' }}</span>
+            <span class="mx-2">{{ user.fullname ?? "" }}</span>
             <nuxt-icon name="chevron-simple-down" class="mx-4" filled />
           </button>
 
@@ -49,7 +57,6 @@
             </button>
             <button
               class="w-full flex gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              href="#"
               @click="signOut"
             >
               <nuxt-icon name="logout" class="text-2xl"></nuxt-icon>
@@ -71,100 +78,123 @@
 
 <script setup>
 // components
-import SideDrawer from '~/components/admin/SideDrawer.vue'
-import PageLoader from '~/components/PageLoader.vue'
+import SideDrawer from "~/components/admin/SideDrawer.vue";
+import PageLoader from "~/components/PageLoader.vue";
 
 // imports
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from "vue";
 
 // router
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
 // component setup
-const isPageLoading = ref(true)
+const isPageLoading = ref(true);
 const user = ref({
-  fullname: '',
-  photo: '',
-})
+  fullname: "",
+  photo: "",
+});
 
 // state
-const isSmallSize = ref(false)
-const open = ref(false)
+const isSmallSize = ref(false);
+const open = ref(false);
 
 const toggleDrawerSize = () => {
-  isSmallSize.value = !isSmallSize.value
+  isSmallSize.value = !isSmallSize.value;
 
   // set local storage
-  localStorage.setItem('sidenav-closed', isSmallSize.value)
-}
+  localStorage.setItem("sidenav-closed", isSmallSize.value);
+};
 
 const navs = [
   {
-    label: 'Dashboard',
-    icon: 'i-heroicons-home',
-    to: '/admin/dashboard',
+    label: "Dashboard",
+    icon: "i-heroicons-home",
+    to: "/admin/dashboard",
   },
   {
-    label: 'Transactions',
-    icon: 'i-heroicons-chart-bar',
-    to: '/admin/transactions',
+    label: "Transactions",
+    icon: "i-heroicons-chart-bar",
+    to: "/admin/transactions",
   },
   {
-    label: 'Facilitator',
-    icon: 'i-heroicons-building-storefront',
-    to: '/admin/merchants',
+    label: "Facilitators",
+    icon: "i-heroicons-building-storefront",
+    to: "/admin/merchants",
   },
-  // {
-  //   label: 'Users',
-  //   icon: 'i-heroicons-users',
-  //   to: '/admin/users',
-  // },
   {
-    label: 'Ads',
-    icon: 'i-heroicons-megaphone',
-    to: '/admin/ads',
+    label: "Ads",
+    icon: "i-heroicons-megaphone",
+    to: "/admin/ads",
   },
-]
+  {
+    label: "Users",
+    icon: "i-heroicons-users",
+    to: "/admin/users",
+  },
+  {
+    label: "Packages",
+    icon: "i-heroicons-sparkles",
+    to: "/admin/packages",
+  },
+  {
+    label: "Settings",
+    icon: "i-heroicons-cog",
+    to: "/admin/settings",
+  },
+];
+
+const dynamicWidth = ref("w-11/12");
 
 // fetch user data on mount
 const fetchUser = async () => {
   try {
-    user.value = useCookie('token').value.user || null
+    user.value = useCookie("token").value.user || null;
   } catch (error) {
-    console.error('Fetching user failed:', error)
+    console.error("Fetching user failed:", error);
   }
-}
+};
 
 const signOut = () => {
-  const token = useCookie('token')
-  token.value = null
+  const token = useCookie("token");
+  token.value = null;
 
-  open.value = false
+  open.value = false;
 
   // redirect to login
-  router.push('/auth/login')
-}
+  router.push("/auth/login");
+};
 
 const navigateTo = (to) => {
-  router.push(to)
-}
+  router.push(to);
+};
+
+watch(isSmallSize, (newVal) => {
+  dynamicWidth.value = newVal ? "w-full" : "w-11/12";
+});
 
 // on mount
 onMounted(async () => {
   // sidebar size
-  isSmallSize.value = localStorage.getItem('sidenav-closed') === 'true'
+  isSmallSize.value = localStorage.getItem("sidenav-closed") === "true";
 
   // fetch user data
-  if (useCookie('token').value) {
-    await fetchUser()
+  if (useCookie("token").value) {
+    await fetchUser();
   }
 
-  isPageLoading.value = false
+  isPageLoading.value = false;
 
   window.scrollTo({
     top: 0,
-    behavior: 'smooth',
-  })
-})
+    behavior: "smooth",
+  });
+});
 </script>
+
+<style scoped>
+.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+}
+</style>

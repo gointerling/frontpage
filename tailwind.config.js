@@ -51,6 +51,9 @@ module.exports = {
       fontFamily: {
         sans: ['Poppins', 'sans-serif'],
       },
+      listStyleImage: {
+        checkmark: 'url("assets/icons/check-package.svg")',
+      },
     },
   },
   plugins: [],

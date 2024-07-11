@@ -15,9 +15,9 @@
       }"
     >
       <img
-        src="https://dev-api.gointerling.com/storage/uploads/MBGJq0Q9ASbus64HGkpKKVpOcj5nrrJbf6JH33WE.png"
+        :src="ads.image_url"
         alt=""
-        class="w-full h-full object-cover rounded-lg"
+        class="w-full h-full object-cover rounded-lg max-h-[500px]"
       />
       <div
         class="absolute top-0 left-0 w-full h-full flex flex-col justify-between p-8 transition-opacity duration-300 ease-in-out opacity-0 hover:opacity-100 bg-gradient-to-r from-transparent via-transparent via-10% to-primary rounded-lg"
@@ -29,12 +29,12 @@
             </button>
           </div>
           <div class="flex flex-col justify-center items-end h-full">
-            <div class="h-full flex flex-col justify-center pb-6">
+            <div class="h-full flex flex-col items-end justify-center pb-6">
               <h6 class="text-white text-xl font-bold text-right pb-4">
-                {{ props.data.title }}
+                {{ ads.tagline }}
               </h6>
               <p class="text-white text-sm max-w-sm text-right">
-                {{ props.data.content }}
+                {{ ads.description }}
               </p>
             </div>
           </div>
@@ -47,23 +47,27 @@
 <script setup>
 import { ref, watch } from 'vue'
 
+// services
+import { useAdvertisementService } from '~/composables/useAdvertisementService'
+const { getDisplayAds } = useAdvertisementService()
+
 // define props
 const props = defineProps({
   isOpen: {
     type: Boolean,
     default: false,
   },
-  data: {
-    type: Object,
-    default: () => ({
-      title: 'Ads Title',
-      content:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non metus et eros consectetur dapibus. Nulla facilisi. Maecenas ac libero nec justo feugiat varius. Cras at turpis non nisi bibendum fermentum. Integer non orci libero.',
-      confirmText: 'Confirm',
-      cancelText: 'Cancel',
-      callback: () => {},
-    }),
-  },
+  // data: {
+  //   type: Object,
+  //   default: () => ({
+  //     title: 'Ads Title',
+  //     content:
+  //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non metus et eros consectetur dapibus. Nulla facilisi. Maecenas ac libero nec justo feugiat varius. Cras at turpis non nisi bibendum fermentum. Integer non orci libero.',
+  //     confirmText: 'Confirm',
+  //     cancelText: 'Cancel',
+  //     callback: () => {},
+  //   }),
+  // },
 })
 
 // emit event to update the prop value
@@ -85,18 +89,32 @@ watch(internalIsOpen, (newVal) => {
   emit('update:isOpen', newVal)
 })
 
-// methods for handling confirmation and cancellation
-const confirm = () => {
-  props.data.callback(true)
-  internalIsOpen.value = false
-}
-
 const cancel = () => {
-  props.data.callback(false)
   internalIsOpen.value = false
 
   // emit event to update the prop value
 }
+
+const ads = ref()
+
+const fetchAds = async () => {
+  try {
+    const { data } = await getDisplayAds()
+
+    ads.value = data.data.selectedAdvertisement
+    internalIsOpen.value = true
+  } catch (err) {
+    console.log(err)
+
+    // hide banner
+    internalIsOpen.value = false
+  }
+}
+
+// mounted
+onMounted(async () => {
+  await fetchAds()
+})
 </script>
 
 <style scoped>

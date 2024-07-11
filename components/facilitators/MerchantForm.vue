@@ -124,14 +124,18 @@
           </template>
         </UButton>
 
-        <UButton v-if="flow === 4" @click="finishSetup()">
+        <UButton
+          v-if="flow === 4"
+          @click="finishSetup()"
+          :loading="isFinishButton"
+        >
           <template #default>
             <div class="flex items-center gap-2">
               <span>
                 {{
                   portfolios.length > 0 || certificates.length > 0
-                    ? 'Finish Setup'
-                    : 'Skip for Now'
+                    ? "Finish Setup"
+                    : "Skip for Now"
                 }}
               </span>
             </div>
@@ -143,12 +147,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import * as yup from 'yup'
+import { ref } from "vue";
+import * as yup from "yup";
 
-import { useMerchantService } from '~/composables/useMerchantService'
+import { useMerchantService } from "~/composables/useMerchantService";
 
-const { updateMyMerchant, setupMyMerchantService } = useMerchantService()
+const { updateMyMerchant, setupMyMerchantService } = useMerchantService();
 
 // define props
 
@@ -157,7 +161,7 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-})
+});
 
 // ref
 const validationSchema = yup.object({
@@ -165,45 +169,46 @@ const validationSchema = yup.object({
   bank: yup.string().required(),
   bank_account: yup.string().required(),
   cv_url: yup.string().required(),
-})
+});
 
 // state
-const flow = ref(1)
-const router = useRouter()
+const flow = ref(1);
+const router = useRouter();
+const isFinishButton = ref(false);
 
 // data references
-const toast = useToast()
+const toast = useToast();
 const typeList = [
-  { id: 'translator', name: 'Translator' },
-  { id: 'interpreter', name: 'Interpreter' },
-]
+  { id: "translator", name: "Translator" },
+  { id: "interpreter", name: "Interpreter" },
+];
 const bankList = [
-  { id: 'bca', name: 'BCA' },
-  { id: 'bni', name: 'BNI' },
-  { id: 'bri', name: 'BRI' },
-  { id: 'mandiri', name: 'Mandiri' },
-]
+  { id: "bca", name: "BCA" },
+  { id: "bni", name: "BNI" },
+  { id: "bri", name: "BRI" },
+  { id: "mandiri", name: "Mandiri" },
+];
 
 const type = ref(
-  typeList.find((item) => item.id === 'translator') || typeList[0]
-)
+  typeList.find((item) => item.id === "translator") || typeList[0]
+);
 
-const isError = ref(false)
+const isError = ref(false);
 
-const bank_id = ref(null)
-const bank_account = ref(null)
-const bank = ref(null)
-const cv_url = ref(null)
-const portfolios = ref([])
-const certificates = ref([])
+const bank_id = ref(null);
+const bank_account = ref(null);
+const bank = ref(null);
+const cv_url = ref(null);
+const portfolios = ref([]);
+const certificates = ref([]);
 
 // methods
 const navigateTo = (to) => {
   // if flow is valid then move to next flow
   if (to === -1) {
-    flow.value = flow.value + to
+    flow.value = flow.value + to;
   } else if (validateCurrentFlow(flow.value)) {
-    flow.value = flow.value + to
+    flow.value = flow.value + to;
   }
 
   // set route params
@@ -211,15 +216,15 @@ const navigateTo = (to) => {
     query: {
       step: flow.value,
     },
-  })
-}
+  });
+};
 
 const validationRules = {
   1: {
     conditions: [
       {
         check: () => !type.value,
-        message: 'Please select a type',
+        message: "Please select a type",
       },
     ],
   },
@@ -227,11 +232,11 @@ const validationRules = {
     conditions: [
       {
         check: () => !bank.value,
-        message: 'Please select a valid bank',
+        message: "Please select a valid bank",
       },
       {
         check: () => !bank_account.value,
-        message: 'Please fill in the bank account number',
+        message: "Please fill in the bank account number",
       },
     ],
   },
@@ -239,57 +244,58 @@ const validationRules = {
     conditions: [
       {
         check: () => !cv_url.value,
-        message: 'Please upload your CV',
+        message: "Please upload your CV",
       },
     ],
   },
-}
+};
 
 const validateCurrentFlow = (flow) => {
-  const rules = validationRules[flow]
-  if (!rules) return false
+  const rules = validationRules[flow];
+  if (!rules) return false;
 
-  let isValid = true
+  let isValid = true;
 
   rules.conditions.forEach((condition) => {
     if (condition.check()) {
-      showToast(condition.message)
-      isValid = false
-      isError.value = true
+      showToast(condition.message);
+      isValid = false;
+      isError.value = true;
     }
 
-    isError.value = false
-  })
+    isError.value = false;
+  });
 
-  return isValid
-}
+  return isValid;
+};
 
 const showToast = (error) => {
   toast.add({
-    title: 'Uh Oh!',
-    color: 'red',
-    icon: 'i-heroicons-x-circle',
-    description: error || 'Please fill in the form correctly!',
-  })
-}
+    title: "Uh Oh!",
+    color: "red",
+    icon: "i-heroicons-x-circle",
+    description: error || "Please fill in the form correctly!",
+  });
+};
 
 const to = (to) => {
-  router.push(to)
-}
+  router.push(to);
+};
 
 const setCV = (value) => {
-  cv_url.value = value
-}
+  cv_url.value = value;
+};
 
 const setPortofolio = (value) => {
-  portfolios.value = value
-}
+  portfolios.value = value;
+};
 
 const setCertificate = (value) => {
-  certificates.value = value
-}
+  certificates.value = value;
+};
 
 const finishSetup = async () => {
+  isFinishButton.value = true;
   const data = {
     type: type.value.id,
     bank_id: bank.value.id,
@@ -299,31 +305,36 @@ const finishSetup = async () => {
     portfolios: portfolios.value,
     certificates: certificates.value,
     merchant_id: props.merchant_id,
-  }
+  };
 
   try {
-    await updateMyMerchant(data)
+    await updateMyMerchant(data);
 
     toast.add({
-      title: 'Success!',
-      color: 'green',
-      icon: 'i-heroicons-check-circle',
-      description: 'Merchant setup successfully!',
-    })
+      title: "Success!",
+      color: "green",
+      icon: "i-heroicons-check-circle",
+      description: "Merchant setup successfully!",
+    });
 
-    to('/my/merchant/status')
+    // redirect to dashboard
+    router.push({
+      name: "my-merchant-status",
+    });
   } catch (error) {
     toast.add({
-      title: 'Uh Oh!',
-      color: 'red',
-      icon: 'i-heroicons-x-circle',
+      title: "Uh Oh!",
+      color: "red",
+      icon: "i-heroicons-x-circle",
       description: error.response.data.error.message,
-    })
+    });
+  } finally {
+    isFinishButton.value = false;
   }
-}
+};
 
 // onMounted
 onMounted(async () => {
-  bank.value = bankList[0]
-})
+  bank.value = bankList[0];
+});
 </script>

@@ -3,7 +3,9 @@
     <div v-show="!isPageLoading" class="w-100 flex flex-col items-center">
       <Navbar :user="user" @logout="logout" class="w-full" />
 
-      <div class="flex justify-between items-stretch w-10/12 my-16 gap-16 px-8">
+      <div
+        class="flex justify-between items-stretch w-10/12 my-16 gap-16 px-8 pt-16"
+      >
         <!-- side nav -->
         <div class="w-2/12">
           <h6 class="font-semibold">Client Dashboard</h6>

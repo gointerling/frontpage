@@ -25,7 +25,7 @@
           imgClass="object-cover"
           class="-mt-10"
         />
-        <h2 class="font-semibold py-2">
+        <h2 class="font-semibold py-2 capitalize text-center">
           {{ props.data.merchants[0].users[0].fullname }}
         </h2>
 
@@ -41,7 +41,9 @@
         </UBadge>
 
         <!-- hide this on hover -->
-        <div class="flex gap-4 items-center py-2">
+        <div
+          class="flex flex-col lg:flex-row gap-4 items-center py-2 text-center sm:text-left"
+        >
           <div v-if="props.data.languages.length === 0" class="flex gap-2">
             <span class="text-sm"> No Language </span>
           </div>
@@ -73,7 +75,7 @@
             </UTooltip>
           </div>
 
-          <div class="flex gap-2 items-center border-x border-gray-900 px-6">
+          <div class="flex gap-2 items-center lg:border-x border-gray-900 px-6">
             <nuxt-icon name="star" class="text-2xl" filled />
             <strong>
               {{ props.data.merchants[0].rating }}
@@ -86,7 +88,9 @@
         </div>
 
         <!--  -->
-        <div class="w-full grid grid-cols-2 gap-4 py-2 pb-6 px-8">
+        <div
+          class="w-full grid grid-cols-1 sm:grid-cols-2 gap-4 py-2 pb-6 px-8"
+        >
           <UButton
             block
             variant="outline"
@@ -123,13 +127,13 @@
 </template>
 
 <script setup>
-import bannerImage from '/assets/images/facilitators-blue-bg.png'
+import bannerImage from "/assets/images/facilitators-blue-bg.png";
 
 // route
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
-const emit = defineEmits(['order'])
+const emit = defineEmits(["order"]);
 
 // data
 
@@ -142,20 +146,20 @@ const props = defineProps({
     type: Function,
     required: true,
   },
-})
+});
 
 const navigateTo = (route) => {
-  router.push(route)
-}
+  router.push(route);
+};
 
 const openOrderSidebar = () => {
-  emit('order')
-}
+  emit("order");
+};
 
 const formatPrice = (price) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-  }).format(price)
-}
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+  }).format(price);
+};
 </script>

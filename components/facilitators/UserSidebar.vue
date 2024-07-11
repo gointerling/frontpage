@@ -16,7 +16,7 @@
       }"
     />
 
-    <h2 class="text-xl text-primary font-bold pt-3 pb-1">
+    <h2 class="text-xl text-primary font-bold pt-3 pb-1 capitalize">
       {{ data.users[0].fullname }}
     </h2>
 

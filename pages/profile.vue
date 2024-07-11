@@ -2,14 +2,16 @@
   <div>
     <!-- Loader -->
     <PageLoader v-if="isPageLoading" />
-    <div v-else class="w-100 flex flex-col items-center">
+    <div v-else class="flex flex-col items-center w-full">
       <Navbar :user="user" @logout="logout" class="w-full" />
 
-      <div class="flex justify-between items-stretch w-10/12 my-16 gap-16 px-8">
+      <div
+        class="flex flex-col md:flex-row justify-between items-stretch w-11/12 my-8 md:my-16 gap-8 md:gap-16 px-4 md:px-8 pt-8 md:pt-16"
+      >
         <!-- side nav -->
-        <div class="w-2/12">
-          <h6 class="font-semibold">My Profile</h6>
-          <div class="flex flex-col items-start mt-4">
+        <div class="w-full md:w-2/12 mb-8 md:mb-0">
+          <h6 class="font-semibold text-center md:text-left">My Profile</h6>
+          <div class="flex flex-col items-center md:items-start mt-4">
             <UButton
               v-for="(nav, index) in filteredNavs"
               :key="index"
@@ -24,11 +26,13 @@
           </div>
         </div>
 
-        <div v-if="selectedTab === 'profile'" class="w-10/12">
+        <div v-if="selectedTab === 'profile'" class="w-full md:w-10/12">
           <!-- Personal info -->
           <h6 class="font-semibold mb-3">Personal Information</h6>
           <UCard>
-            <div class="flex justify-start gap-6 items-center mb-6">
+            <div
+              class="flex flex-col md:flex-row justify-start gap-6 items-center mb-6"
+            >
               <div class="relative">
                 <UAvatar
                   :alt="payload.fullname ?? ''"
@@ -67,30 +71,34 @@
             </div>
 
             <div class="flex flex-col gap-4">
-              <div class="flex justify-between">
+              <div class="flex flex-col md:flex-row justify-between">
                 <span class="font-semibold">Name</span>
-                <UInput v-model="payload.fullname" class="w-7/12" />
+                <UInput v-model="payload.fullname" class="w-full md:w-7/12" />
               </div>
-              <div class="flex justify-between">
+              <div class="flex flex-col md:flex-row justify-between">
                 <span class="font-semibold">Street Address</span>
-                <UInput v-model="payload.address" class="w-7/12" />
+                <UInput v-model="payload.address" class="w-full md:w-7/12" />
               </div>
-              <div class="flex justify-between">
+              <div class="flex flex-col md:flex-row justify-between">
                 <span class="font-semibold">Email</span>
-                <UInput v-model="payload.email" class="w-7/12" />
+                <UInput
+                  v-model="payload.email"
+                  class="w-full md:w-7/12"
+                  readonly
+                />
               </div>
-              <div class="flex justify-between">
+              <div class="flex flex-col md:flex-row justify-between">
                 <span class="font-semibold">Phone</span>
-                <UInput v-model="payload.phone" class="w-7/12" />
+                <UInput v-model="payload.phone" class="w-full md:w-7/12" />
               </div>
-              <div class="flex justify-between">
+              <div class="flex flex-col md:flex-row justify-between">
                 <span class="font-semibold">About Yourself</span>
                 <UTextarea
                   v-model="payload.personal_description"
-                  class="w-7/12"
+                  class="w-full md:w-7/12"
                 />
               </div>
-              <div class="flex justify-between">
+              <div class="flex flex-col md:flex-row justify-between">
                 <span class="font-semibold">Skills</span>
                 <USelectMenu
                   v-model="payload.main_skills"
@@ -102,7 +110,7 @@
                   multiple
                   trailing
                   by="id"
-                  class="w-7/12"
+                  class="w-full md:w-7/12"
                 >
                   <UButton color="gray" class="flex-1 justify-between">
                     <div
@@ -131,7 +139,7 @@
                   </UButton>
                 </USelectMenu>
               </div>
-              <div class="flex justify-between">
+              <div class="flex flex-col md:flex-row justify-between">
                 <span class="font-semibold">Additional Skills</span>
                 <USelectMenu
                   v-model="payload.additional_skills"
@@ -143,7 +151,7 @@
                   multiple
                   trailing
                   by="id"
-                  class="w-7/12"
+                  class="w-full md:w-7/12"
                 >
                   <UButton color="gray" class="flex-1 justify-between">
                     <div
@@ -238,18 +246,23 @@
                   </button>
                 </div>
               </u-form-group>
-            </div>
-            <div class="flex justify-end">
-              <!-- save button -->
-              <UButton @click="updatePassword" class="mt-4 bg-accent">
-                <nuxt-icon name="floppy" class="text-white" />
-                Change Password
-              </UButton>
+
+              <div class="flex justify-end">
+                <!-- save button -->
+                <UButton
+                  @click="updatePassword"
+                  class="mt-4 bg-accent"
+                  :disabled="!newPassword || !confirmPassword"
+                >
+                  <nuxt-icon name="floppy" class="text-white" />
+                  Save
+                </UButton>
+              </div>
             </div>
           </UCard>
         </div>
 
-        <div v-if="selectedTab === 'account'" class="w-10/12">
+        <div v-if="selectedTab === 'account'" class="w-full md:w-10/12">
           <h6 class="font-semibold mb-3">Account Information</h6>
 
           <UCard>
@@ -289,7 +302,7 @@
           </UCard>
         </div>
 
-        <div v-if="selectedTab === 'service'" class="w-10/12">
+        <div v-if="selectedTab === 'service'" class="w-full md:w-10/12">
           <h6 class="font-semibold mb-3">Service Information</h6>
 
           <UCard class="mb-4">
@@ -456,7 +469,7 @@
           </UCard>
         </div>
 
-        <div v-if="selectedTab === 'certificate'" class="w-10/12">
+        <div v-if="selectedTab === 'certificate'" class="w-full md:w-10/12">
           <h6 class="font-semibold mb-3">Certificates</h6>
 
           <UCard>
@@ -466,7 +479,10 @@
               >
                 List of Certificates
               </label>
-              <div class="flex gap-3 flex-wrap">
+              <div
+                v-if="merchant.certificates.length > 0"
+                class="flex gap-3 flex-wrap"
+              >
                 <UCard
                   v-for="(certificate_url, index) in merchant.certificates"
                   :key="index"
@@ -505,6 +521,11 @@
                 </UCard>
               </div>
 
+              <div v-else>
+                <!-- No data -->
+                <span class="text-gray-400 text-sm">No certificate data</span>
+              </div>
+
               <u-form-group
                 name="certificates"
                 label="Add Certificate"
@@ -530,6 +551,36 @@
             </div>
           </UCard>
         </div>
+
+        <div v-if="selectedTab === 'subscription'" class="w-full md:w-10/12">
+          <h6 class="font-semibold mb-3">Subscription</h6>
+
+          <UCard>
+            <div class="flex flex-col gap-2">
+              <label
+                class="text-sm font-medium text-gray-700 dark:text-gray-200"
+              >
+                Current Subscription
+              </label>
+              <div class="flex gap-3 flex-wrap">
+                <UCard>
+                  <div class="flex gap-2 items-center">
+                    <nuxt-icon name="star" class="text-primary" />
+                    <span class="text-primary">Standard</span>
+                  </div>
+                </UCard>
+              </div>
+
+              <div class="flex justify-end">
+                <!-- save button -->
+                <UButton @click="updateCertificate" class="mt-4 bg-accent">
+                  <nuxt-icon name="floppy" class="text-white" />
+                  Save
+                </UButton>
+              </div>
+            </div>
+          </UCard>
+        </div>
       </div>
     </div>
 
@@ -539,21 +590,21 @@
 
 <script setup>
 // components
-import PageLoader from '~/components/PageLoader.vue'
-import Navbar from '~/components/Navbar.vue'
+import PageLoader from "~/components/PageLoader.vue";
+import Navbar from "~/components/Navbar.vue";
 
 // imports
-import { ref, onMounted } from 'vue'
-const toast = useToast()
-const route = useRoute()
-const router = useRouter()
+import { ref, onMounted } from "vue";
+const toast = useToast();
+const route = useRoute();
+const router = useRouter();
 
 // services
-import { useMerchantService } from '~/composables/useMerchantService'
-import { useUserService } from '~/composables/useUserService'
-import { useSkillService } from '~/composables/useSkillService'
-import { useFileService } from '~/composables/useFileService'
-import { useMasterDataService } from '~/composables/useMasterDataService'
+import { useMerchantService } from "~/composables/useMerchantService";
+import { useUserService } from "~/composables/useUserService";
+import { useSkillService } from "~/composables/useSkillService";
+import { useFileService } from "~/composables/useFileService";
+import { useMasterDataService } from "~/composables/useMasterDataService";
 
 const {
   getMyMerchants,
@@ -561,254 +612,260 @@ const {
   getMyMerchantServices,
   updateMyService,
   updateMyMerchantFile,
-} = useMerchantService()
-const { updateMyProfile, updateMyPassword } = useUserService()
-const { getSkills } = useSkillService()
-const { uploadFile } = useFileService()
-const { getLanguages } = useMasterDataService()
+} = useMerchantService();
+const { updateMyProfile, updateMyPassword } = useUserService();
+const { getSkills } = useSkillService();
+const { uploadFile } = useFileService();
+const { getLanguages } = useMasterDataService();
 
 // navs
-const fileInput = ref(null)
+const fileInput = ref(null);
 const navs = [
   {
-    key: 'profile',
-    label: 'Profile',
-    icon: 'user-circle',
-    scope: 'all',
+    key: "profile",
+    label: "Profile",
+    icon: "user-circle",
+    scope: "all",
   },
   {
-    key: 'account',
-    label: 'Account Number',
-    icon: 'credit-card',
-    scope: 'merchant',
+    key: "account",
+    label: "Account Number",
+    icon: "credit-card",
+    scope: "merchant",
   },
   {
-    key: 'service',
-    label: 'Service',
-    icon: 'service',
-    scope: 'merchant',
+    key: "service",
+    label: "Service",
+    icon: "service",
+    scope: "merchant",
   },
   {
-    key: 'certificate',
-    label: 'Certificates',
-    icon: 'badge',
-    scope: 'merchant',
+    key: "certificate",
+    label: "Certificates",
+    icon: "badge",
+    scope: "merchant",
   },
-]
+  {
+    key: "subscription",
+    label: "Subscription",
+    icon: "star",
+    scope: "all",
+  },
+];
 
 const bankList = [
-  { id: 'bca', name: 'BCA' },
-  { id: 'bni', name: 'BNI' },
-  { id: 'bri', name: 'BRI' },
-  { id: 'mandiri', name: 'Mandiri' },
-]
+  { id: "bca", name: "BCA" },
+  { id: "bni", name: "BNI" },
+  { id: "bri", name: "BRI" },
+  { id: "mandiri", name: "Mandiri" },
+];
 
 const typeList = [
-  { id: 'translator', name: 'Translator' },
-  { id: 'interpreter', name: 'Interpreter' },
+  { id: "translator", name: "Translator" },
+  { id: "interpreter", name: "Interpreter" },
   // { id: 'both', name: 'Both' },
-]
+];
 
 const modalData = ref({
-  title: '',
-  content: '',
-  confirmText: '',
-  cancelText: '',
+  title: "",
+  content: "",
+  confirmText: "",
+  cancelText: "",
   callback: null,
-})
+});
 
 // state
-const isPageLoading = ref(true)
-const isConfirmationModalOpen = ref(false)
-const selectedTab = ref('profile')
-const showPassword = ref(false)
-const photoWarning = ref('')
+const isPageLoading = ref(true);
+const isConfirmationModalOpen = ref(false);
+const selectedTab = ref("profile");
+const showPassword = ref(false);
+const photoWarning = ref("");
 
 // data
 const user = ref({
-  fullname: '',
-  photo: '',
-  email: '',
-  phone: '',
-  address: '',
-  role: '',
-  personal_description: '',
+  fullname: "",
+  photo: "",
+  email: "",
+  phone: "",
+  address: "",
+  role: "",
+  personal_description: "",
   main_skills: [],
   additional_skills: [],
   is_admin: false,
   is_facilitator: false,
-})
+});
 
 const payload = ref({
-  fullname: '',
-  photo: '',
-  email: '',
-  phone: '',
-  address: '',
-  personal_description: '',
+  fullname: "",
+  photo: "",
+  email: "",
+  phone: "",
+  address: "",
+  personal_description: "",
   main_skills: [],
   additional_skills: [],
-})
+});
 
 const merchant = ref({
-  type: '',
+  type: "",
   bank: {
-    id: '',
-    name: '',
+    id: "",
+    name: "",
   },
-  bank_account: '',
-  cv_url: '',
+  bank_account: "",
+  cv_url: "",
   certificates: [],
   portfolios: [],
-})
+});
 
 const service = ref({
-  name: '',
+  name: "",
   price: 50000,
-  type: 'Standard',
-  time_estimated: '',
-  time_estimated_unit: 'days',
-  desc: '',
-  working_hours: '',
+  type: "Standard",
+  time_estimated: "",
+  time_estimated_unit: "days",
+  desc: "",
+  working_hours: "",
   languages: [],
-})
+});
 
-const newPassword = ref('')
-const confirmPassword = ref('')
-const skillList = ref([])
-const languageList = ref([])
-const mainSkillQuery = ref('')
-const addtionalSkillQuery = ref('')
-const languageQuery = ref('')
-const addCertificates = ref([])
+const newPassword = ref("");
+const confirmPassword = ref("");
+const skillList = ref([]);
+const languageList = ref([]);
+const mainSkillQuery = ref("");
+const addtionalSkillQuery = ref("");
+const languageQuery = ref("");
+const addCertificates = ref([]);
 
 // computed
 const mainSkillsList = computed(() => {
   // return id and name only
   return skillList.value
-    .filter((skill) => skill.skill_type === 'main')
+    .filter((skill) => skill.skill_type === "main")
     .map((skill) => ({
       id: skill.id,
       name: skill.name,
-    }))
-})
+    }));
+});
 const additionalSkillList = computed(() => {
   return skillList.value
-    .filter((skill) => skill.skill_type === 'additional')
+    .filter((skill) => skill.skill_type === "additional")
     .map((skill) => ({
       id: skill.id,
       name: skill.name,
-    }))
-})
+    }));
+});
 
 const filteredNavs = computed(() => {
-  if (!user.value) return []
+  if (!user.value) return [];
 
-  const isAdmin = user.value.is_admin ?? false
-  const isMerchant = user.value.is_facilitator ?? false
+  const isAdmin = user.value.is_admin ?? false;
+  const isMerchant = user.value.is_facilitator ?? false;
 
   return navs.filter(
     (nav) =>
-      nav.scope === 'all' ||
-      (nav.scope === 'admin' && isAdmin) ||
-      (nav.scope === 'merchant' && isMerchant)
-  )
-})
+      nav.scope === "all" ||
+      (nav.scope === "admin" && isAdmin) ||
+      (nav.scope === "merchant" && isMerchant)
+  );
+});
 
 // methods
 // toggle password visibility
 const toggleShowPassword = () => {
-  showPassword.value = !showPassword.value
-}
+  showPassword.value = !showPassword.value;
+};
 
 const openNewTab = (url) => {
-  window.open(url, '_blank')
-}
+  window.open(url, "_blank");
+};
 
 // logout
 const logout = () => {
-  console.log('Logging out...')
-  useCookie('token').value = null
+  console.log("Logging out...");
+  useCookie("token").value = null;
   user.value = {
-    fullname: '',
-    photo: '',
-    email: '',
-    phone: '',
-    address: '',
-    role: '',
-    personal_description: '',
+    fullname: "",
+    photo: "",
+    email: "",
+    phone: "",
+    address: "",
+    role: "",
+    personal_description: "",
     main_skills: [],
     additional_skills: [],
     is_admin: false,
     is_facilitator: false,
-  }
-}
+  };
+};
 
 // set Active Service
 const setActiveService = (serviceType) => {
   // set active service
-  service.value.type = serviceType
-}
+  service.value.type = serviceType;
+};
 
 // check if json
 const checkIfJSON = (data) => {
   try {
-    return JSON.parse(data)
+    return JSON.parse(data);
   } catch (error) {
-    return data
+    return data;
   }
-}
+};
 
 const setCertificate = (files) => {
-  addCertificates.value = files
-}
+  addCertificates.value = files;
+};
 
 const removeCertificate = (index) => {
   // show confirmation modal
   modalData.value = {
-    title: 'Remove Certificate',
-    content: 'Are you sure you want to remove this certificate?',
-    confirmText: 'Yes',
-    cancelText: 'No',
+    title: "Remove Certificate",
+    content: "Are you sure you want to remove this certificate?",
+    confirmText: "Yes",
+    cancelText: "No",
     callback: () => {
-      merchant.value.certificates.splice(index, 1)
+      merchant.value.certificates.splice(index, 1);
     },
-  }
+  };
 
-  isConfirmationModalOpen.value = true
-}
+  isConfirmationModalOpen.value = true;
+};
 
 const changeService = (callback) => {
   // display confirmation modal
   modalData.value = {
-    title: 'Change Service',
+    title: "Change Service",
     content:
-      'Are you sure you want to change your main service? This action cannot be undone and your Facilitator Status will be reset and waiting for approval.',
-    confirmText: 'Sure',
-    cancelText: 'Cancel',
+      "Are you sure you want to change your main service? This action cannot be undone and your Facilitator Status will be reset and waiting for approval.",
+    confirmText: "Sure",
+    cancelText: "Cancel",
     callback,
-  }
+  };
 
-  isConfirmationModalOpen.value = true
-}
+  isConfirmationModalOpen.value = true;
+};
 
 // fetch skills list
 const fetchSkills = async () => {
   try {
     const { data } = await getSkills({
       per_page: 10000,
-    })
+    });
 
-    skillList.value = data.data.data
+    skillList.value = data.data.data;
   } catch (error) {
-    console.error('Fetching skills failed:', error)
+    console.error("Fetching skills failed:", error);
   }
-}
+};
 
 // fetch user data on mount
 const fetchUser = async () => {
   try {
-    user.value = useCookie('token').value.user || null
+    user.value = useCookie("token").value.user || null;
 
     payload.value = {
       fullname: user.value.fullname,
@@ -819,52 +876,52 @@ const fetchUser = async () => {
       photo: user.value.photo,
       main_skills: checkIfJSON(user.value.main_skills) ?? [],
       additional_skills: checkIfJSON(user.value.additional_skills) ?? [],
-    }
+    };
   } catch (error) {
-    console.error('Fetching user failed:', error)
+    console.error("Fetching user failed:", error);
   }
-}
+};
 
 const fetchMyMerchant = async () => {
   try {
-    const { data } = await getMyMerchants()
+    const { data } = await getMyMerchants();
 
     if (data.data.user.merchants.length > 0) {
-      merchant.value = data.data.user.merchants[0]
+      merchant.value = data.data.user.merchants[0];
 
       merchant.value.bank = {
         id: data.data.user.merchants[0].bank_id,
         name: data.data.user.merchants[0].bank,
-      }
+      };
 
       merchant.value.certificates = JSON.parse(
         data.data.user.merchants[0].certificates
-      )
+      );
 
       merchant.value.portfolios = JSON.parse(
         data.data.user.merchants[0].portfolios
-      )
+      );
     }
   } catch (error) {
-    console.error('Fetching merchant failed:', error)
+    console.error("Fetching merchant failed:", error);
   }
-}
+};
 
 const fetchLanguages = async () => {
   try {
     const { data } = await getLanguages({
       per_page: 10000,
-    })
+    });
 
-    languageList.value = data.data.data
+    languageList.value = data.data.data;
   } catch (error) {
-    console.error('Fetching languages failed:', error)
+    console.error("Fetching languages failed:", error);
   }
-}
+};
 
 const fetchMyService = async () => {
   try {
-    const { data } = await getMyMerchantServices()
+    const { data } = await getMyMerchantServices();
 
     if (data.data.user.merchants[0].services.length > 0) {
       service.value = {
@@ -872,66 +929,81 @@ const fetchMyService = async () => {
         languages: checkIfJSON(
           data.data.user.merchants[0].services[0].language_sources ?? []
         ),
-      }
+      };
     }
   } catch (error) {
-    console.error('Fetching service failed:', error)
+    console.error("Fetching service failed:", error);
   }
-}
+};
 
 // trigger file input click
 const triggerFileInput = () => {
-  fileInput.value.click()
-}
+  fileInput.value.click();
+};
 
 // handle file change
 const onFileChange = async (event) => {
-  const file = event.target.files[0]
+  const file = event.target.files[0];
   if (file) {
     // toast upload progress
     toast.add({
-      title: 'Uploading...',
-      color: 'blue',
-      icon: 'i-heroicons-arrow-up-tray',
-      description: 'Please wait while we upload your photo...',
-    })
+      title: "Uploading...",
+      color: "blue",
+      icon: "i-heroicons-arrow-up-tray",
+      description: "Please wait while we upload your photo...",
+    });
 
     try {
-      const response = await uploadFile(file, `profile_picture_${file.name}`)
+      const response = await uploadFile(file, `profile_picture_${file.name}`);
 
-      payload.value.photo = response.data.data.fileRecord.url
+      payload.value.photo = response.data.data.fileRecord.url;
       photoWarning.value =
-        'This preview is temporary, please save to apply changes.'
+        "This preview is temporary, please save to apply changes.";
     } catch (err) {
-      console.error('Photo upload failed:', err)
+      console.error("Photo upload failed:", err);
 
       // show error message
       toast.add({
-        title: 'Uh Oh!',
-        color: 'red',
-        icon: 'i-heroicons-exclamation-triangle',
+        title: "Uh Oh!",
+        color: "red",
+        icon: "i-heroicons-exclamation-triangle",
         description: getFirstErrorMessage(err.response.data.error),
-      })
+      });
     }
   }
-}
+};
 
 const getFirstErrorMessage = (errors) => {
   for (const field in errors) {
     if (errors[field].length > 0) {
-      return errors[field][0]
+      return errors[field][0];
     }
   }
-  return null
-}
+  return null;
+};
+
+const convertPhone = (phone) => {
+  // remove non numeric characters
+  phone = phone.replace(/\D/g, "");
+
+  // change phone format to 62
+  if (phone.startsWith("0")) {
+    return `62${phone.slice(1)}`;
+  }
+
+  return phone;
+};
 
 // update profile
 const updateProfile = async () => {
   try {
-    const { data } = await updateMyProfile(payload.value)
+    const { data } = await updateMyProfile({
+      ...payload.value,
+      phone: convertPhone(payload.value.phone ?? ""),
+    });
 
     const userData = {
-      ...useCookie('token').value.user,
+      ...useCookie("token").value.user,
       email: data.data.user.email,
       fullname: data.data.user.fullname,
       photo: data.data.user.photo,
@@ -940,69 +1012,69 @@ const updateProfile = async () => {
       personal_description: data.data.user.personal_description,
       main_skills: data.data.user.main_skills,
       additional_skills: data.data.user.additional_skills,
-    }
+    };
 
-    console.log(JSON.parse(JSON.stringify(userData)))
+    console.log(JSON.parse(JSON.stringify(userData)));
 
     // set local user
-    user.value = userData
+    user.value = userData;
 
     // update cookie
-    useCookie('token').value.user = userData
+    useCookie("token").value.user = userData;
 
     // show success message
     toast.add({
-      title: 'Success!',
-      color: 'green',
-      icon: 'i-heroicons-check-circle',
+      title: "Success!",
+      color: "green",
+      icon: "i-heroicons-check-circle",
       description: data.message,
-    })
+    });
 
     // reset photo warning
-    photoWarning.value = ''
+    photoWarning.value = "";
   } catch (error) {
-    console.error('Update profile failed:', error)
+    console.error("Update profile failed:", error);
 
     // show error message
     toast.add({
-      title: 'Uh Oh!',
-      color: 'red',
-      icon: 'i-heroicons-exclamation-triangle',
+      title: "Uh Oh!",
+      color: "red",
+      icon: "i-heroicons-exclamation-triangle",
       description: getFirstErrorMessage(error.response.data.error),
-    })
+    });
   }
-}
+};
 
 const updatePassword = async () => {
   try {
     const { data } = await updateMyPassword({
       password: newPassword.value,
       password_confirmation: confirmPassword.value,
-    })
+    });
 
     // show success message
     toast.add({
-      title: 'Success!',
-      color: 'green',
-      icon: 'i-heroicons-check-circle',
+      title: "Success!",
+      color: "green",
+      icon: "i-heroicons-check-circle",
       description: data.message,
-    })
+    });
 
     // reset password fields
-    newPassword.value = ''
-    confirmPassword.value = ''
+    newPassword.value = "";
+    confirmPassword.value = "";
   } catch (error) {
-    console.error('Change password failed:', error)
+    console.error("Change password failed:", error);
 
     // show error message
     toast.add({
-      title: 'Uh Oh!',
-      color: 'red',
-      icon: 'i-heroicons-exclamation-triangle',
+      title: "Uh Oh!",
+      color: "red",
+      icon: "i-heroicons-exclamation-triangle",
       description: getFirstErrorMessage(error.response.data.error),
-    })
+    });
   }
-}
+};
 
 const updateBank = async () => {
   try {
@@ -1014,27 +1086,27 @@ const updateBank = async () => {
       cv_url: merchant.value.cv_url,
       certificates: merchant.value.certificates,
       portfolios: merchant.value.portfolios,
-    })
+    });
 
     // show success message
     toast.add({
-      title: 'Success!',
-      color: 'green',
-      icon: 'i-heroicons-check-circle',
+      title: "Success!",
+      color: "green",
+      icon: "i-heroicons-check-circle",
       description: data.message,
-    })
+    });
   } catch (error) {
-    console.error('Update merchant failed:', error)
+    console.error("Update merchant failed:", error);
 
     // show error message
     toast.add({
-      title: 'Uh Oh!',
-      color: 'red',
-      icon: 'i-heroicons-exclamation-triangle',
+      title: "Uh Oh!",
+      color: "red",
+      icon: "i-heroicons-exclamation-triangle",
       description: getFirstErrorMessage(error.response.data.error),
-    })
+    });
   }
-}
+};
 
 const updateMerchantType = async () => {
   try {
@@ -1046,35 +1118,35 @@ const updateMerchantType = async () => {
       cv_url: merchant.value.cv_url,
       certificates: merchant.value.certificates,
       portfolios: merchant.value.portfolios,
-    })
+    });
 
     // show success message
     toast.add({
-      title: 'Success!',
-      color: 'green',
-      icon: 'i-heroicons-check-circle',
+      title: "Success!",
+      color: "green",
+      icon: "i-heroicons-check-circle",
       description: data.message,
-    })
+    });
 
     // set user cookie
-    useCookie('token').value.user.merchant_status = 'pending'
+    useCookie("token").value.user.merchant_status = "pending";
 
     // redirect to merchant status page
     router.push({
-      name: 'my-merchant-status',
-    })
+      name: "my-merchant-status",
+    });
   } catch (error) {
-    console.error('Update merchant failed:', error)
+    console.error("Update merchant failed:", error);
 
     // show error message
     toast.add({
-      title: 'Uh Oh!',
-      color: 'red',
-      icon: 'i-heroicons-exclamation-triangle',
+      title: "Uh Oh!",
+      color: "red",
+      icon: "i-heroicons-exclamation-triangle",
       description: getFirstErrorMessage(error.response.data.error),
-    })
+    });
   }
-}
+};
 
 const updateService = async () => {
   try {
@@ -1088,27 +1160,27 @@ const updateService = async () => {
       working_hours: service.value.working_hours,
       language_sources: service.value.languages,
       language_destinations: service.value.languages,
-    })
+    });
 
     // show success message
     toast.add({
-      title: 'Success!',
-      color: 'green',
-      icon: 'i-heroicons-check-circle',
+      title: "Success!",
+      color: "green",
+      icon: "i-heroicons-check-circle",
       description: data.message,
-    })
+    });
   } catch (error) {
-    console.error('Update service failed:', error)
+    console.error("Update service failed:", error);
 
     // show error message
     toast.add({
-      title: 'Uh Oh!',
-      color: 'red',
-      icon: 'i-heroicons-exclamation-triangle',
+      title: "Uh Oh!",
+      color: "red",
+      icon: "i-heroicons-exclamation-triangle",
       description: getFirstErrorMessage(error.response.data.error),
-    })
+    });
   }
-}
+};
 
 // update certificate
 const updateCertificate = async () => {
@@ -1116,66 +1188,66 @@ const updateCertificate = async () => {
     const mergeCertificates = [
       ...merchant.value.certificates,
       ...addCertificates.value,
-    ]
+    ];
 
     const { data } = await updateMyMerchantFile({
       certificates: mergeCertificates,
-    })
+    });
 
     // show success message
     toast.add({
-      title: 'Success!',
-      color: 'green',
-      icon: 'i-heroicons-check-circle',
+      title: "Success!",
+      color: "green",
+      icon: "i-heroicons-check-circle",
       description: data.message,
-    })
+    });
   } catch (error) {
-    console.error('Update merchant failed:', error)
+    console.error("Update merchant failed:", error);
 
     // show error message
     toast.add({
-      title: 'Uh Oh!',
-      color: 'red',
-      icon: 'i-heroicons-exclamation-triangle',
+      title: "Uh Oh!",
+      color: "red",
+      icon: "i-heroicons-exclamation-triangle",
       description: getFirstErrorMessage(error.response.data.error),
-    })
+    });
   }
-}
+};
 
 // watch for changes
 watch(
   () => selectedTab.value,
   (newValue) => {
-    if (newValue === 'service') {
-      const user = useCookie('token').value.user
+    if (newValue === "service") {
+      const user = useCookie("token").value.user;
 
-      console.log(user.merchant_status)
+      console.log(user.merchant_status);
 
-      if (user.merchant_status === 'pending') {
+      if (user.merchant_status === "pending") {
         // redirect to merchant status page
         router.push({
-          name: 'my-merchant-status',
-        })
+          name: "my-merchant-status",
+        });
       }
     }
   }
-)
+);
 
 onMounted(async () => {
   // fetch user data
-  if (useCookie('token').value) {
-    await fetchUser()
-    await fetchSkills()
-    await fetchMyMerchant()
-    await fetchLanguages()
-    await fetchMyService()
+  if (useCookie("token").value) {
+    await fetchUser();
+    await fetchSkills();
+    await fetchMyMerchant();
+    await fetchLanguages();
+    await fetchMyService();
   }
 
-  isPageLoading.value = false
+  isPageLoading.value = false;
 
   window.scrollTo({
     top: 0,
-    behavior: 'smooth',
-  })
-})
+    behavior: "smooth",
+  });
+});
 </script>

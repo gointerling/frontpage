@@ -17,16 +17,32 @@
           <div class="flex gap-2">
             <UInputMenu
               :options="[
-                { label: 'All', value: 'all', color: 'gray' },
+                { label: 'All Role', value: 'all', color: 'gray' },
+                { label: 'Admin', value: '1', color: 'blue' },
+                { label: 'User', value: '0', color: 'orange' },
+              ]"
+              v-model="selectedRole"
+              placeholder="Pilih Role"
+              by="value"
+              option-attribute="label"
+              :search-attributes="['label']"
+              @change="filterData"
+              class="max-w-[180px]"
+            />
+            <UInputMenu
+              :options="[
+                { label: 'All Status', value: 'all', color: 'gray' },
                 { label: 'Verified', value: 'verified', color: 'blue' },
                 { label: 'Pending', value: 'pending', color: 'orange' },
+                { label: 'Active', value: 'active', color: 'green' },
+                { label: 'Inactive', value: 'inactive', color: 'gray' },
               ]"
               v-model="selectedStatus"
               placeholder="Pilih Status"
               by="value"
               option-attribute="label"
               :search-attributes="['label']"
-              @change="filterFacilitators"
+              @change="filterData"
               class="max-w-[180px]"
             />
             <UInput
@@ -34,7 +50,7 @@
               size="sm"
               color="white"
               :trailing="false"
-              placeholder="Search Facilitator"
+              placeholder="Search User"
               v-model="searchQuery"
               @input="onSearchChange()"
             />
@@ -48,7 +64,7 @@
           }"
         >
           <UTable
-            :rows="facilitators"
+            :rows="data"
             :loading="isTableLoading"
             :loading-state="{
               icon: 'i-heroicons-arrow-path-20-solid',
@@ -93,26 +109,39 @@
               </div>
             </template>
 
-            <template #bank-data="{ row }">
-              <div v-if="row.bank.bank" class="flex gap-1 flex-col">
-                <div class="flex gap-1 items-center">
-                  <span class="font-semibold text-primary">
-                    Bank {{ row.bank.bank }}
-                  </span>
-                  <UButton
-                    size="xs"
-                    variant="outline"
-                    color="blue"
-                    @click="copyToClipboard(row.bank.bankAccount)"
-                    class=""
+            <template #address-data="{ row }">
+              <div>
+                <UTooltip
+                  v-if="row.address"
+                  :text="row.address"
+                  :popper="{ arrow: true }"
+                  :ui="{
+                    base: '[@media(pointer:coarse)]:hidden h-full px-2 py-1 text-xs font-normal text-wrap text-center',
+                  }"
+                >
+                  <p
+                    class="text-gray-600 max-w-48 text-sm truncate cursor-pointer"
                   >
-                    <nuxt-icon name="copy" class="text-xs" />
-                  </UButton>
-                </div>
-                <span> {{ row.bank.bankAccount }} </span>
-              </div>
+                    {{ row.address }}
+                  </p>
+                </UTooltip>
 
-              <span v-else class="text-gray-300"> Kosong </span>
+                <span v-else class="text-gray-300"> Kosong </span>
+              </div>
+            </template>
+
+            <template #admin-data="{ row }">
+              <div>
+                <UBadge
+                  size="xs"
+                  :label="row.admin ? 'Admin' : 'User'"
+                  :color="row.admin ? 'blue' : 'orange'"
+                  variant="subtle"
+                  class="capitalize"
+                >
+                  {{ row.admin ? "Admin" : "User" }}
+                </UBadge>
+              </div>
             </template>
 
             <template #status-data="{ row }">
@@ -123,87 +152,6 @@
                 variant="subtle"
                 class="capitalize"
               />
-            </template>
-
-            <template #type-data="{ row }">
-              <UBadge
-                size="xs"
-                :label="row.type"
-                :color="row.type === 'interpreter' ? 'emerald' : 'blue'"
-                variant="subtle"
-                class="capitalize"
-              />
-            </template>
-
-            <template #CV-data="{ row }">
-              <UButton
-                v-if="row.CV"
-                size="sm"
-                color="primary"
-                :trailing="false"
-                @click="openLink(row.CV)"
-              >
-                <nuxt-icon name="file" class="text-white" />
-                Open CV
-              </UButton>
-
-              <span v-else class="text-gray-300"> No CV </span>
-            </template>
-
-            <template #portfolio-data="{ row }">
-              <div
-                v-if="row.portfolio"
-                class="flex gap-1 flex-col justify-center"
-                :class="
-                  row.portfolio.length === 0 ? 'items-start' : 'items-center'
-                "
-              >
-                <UButton
-                  v-for="(portfolioLink, index) in row.portfolio"
-                  :key="index"
-                  size="sm"
-                  color="primary"
-                  :trailing="false"
-                  @click="openLink(portfolioLink)"
-                >
-                  <nuxt-icon name="file" class="text-white" />
-                  Portfolio {{ index + 1 }}
-                </UButton>
-
-                <span v-if="row.portfolio.length === 0" class="text-gray-300">
-                  No Portfolio
-                </span>
-              </div>
-
-              <span v-else class="text-gray-300"> No Portfolio </span>
-            </template>
-
-            <template #certificate-data="{ row }">
-              <div
-                v-if="row.certificate"
-                class="flex gap-1 flex-col justify-center"
-                :class="
-                  row.certificate.length === 0 ? 'items-start' : 'items-center'
-                "
-              >
-                <UButton
-                  v-for="(certificateLink, index) in row.certificate"
-                  :key="index"
-                  size="sm"
-                  color="primary"
-                  :trailing="false"
-                  @click="openLink(certificateLink)"
-                >
-                  <nuxt-icon name="file" class="text-white" />
-                  Certificate {{ index + 1 }}
-                </UButton>
-
-                <span v-if="row.certificate.length === 0" class="text-gray-300">
-                  No Certificate
-                </span>
-              </div>
-
-              <span v-else class="text-gray-300"> No Certificate </span>
             </template>
 
             <template #actions-data="{ row }">
@@ -219,11 +167,11 @@
                     @click="
                       displayConfirmationModal(
                         'Hang On',
-                        'Are you sure you want to deactivate this facilitator?',
+                        'Are you sure you want to deactivate this user?',
                         'Deactivate',
                         'Cancel',
                         () => {
-                          updateUserStatus(row.user.id, 'inactive')
+                          updateUserStatus(row.user.id, 'inactive');
                         }
                       )
                     "
@@ -240,12 +188,12 @@
                     square
                     @click="
                       displayConfirmationModal(
-                        'Verify Facilitator',
-                        'Are you sure you want to verify this facilitator?',
+                        'Verify User',
+                        'Are you sure you want to verify this user?',
                         'Verify',
                         'Cancel',
                         () => {
-                          updateUserStatus(row.user.id, 'verified')
+                          updateUserStatus(row.user.id, 'verified');
                         }
                       )
                     "
@@ -256,8 +204,7 @@
           </UTable>
           <UPagination
             v-model="page"
-            :max="5"
-            :page-count="paginationsData.itemsPerPage"
+            :page-count="1"
             :total="paginationsData.totalPage"
           />
         </UCard>
@@ -268,165 +215,165 @@
   </div>
 </template>
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useMerchantService } from '~/composables/useMerchantService'
+import { useMerchantService } from "~/composables/useMerchantService";
+import { useUserService } from "~/composables/useUserService";
 
-const { getMerchants, updateMerchantStatus } = useMerchantService()
+const { getMerchants, updateMerchantStatus } = useUserService();
+const { getUsers } = useUserService();
 
 // components
-const toast = useToast()
+const toast = useToast();
 
 definePageMeta({
   layout: false,
-})
+});
 
 // state
-const isTableLoading = ref(true)
-const isModalOpen = ref(false)
+const isTableLoading = ref(true);
+const isModalOpen = ref(false);
 const modalData = ref({
-  title: '',
-  message: '',
+  title: "",
+  message: "",
   callback: null,
-})
+});
 
 // data
-const pageTitle = 'Users List'
-const facilitators = ref([])
+const pageTitle = "Users List";
+const data = ref([]);
 const selectedStatus = ref({
-  label: 'All',
-  value: 'all',
-})
-const searchQuery = ref('')
-const page = ref(1)
+  label: "All",
+  value: "all",
+});
+
+const selectedRole = ref({
+  label: "All",
+  value: "all",
+});
+const searchQuery = ref("");
+const page = ref(1);
 const paginationsData = ref({
   page: 1,
   totalPage: 1,
   totalItems: 0,
   itemsPerPage: 10,
-})
+});
 
-const actions = [
-  [
-    {
-      key: 'completed',
-      label: 'Completed',
-      icon: 'i-heroicons-check',
-      callback: () => {
-        console.log('completed')
-      },
-    },
-  ],
-  [
-    {
-      key: 'uncompleted',
-      label: 'In Progress',
-      icon: 'i-heroicons-arrow-path',
-      callback: () => {
-        console.log('uncompleted')
-      },
-    },
-  ],
-]
-
-// Fetch facilitators
-const fetchFacilitators = async () => {
+// Fetch data
+const fetchData = async () => {
   try {
-    await getMerchants({
+    await getUsers({
       page: page.value,
       per_page: paginationsData.value.itemsPerPage,
       status:
-        selectedStatus.value.value === 'all' ? '' : selectedStatus.value.value,
+        selectedStatus.value.value === "all" ? "" : selectedStatus.value.value,
+      is_admin:
+        selectedRole.value.value === "all" ? null : selectedRole.value.value,
       search: searchQuery.value,
     }).then((response) => {
-      facilitators.value = response.data.data.data.map((user) => ({
+      data.value = response.data.data.users.data.map((user, index) => ({
+        no: index + 1,
         user: {
           id: user.id,
           fullname: user.fullname,
           email: user.email,
+          photo: user.photo,
         },
-        phone: user.phone,
-        type: user.merchants[0].type,
-        bank: {
-          bank: user.merchants[0].bank,
-          bankAccount: user.merchants[0].bank_account,
+        phone: convertPhone(user.phone ?? ""),
+        address: user.address,
+        admin: user.is_admin,
+        status: user.status,
+        actions: {
+          id: user.id,
+          status: user.status,
         },
-        CV: user.merchants[0].cv_url,
-        portfolio: JSON.parse(user.merchants[0].portfolios),
-        certificate: JSON.parse(user.merchants[0].certificates),
-        status: user.merchants[0].status,
-        actions: actions,
-      }))
+      }));
+
       paginationsData.value = {
-        page: response.data.data.current_page,
-        totalPage: response.data.data.last_page,
-        totalItems: response.data.data.total,
-        itemsPerPage: response.data.data.per_page,
-      }
-    })
+        page: response.data.data.users.current_page,
+        totalPage: response.data.data.users.last_page,
+        totalItems: response.data.data.users.total,
+        itemsPerPage: response.data.data.users.per_page,
+      };
+    });
   } catch (error) {
-    console.error('Error fetching facilitators:', error)
+    console.error("Error fetching users:", error);
   } finally {
-    isTableLoading.value = false
+    isTableLoading.value = false;
   }
-}
+};
+
+const convertPhone = (phone) => {
+  // remove non numeric characters
+  phone = phone.replace(/\D/g, "");
+
+  // change phone format to 62
+  if (phone.startsWith("0")) {
+    return `62${phone.slice(1)}`;
+  }
+
+  return phone;
+};
 
 // Watcher to fetch data when page changes
-watch(page, fetchFacilitators)
+watch(page, fetchData);
 
-// Filter facilitators based on search query
-const filterFacilitators = () => {
-  fetchFacilitators(page.value, selectedStatus.value.value, searchQuery.value)
-}
+// Filter users based on search query
+const filterData = () => {
+  page.value = 1;
+  fetchData();
+};
 
 // Search change handler with manual debounce
 const onSearchChange = debounce(() => {
-  filterFacilitators()
-}, 500)
+  filterData();
+}, 500);
 
 // debounce function
 function debounce(func, wait, immediate) {
-  let timeout
+  let timeout;
   return function () {
-    const context = this
-    const args = arguments
+    const context = this;
+    const args = arguments;
     const later = function () {
-      timeout = null
-      if (!immediate) func.apply(context, args)
-    }
-    const callNow = immediate && !timeout
-    clearTimeout(timeout)
-    timeout = setTimeout(later, wait)
-    if (callNow) func.apply(context, args)
-  }
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    const callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
 }
 
 // Open link in new tab
 const openLink = (url) => {
   // Open link in new tab
-  window.open(url, '_blank')
-}
+  window.open(url, "_blank");
+};
 
 const copyToClipboard = (text) => {
-  navigator.clipboard.writeText(text)
+  navigator.clipboard.writeText(text);
 
   // Show toast
   toast.add({
-    title: 'Copied!',
-    color: 'green',
-    icon: 'i-heroicons-check-circle',
-    description: 'No Rekening copied to clipboard!',
-  })
-}
+    title: "Copied!",
+    color: "green",
+    icon: "i-heroicons-check-circle",
+    description: "No Rekening copied to clipboard!",
+  });
+};
 
 const resolveStatusColor = (status) => {
-  if (status === 'verified') {
-    return 'blue'
-  } else if (status === 'pending') {
-    return 'orange'
+  if (status === "verified") {
+    return "blue";
+  } else if (status === "active") {
+    return "green";
+  } else if (status === "pending") {
+    return "orange";
   } else {
-    return 'gray'
+    return "gray";
   }
-}
+};
 
 const displayConfirmationModal = (
   title,
@@ -441,42 +388,42 @@ const displayConfirmationModal = (
     confirmText,
     cancelText,
     callback,
-  }
-  isModalOpen.value = true
-}
+  };
+  isModalOpen.value = true;
+};
 
 const updateUserStatus = async (userId, status) => {
   await updateMerchantStatus(userId, status)
     .then(() => {
       // Close modal
-      isModalOpen.value = false
+      isModalOpen.value = false;
 
       // Show toast
       toast.add({
-        title: 'Success!',
-        color: 'green',
-        icon: 'i-heroicons-check-circle',
-        description: 'User status updated successfully!',
-      })
+        title: "Success!",
+        color: "green",
+        icon: "i-heroicons-check-circle",
+        description: "User status updated successfully!",
+      });
 
-      // Fetch facilitators
-      fetchFacilitators()
+      // Fetch user data
+      fetchData();
     })
     .catch((error) => {
-      console.error('Error updating user status:', error)
+      console.error("Error updating user status:", error);
 
       // Show toast
       toast.add({
-        title: 'Uh Oh!',
-        color: 'red',
-        icon: 'i-heroicons-x-circle',
-        description: 'Error updating user status!',
-      })
-    })
-}
+        title: "Uh Oh!",
+        color: "red",
+        icon: "i-heroicons-x-circle",
+        description: "Error updating user status!",
+      });
+    });
+};
 
 // Mounted lifecycle hook
-onMounted(() => {
-  fetchFacilitators()
-})
+onMounted(async () => {
+  await fetchData();
+});
 </script>
