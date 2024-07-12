@@ -23,6 +23,11 @@
                 >Delivery</nuxt-link
               >
             </li>
+            <li>
+              <nuxt-link href="#" class="text-gray-500 hover:text-primary"
+                >Test</nuxt-link
+              >
+            </li>
           </ul>
         </div>
         <div>
@@ -97,13 +102,13 @@
 </template>
 
 <script>
-import logo from '@/assets/images/logo.svg'
+import logo from "@/assets/images/logo.svg";
 
 export default {
   data() {
     return {
       logo,
-    }
+    };
   },
-}
+};
 </script>
