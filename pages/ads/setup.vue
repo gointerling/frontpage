@@ -269,26 +269,44 @@
                   <UButton
                     color="primary"
                     class="text-white py-3 rounded-lg my-1"
-                    @click="toggleIsReupload"
+                    @click="isReupload = false"
                   >
-                    Cancel
+                    <UIcon name="i-heroicons-arrow-path" />
+                    Reupload
                   </UButton>
+
                   <UButton
-                    color="primary"
-                    class="text-white py-3 rounded-lg my-1"
-                    @click="toggleIsReupload"
+                    v-if="isReupload"
+                    class="text-white py-3 rounded-lg my-1 bg-accent hover:bg-accent-700"
+                    @click="
+                      navigateTo({
+                        name: 'my-client-orders',
+                        query: { section: 'ads-history' },
+                      })
+                    "
                   >
-                    Re-Upload
+                    <UIcon name="i-heroicons-megaphone" />
+
+                    Other Ads History
                   </UButton>
                 </div>
 
-                <FileUploadInline
-                  class="w-full my-4"
+                <FileUpload
+                  v-else
                   title="Proof of Payment"
-                  accept="image/*"
+                  accept="*"
                   max-size="6291456"
-                  @file-uploaded="uploadProofOfPayment"
+                  @file-uploaded="updateProofOfPayment"
+                  class="my-1"
                 />
+
+                <span
+                  v-if="payload.payment_file_url"
+                  class="text-xs text-gray-500 max-w-xs"
+                >
+                  *Your transaction will be processed. Please wait for the
+                  verification process.
+                </span>
               </div>
             </div>
           </div>
@@ -571,6 +589,9 @@ const updateProofOfPayment = (fileUrl) => {
       });
 
       isReupload.value = true;
+
+      // fetch ads detail
+      fetchAdsDetail(payload.value.id);
     })
     .catch((err) => {
       console.error(err);

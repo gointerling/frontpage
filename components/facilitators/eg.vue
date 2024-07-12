@@ -4,13 +4,13 @@
     fullscreen
     prevent-close
     :ui="{
-      base: '!w-full sm:!w-[600px] absolute top-0 right-0 h-screen bg-white dark:bg-gray-800 rounded-l-3xl',
+      base: '!w-[600px] absolute top-0 right-0 h-screen bg-white dark:bg-gray-800 rounded-l-3xl',
       rounded: 'rounded-l-3xl rounded-r-0',
     }"
   >
     <UCard
       :ui="{
-        base: 'h-full',
+        base: 'h-full ',
         ring: '',
         divide: 'divide-y divide-gray-100 dark:divide-gray-800',
         rounded: 'rounded-l-3xl rounded-r-0',
@@ -40,11 +40,10 @@
         >
           Discussions
         </h3>
-      </div>
 
-      <div
-        class="flex flex-col items-center justify-between w-full h-full py-2"
-      >
+        <!-- comment -->
+      </div>
+      <div class="flex flex-col items-center justify-between w-full h-full">
         <div v-if="props.data.comments.total === 0" class="py-4 text-gray-400">
           Start Discussion
         </div>
@@ -62,7 +61,7 @@
 
         <div
           id="comment-section"
-          class="w-full h-full max-h-screen overflow-auto px-2 py-2"
+          class="w-full h-full max-h-[550px] overflow-auto px-2 py-1"
         >
           <div
             v-for="comment in filteredComments"
@@ -176,7 +175,6 @@
           </div>
         </div>
       </div>
-
       <UCard
         :ui="{
           body: {
@@ -211,14 +209,14 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch } from 'vue'
 
-import { useOrderService } from "~/composables/useOrderService";
-const { updateMerchantOrder } = useOrderService();
+import { useOrderService } from '~/composables/useOrderService'
+const { updateMerchantOrder } = useOrderService()
 
-const route = useRoute();
-const router = useRouter();
-const toast = useToast();
+const route = useRoute()
+const router = useRouter()
+const toast = useToast()
 
 // define props
 const props = defineProps({
@@ -238,59 +236,59 @@ const props = defineProps({
       callback: () => {},
     }),
   },
-});
+})
 
 // emit event to update the prop value
-const emit = defineEmits(["update:isOpen", "hide", "refresh"]);
+const emit = defineEmits(['update:isOpen', 'hide', 'refresh'])
 
-const commentlimit = ref(3);
-const user = useCookie("token").value.user;
+const commentlimit = ref(3)
+const user = useCookie('token').value.user
 const userComment = ref({
   user: {
     fullname: user.fullname,
     photo: user.photo,
   },
-  message: "",
+  message: '',
   time: new Date().toISOString(),
-  file_url: "",
-  other_link: "",
+  file_url: '',
+  other_link: '',
   is_facilitator: true,
-});
+})
 
 const filteredComments = computed(() => {
-  return props.data.comments.data.slice(0, commentlimit.value);
-});
+  return props.data.comments.data.slice(0, commentlimit.value)
+})
 
 // internal state to handle the modal visibility
-const internalIsOpen = ref(props.isOpen);
+const internalIsOpen = ref(props.isOpen)
 
 // watch for changes in the prop to update the internal state
 watch(
   () => props.isOpen,
   (newVal) => {
-    internalIsOpen.value = newVal;
+    internalIsOpen.value = newVal
 
     if (!newVal) {
-      hideSidebar();
+      hideSidebar()
     }
   }
-);
+)
 
 // watch for changes in the internal state to emit the event
 watch(internalIsOpen, (newVal) => {
-  emit("update:isOpen", newVal);
-});
+  emit('update:isOpen', newVal)
+})
 
 const hideSidebar = () => {
-  internalIsOpen.value = false;
+  internalIsOpen.value = false
 
-  emit("hide");
-};
+  emit('hide')
+}
 
 const formatDistanceToNow = (date) => {
-  const now = new Date();
-  const past = new Date(date);
-  const diffInSeconds = Math.floor((now - past) / 1000);
+  const now = new Date()
+  const past = new Date(date)
+  const diffInSeconds = Math.floor((now - past) / 1000)
 
   const intervals = {
     year: 31536000,
@@ -300,85 +298,85 @@ const formatDistanceToNow = (date) => {
     hour: 3600,
     minute: 60,
     second: 1,
-  };
+  }
 
   for (const interval in intervals) {
-    const value = Math.floor(diffInSeconds / intervals[interval]);
+    const value = Math.floor(diffInSeconds / intervals[interval])
     if (value >= 1) {
       return value === 1
-        ? `${value} ${interval} ago`
-        : `${value} ${interval}s ago`;
+        ? ${value} ${interval} ago
+        : ${value} ${interval}s ago
     }
   }
-  return "just now";
-};
+  return 'just now'
+}
 
 const formatPrice = (price) => {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-  }).format(price);
-};
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+  }).format(price)
+}
 
 const setCommentFileUrl = (file) => {
-  userComment.value.file_url = file;
-};
+  userComment.value.file_url = file
+}
 
 const openNewTab = (url) => {
-  window.open(url, "_blank");
-};
+  window.open(url, '_blank')
+}
 
 const updatePropsComments = (comments) => {
-  props.data.comments.data = comments;
+  props.data.comments.data = comments
 
   // emit event to update the prop value
-  emit("refresh", props.data);
-};
+  emit('refresh', props.data)
+}
 
 const updateComment = async (payload) => {
-  const orderId = props.data.actions.id;
-  const comment_payload = props.data.comments.data ?? [];
+  const orderId = props.data.actions.id
+  const comment_payload = props.data.comments.data ?? []
 
   if (!payload.message && payload.file_url) {
-    payload.message = "Here I attached a file.";
+    payload.message = 'Here I attached a file.'
   }
 
   if (!payload.message && !payload.file_url) {
     toast.add({
-      title: "Failed!",
-      color: "red",
-      icon: "i-heroicons-x-circle",
-      description: "Comment message is required!",
-    });
-    return;
+      title: 'Failed!',
+      color: 'red',
+      icon: 'i-heroicons-x-circle',
+      description: 'Comment message is required!',
+    })
+    return
   }
 
-  comment_payload.push(payload);
+  comment_payload.push(payload)
 
   try {
     const { data } = await updateMerchantOrder(orderId, {
       comment_json: comment_payload,
-    });
+    })
     // Show toast
     toast.add({
-      title: "Success!",
-      color: "green",
-      icon: "i-heroicons-check-circle",
-      description: "Order updated successfully!",
-    });
+      title: 'Success!',
+      color: 'green',
+      icon: 'i-heroicons-check-circle',
+      description: 'Order updated successfully!',
+    })
     // fetch updated order
 
     // set props.data.comments.data with updated data
-    updatePropsComments(comment_payload);
+    updatePropsComments(comment_payload)
 
     // set comment limit
-    commentlimit.value = comment_payload.length;
+    commentlimit.value = comment_payload.length
 
     // scroll to bottom of comment section and delay after 2ms
     setTimeout(() => {
-      const commentSection = document.getElementById("comment-section");
-      commentSection.scrollTop = commentSection.scrollHeight;
-    }, 2);
+      const commentSection = document.getElementById('comment-section')
+      commentSection.scrollTop = commentSection.scrollHeight
+    }, 2)
 
     // reset comment
     userComment.value = {
@@ -386,27 +384,21 @@ const updateComment = async (payload) => {
         fullname: user.fullname,
         photo: user.photo,
       },
-      message: "",
+      message: '',
       time: new Date().toISOString(),
-      file_url: "",
-      other_link: "",
+      file_url: '',
+      other_link: '',
       is_facilitator: true,
-    };
+    }
   } catch (error) {
-    console.error("Updating order failed:", error);
+    console.error('Updating order failed:', error)
     // Show toast
     toast.add({
-      title: "Failed!",
-      color: "red",
-      icon: "i-heroicons-x-circle",
-      description: "Failed to update order!",
-    });
+      title: 'Failed!',
+      color: 'red',
+      icon: 'i-heroicons-x-circle',
+      description: 'Failed to update order!',
+    })
   }
-};
-</script>
-
-<style>
-.max-h-screen {
-  max-height: calc(70vh - 4rem);
 }
-</style>
+</script>

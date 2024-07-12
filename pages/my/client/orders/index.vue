@@ -111,17 +111,11 @@
                               resolveOrderStatus(order.order_status).text
                             }}</span>
                           </UBadge>
-                          <UButton variant="link">
-                            <nuxt-icon
-                              name="dots"
-                              class="text-md text-primary"
-                            />
-                          </UButton>
                         </div>
                       </div>
                     </template>
                     <div
-                      class="flex flex-col md:flex-row gap-3 justify-between items-center"
+                      class="flex flex-row gap-3 justify-between items-center py-2"
                     >
                       <div class="flex gap-3">
                         <div class="">
@@ -139,12 +133,14 @@
                           <div
                             class="flex flex-wrap gap-2 text-xs text-gray-700"
                           >
-                            <span>{{ order.service.name }}</span>
-                            <span
-                              >({{ order.language_source.name }} -
-                              {{ order.language_destination.name }})</span
-                            >
-                            <span>x 1</span>
+                            <span class="hidden md:block">{{
+                              order.service.name
+                            }}</span>
+                            <span>
+                              ({{ order.language_source.name }} -
+                              {{ order.language_destination.name }})
+                            </span>
+                            <span class="hidden md:block">x 1</span>
                           </div>
 
                           <span class="font-semibold text-primary text-md">
@@ -162,7 +158,7 @@
                           })
                         "
                       >
-                        Show Detail
+                        Detail
                       </UButton>
                     </div>
                   </UCard>
@@ -250,66 +246,50 @@
                     <template #header>
                       <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2 capitalize">
-                          <UIcon name="i-heroicons-language" />
+                          <UIcon name="i-heroicons-megaphone" />
                           <span class="font-semibold">
-                            {{ advertisement.type }}
+                            {{ advertisement.package.name }}
                           </span>
                         </div>
                         <div class="flex justify-between items-center gap-2">
                           <UBadge
                             variant="soft"
                             :color="
-                              resolveAdvertisementStatus(
-                                advertisement.ad_status
-                              ).color
+                              resolveOrderStatus(advertisement.status).color
                             "
                           >
                             <span class="capitalize">{{
-                              resolveAdvertisementStatus(
-                                advertisement.ad_status
-                              ).text
+                              resolveOrderStatus(advertisement.status).text
                             }}</span>
                           </UBadge>
-                          <UButton variant="link">
-                            <nuxt-icon
-                              name="dots"
-                              searchclass="text-md text-primary"
-                            />
-                          </UButton>
                         </div>
                       </div>
                     </template>
                     <div
-                      class="flex flex-col md:flex-row gap-3 justify-between items-center"
+                      class="flex flex-row gap-3 justify-between items-center py-2"
                     >
                       <div class="flex gap-3">
                         <div class="">
                           <UAvatar
-                            :alt="advertisement.merchant_user.fullname"
-                            :src="advertisement.merchant_user.photo"
+                            :alt="advertisement.name"
+                            :src="advertisement.image_url"
                             size="lg"
                             imgClass="object-cover"
                           />
                         </div>
                         <div class="flex flex-col">
                           <span class="font-semibold text-primary">
-                            {{ advertisement.merchant_user.fullname }}
+                            {{ advertisement.name }}
                           </span>
                           <div
                             class="flex flex-wrap gap-2 text-xs text-gray-700"
                           >
-                            <span>{{ advertisement.service.name }}</span>
-                            <span
-                              >({{ advertisement.language_source.name }} -
-                              {{
-                                advertisement.language_destination.name
-                              }})</span
-                            >
+                            <span>{{ advertisement.tagline }}</span>
                             <span>x 1</span>
                           </div>
 
                           <span class="font-semibold text-primary text-md">
-                            {{ formatPrice(advertisement.price) }}
+                            {{ formatPrice(advertisement.package.price) }}
                           </span>
                         </div>
                       </div>
@@ -318,12 +298,15 @@
                         class="text-white mr-4"
                         @click="
                           navigateTo({
-                            name: 'my-client-ads-id',
-                            params: { id: advertisement.id },
+                            name: 'ads-setup',
+                            query: {
+                              transaction_id: advertisement.id,
+                              section: 'payment',
+                            },
                           })
                         "
                       >
-                        Show Detail
+                        Detail
                       </UButton>
                     </div>
                   </UCard>
@@ -556,6 +539,13 @@ const fetchAll = async () => {
   if (selectedTab.value === "ads-history") {
     await fetchMyAds();
   }
+};
+
+const filterFacilitators = async () => {
+  isContentLoading.value = true;
+  perPage.value = 5;
+
+  fetchAll();
 };
 
 const resetFilter = () => {
