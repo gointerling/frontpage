@@ -1,0 +1,23 @@
+name: Auto Pull on Update
+
+on:
+  push:
+    branches:
+      - build  # You can change this to any branch you want to monitor
+
+jobs:
+  auto-pull:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2.1.8
+        with: 
+          fetch-depth: 2
+
+      - name: Set up FTP
+        uses: SamKirkland/FTP-Deploy-Action@3.1.1
+        with:
+          ftp-server: ${{ secrets.GOINTERLING_FTP_SERVER }}
+          ftp-username: ${{ secrets.GOINTERLING_FTP_USERNAME }}
+          ftp-password: ${{ secrets.GOINTERLING_FTP_PASSWORD }}
