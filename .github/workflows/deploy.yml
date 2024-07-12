@@ -13,6 +13,23 @@ jobs:
     - name: 🚚 Get latest code
       uses: actions/checkout@v4
     
+    - name: 🔍 Validate secrets
+      run: |
+        echo "Validating secrets..."
+        if [ -z "${{ secrets.GOINTERLING_FTP_SERVER }}" ]; then
+          echo "Error: GOINTERLING_FTP_SERVER is not set."
+          exit 1
+        fi
+        if [ -z "${{ secrets.GOINTERLING_FTP_USERNAME }}" ]; then
+          echo "Error: GOINTERLING_FTP_USERNAME is not set."
+          exit 1
+        fi
+        if [ -z "${{ secrets.GOINTERLING_FTP_PASSWORD }}" ]; then
+          echo "Error: GOINTERLING_FTP_PASSWORD is not set."
+          exit 1
+        fi
+        echo "All required secrets are set."
+
     - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
