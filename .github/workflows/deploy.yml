@@ -33,8 +33,8 @@ jobs:
     - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
-        server: ${{ secrets.GOINTERLING_FTP_SERVER }}
-        username: ${{ secrets.GOINTERLING_FTP_USERNAME }}
+        server: 203.175.9.138
+        username: gointerling@gointerling.com
         password: ${{ secrets.GOINTERLING_FTP_PASSWORD }}
         port: 21
         protocol: ftps
