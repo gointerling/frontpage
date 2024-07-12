@@ -28,6 +28,11 @@
                 >Test</nuxt-link
               >
             </li>
+            <li>
+              <nuxt-link href="#" class="text-gray-500 hover:text-primary"
+                >Test 2</nuxt-link
+              >
+            </li>
           </ul>
         </div>
         <div>
