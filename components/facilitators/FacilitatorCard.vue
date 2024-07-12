@@ -54,7 +54,7 @@
               :key="index"
               class="text-sm"
             >
-              {{ language }}
+              {{ language.name }}
             </span>
           </div>
 

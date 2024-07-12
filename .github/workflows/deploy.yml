@@ -16,16 +16,20 @@ jobs:
     - name: 🔍 Validate secrets
       run: |
         echo "Validating secrets..."
-        if [ -z "${{ secrets.GOINTERLING_FTP_SERVER }}" ]; then
-          echo "Error: GOINTERLING_FTP_SERVER is not set."
+        if [ -z "${{ secrets.FE_DEPLOY_PATH }}" ]; then
+          echo "Error: FE_DEPLOY_PATH is not set."
           exit 1
         fi
-        if [ -z "${{ secrets.GOINTERLING_FTP_USERNAME }}" ]; then
-          echo "Error: GOINTERLING_FTP_USERNAME is not set."
+        if [ -z "${{ secrets.FE_DEPLOY_HOST }}" ]; then
+          echo "Error: FE_DEPLOY_HOST is not set."
           exit 1
         fi
-        if [ -z "${{ secrets.GOINTERLING_FTP_PASSWORD }}" ]; then
-          echo "Error: GOINTERLING_FTP_PASSWORD is not set."
+        if [ -z "${{ secrets.DEPLOY_USER }}" ]; then
+          echo "Error: DEPLOY_USER is not set."
+          exit 1
+        fi
+        if [ -z "${{ secrets.DEPLOY_KEY }}" ]; then
+          echo "Error: DEPLOY_KEY is not set."
           exit 1
         fi
         echo "All required secrets are set."
