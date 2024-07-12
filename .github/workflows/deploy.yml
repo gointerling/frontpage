@@ -31,10 +31,11 @@ jobs:
         echo "All required secrets are set."
 
     - name: 📂 Sync files
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      uses: burnett01/rsync-deployments@4.1
       with:
-        server: ${{ secrets.GOINTERLING_FTP_SERVER }}
-        username: ${{ secrets.GOINTERLING_FTP_USERNAME }}
-        password: ${{ secrets.GOINTERLING_FTP_PASSWORD }}
-        port: 21
-        protocol: ftps
+        switches: -avzr --delete --exclude=".git" --exclude=".github"
+        path: /
+        remote_path: ${{ secrets.FE_DEPLOY_PATH }}
+        remote_host: ${{ secrets.FE_DEPLOY_HOST }}
+        remote_user: ${{ secrets.DEPLOY_USER }}
+        remote_key: ${{ secrets.DEPLOY_KEY }}
