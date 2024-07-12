@@ -47,7 +47,7 @@
             </li>
             <li>
               <nuxt-link href="#" class="text-gray-500 hover:text-primary"
-                >Test</nuxt-link
+                >Test 1</nuxt-link
               >
             </li>
           </ul>
