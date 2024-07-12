@@ -1,0 +1,8 @@
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/mane2948/public_html/project/gointerling/frontpage
+    - echo "Starting deployment"
+    - cd $DEPLOYPATH
+    - echo "Pulling latest changes from repository"
+    - git pull origin build
+    - echo "Deployment completed"
