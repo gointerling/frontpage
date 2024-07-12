@@ -10,34 +10,13 @@ jobs:
     name: 🎉 Deploy
     runs-on: ubuntu-latest
     steps:
-    - name: 🚚 Get latest code
-      uses: actions/checkout@v4
-    
-    - name: 🔍 Validate secrets
-      run: |
-        echo "Validating secrets..."
-        if [ -z "${{ secrets.FE_DEPLOY_PATH }}" ]; then
-          echo "Error: FE_DEPLOY_PATH is not set."
-          exit 1
-        fi
-        if [ -z "${{ secrets.FE_DEPLOY_HOST }}" ]; then
-          echo "Error: FE_DEPLOY_HOST is not set."
-          exit 1
-        fi
-        if [ -z "${{ secrets.DEPLOY_USER }}" ]; then
-          echo "Error: DEPLOY_USER is not set."
-          exit 1
-        fi
-        if [ -z "${{ secrets.DEPLOY_KEY }}" ]; then
-          echo "Error: DEPLOY_KEY is not set."
-          exit 1
-        fi
-        echo "All required secrets are set."
+    - name: 🚚 Get Latest Code
+      uses: actions/checkout@v3
 
     - name: 📂 Sync Files
-        uses: SamKirkland/web-deploy@v1
-        with:
-          target-server: gointerling.com
-          remote-user: ${{ secrets.DEPLOY_USER }}
-          private-ssh-key: ${{ secrets.DEPLOY_KEY }}
-          destination-path: ${{ secrets.FE_DEPLOY_PATH }}
+      uses: SamKirkland/web-deploy@v1
+      with:
+        target-server: gointerling.com
+        remote-user: ${{ secrets.DEPLOY_USER }}
+        private-ssh-key: ${{ secrets.DEPLOY_KEY }}
+        destination-path: ${{ secrets.FE_DEPLOY_PATH }}
