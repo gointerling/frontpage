@@ -34,12 +34,10 @@ jobs:
         fi
         echo "All required secrets are set."
 
-    - name: 📂 Sync files
-      uses: burnett01/rsync-deployments@4.1
-      with:
-        switches: -avzr --delete --exclude=".git" --exclude=".github"
-        path: /
-        remote_path: ${{ secrets.FE_DEPLOY_PATH }}
-        remote_host: ${{ secrets.FE_DEPLOY_HOST }}
-        remote_user: ${{ secrets.DEPLOY_USER }}
-        remote_key: ${{ secrets.DEPLOY_KEY }}
+    - name: 📂 Sync Files
+        uses: SamKirkland/web-deploy@v1
+        with:
+          target-server: gointerling.com
+          remote-user: ${{ secrets.DEPLOY_USER }}
+          private-ssh-key: ${{ secrets.DEPLOY_KEY }}
+          destination-path: ${{ secrets.FE_DEPLOY_PATH }}
