@@ -79,7 +79,7 @@
                 name="instagram"
                 class="text-2xl text-[#64748B] hover:text-primary"
             /></nuxt-link>
-            <nuxt-link href="#"
+            <nuxt-link href="https://www.facebook.com/profile.php?id=61558718315352&mibextid=ZbWKwL"
               ><nuxt-icon
                 name="facebook"
                 class="text-2xl text-[#64748B] hover:text-primary"
