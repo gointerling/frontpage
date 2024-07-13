@@ -45,6 +45,11 @@
                 >Career</nuxt-link
               >
             </li>
+            <li>
+              <nuxt-link href="#" class="text-gray-500 hover:text-primary"
+                >Link</nuxt-link
+              >
+            </li>
           </ul>
         </div>
         <div>
@@ -79,7 +84,8 @@
                 name="instagram"
                 class="text-2xl text-[#64748B] hover:text-primary"
             /></nuxt-link>
-            <nuxt-link href="https://www.facebook.com/profile.php?id=61558718315352&mibextid=ZbWKwL"
+            <nuxt-link
+              href="https://www.facebook.com/profile.php?id=61558718315352&mibextid=ZbWKwL"
               ><nuxt-icon
                 name="facebook"
                 class="text-2xl text-[#64748B] hover:text-primary"
@@ -97,13 +103,13 @@
 </template>
 
 <script>
-import logo from "@/assets/images/logo.svg";
+import logo from '@/assets/images/logo.svg'
 
 export default {
   data() {
     return {
       logo,
-    };
+    }
   },
-};
+}
 </script>
