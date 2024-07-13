@@ -1,0 +1,1 @@
+import{aw as r,I as e,K as t}from"./DMItnUQL.js";const i=r(n=>{const a=e("token").value.user.merchant_status||null,s=e("token").value.user.is_first_time||null;switch(a){case"pending":return s?t("/my/merchant/onboarding"):t("/my/merchant/status");case"inactive":return t("/my/merchant/status");case"verified":return;default:return}});export{i as default};
