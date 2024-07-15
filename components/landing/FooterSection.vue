@@ -35,7 +35,7 @@
                 >Place an Ads Here</nuxt-link
               >
             </li>
-            <li>
+            <!-- <li>
               <nuxt-link href="#" class="text-gray-500 hover:text-primary"
                 >News</nuxt-link
               >
@@ -44,12 +44,7 @@
               <nuxt-link href="#" class="text-gray-500 hover:text-primary"
                 >Career</nuxt-link
               >
-            </li>
-            <li>
-              <nuxt-link href="#" class="text-gray-500 hover:text-primary"
-                >Link</nuxt-link
-              >
-            </li>
+            </li> -->
           </ul>
         </div>
         <div>
