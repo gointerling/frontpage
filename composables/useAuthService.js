@@ -21,5 +21,9 @@ export const useAuthService = () => {
     getTestData() {
       return $axios.get('/test')
     },
+
+    verifyGoogleToken(payload) {
+      return $axios.post('/auth/sso/google/verify', payload)
+    }
   }
 }

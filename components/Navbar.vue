@@ -362,6 +362,8 @@ const emit = defineEmits(['update'])
 // methods
 const navigateTo = (path) => {
   router.push(path)
+
+  console.log('path', path)
 }
 
 const toggleNotification = () => {
