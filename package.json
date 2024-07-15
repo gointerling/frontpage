@@ -16,6 +16,7 @@
     "axios": "^1.7.2",
     "nuxt": "^3.11.2",
     "nuxt-icons": "^3.2.1",
+    "nuxt-vue3-google-signin": "^0.0.11",
     "vue": "^3.4.27",
     "vue-router": "^4.3.2",
     "yup": "^1.4.0"

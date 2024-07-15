@@ -1,3 +1,6 @@
+import path from 'path'
+import fs from 'fs'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   app: {
@@ -14,6 +17,7 @@ export default defineNuxtConfig({
     '@nuxtjs/google-fonts',
     '@nuxt/ui',
     '@nuxtjs/color-mode',
+    'nuxt-vue3-google-signin',
   ],
   postcss: {
     plugins: {
@@ -27,4 +31,8 @@ export default defineNuxtConfig({
     },
   },
   plugins: ['~/plugins/axios.js'],
+  googleSignIn: {
+    // ENV
+    clientId: process.env.VITE_GOOGLE_CLIENT_ID,
+  },
 })

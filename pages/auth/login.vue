@@ -80,10 +80,13 @@
               <UDivider label="OR" class="py-2 mt-4" />
               <button
                 class="w-full bg-white py-2 rounded-md flex gap-2 justify-center items-center border-2 border-gray-100"
+                :disabled="!isReady"
+                @click="() => googleLogin()"
               >
                 <nuxt-icon name="google" filled />
                 Continue with Google
               </button>
+
               <p class="mt-4 flex justify-between text-sm text-gray-600">
                 Don't have an account?
                 <a
@@ -179,6 +182,8 @@
               <UDivider label="OR" class="py-2 mt-4" />
               <button
                 class="w-full bg-white py-2 rounded-md flex gap-2 justify-center items-center border-2 border-gray-100"
+                :disabled="!isReady"
+                @click="() => googleLogin()"
               >
                 <nuxt-icon name="google" filled />
                 Continue with Google
@@ -208,10 +213,17 @@ import helloImage from '@/assets/images/welcome.svg'
 
 // imports
 import { useAuthService } from '~/composables/useAuthService'
-const { login, register } = useAuthService()
+const { login, register, verifyGoogleToken } = useAuthService()
 import { useRouter, useRoute } from 'vue-router'
 import { ref, onMounted, watch } from 'vue'
 import * as yup from 'yup'
+
+// login with google
+import {
+  GoogleSignInButton,
+  decodeCredential,
+  useTokenClient,
+} from 'vue3-google-signin'
 
 // components
 const toast = useToast()
@@ -365,6 +377,69 @@ const navigateTo = (path) => {
 const toggleShowPassword = () => {
   showPassword.value = !showPassword.value
 }
+
+const handleGoogleVerify = async (token) => {
+  await verifyGoogleToken({
+    token,
+    as,
+  })
+    .then((result) => {
+      console.log('Google Token:', result)
+
+      const token = useCookie('token')
+      token.value = result.data.data
+
+      loading.value = false
+
+      toast.add({
+        title: 'Success!',
+        color: 'green',
+        icon: 'i-heroicons-check-circle',
+        description: 'You have successfully logged in!',
+      })
+
+      router.push('/')
+    })
+    .catch((err) => {
+      console.error(err)
+      toast.add({
+        title: 'Uh Oh!',
+        color: 'red',
+        icon: 'i-heroicons-exclamation-triangle',
+        description: err.response.data.error,
+      })
+
+      loading.value = false
+    })
+}
+
+// handle success event
+const handleLoginSuccess = async (response) => {
+  const { access_token } = response
+  console.log('Access Token', access_token)
+
+  // const decodedCredential = decodeCredential(credential)
+  // console.log('User:', decodedCredential)
+
+  await handleGoogleVerify(access_token)
+}
+
+// handle an error event
+const handleLoginError = () => {
+  console.error('Login failed')
+}
+
+const google = useTokenClient({
+  onSuccess: handleLoginSuccess,
+  onError: handleLoginError,
+  // other options
+})
+
+const googleLogin = async () => {
+  google.login()
+}
+
+const isReady = ref(google.isReady)
 
 // watch route type
 watch(
