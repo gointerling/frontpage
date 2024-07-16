@@ -211,7 +211,12 @@
         </div>
 
         <!-- Edit Modal -->
-        <UModal v-model="isFormModalOpen">
+        <UModal
+          v-model="isFormModalOpen"
+          :ui="{
+            width: 'w-full sm:max-w-2xl',
+          }"
+        >
           <UCard>
             <div class="flex justify-between items-center">
               <h6 class="font-semibold">Edit Package</h6>
@@ -251,6 +256,7 @@
                     <input
                       type="number"
                       id="duration"
+                      min="0"
                       v-model="selectedData.duration"
                       class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2"
                     />
@@ -265,6 +271,7 @@
                     <input
                       type="number"
                       id="price"
+                      min="0"
                       v-model="selectedData.price"
                       class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2"
                     />
@@ -281,7 +288,12 @@
         </UModal>
 
         <!-- Add Modal -->
-        <UModal v-model="isAddModalOpen">
+        <UModal
+          v-model="isAddModalOpen"
+          :ui="{
+            width: 'w-full sm:max-w-2xl',
+          }"
+        >
           <UCard>
             <div class="flex justify-between items-center">
               <h6 class="font-semibold">Add New Package</h6>
@@ -361,7 +373,7 @@
                           :value="rule.id"
                           v-model="newPackageData.rule_json"
                         />
-                        <span class="ml-2 text-gray-700">{{ rule.name }}</span>
+                        <span class="ml-2 text-gray-700">{{ rule.name }}.</span>
                       </label>
                     </div>
                   </div>
@@ -429,9 +441,9 @@
 </template>
 
 <script setup>
-import ConfirmationModal from "~/components/ConfirmationModal.vue";
+import ConfirmationModal from '~/components/ConfirmationModal.vue'
 
-import { usePackageService } from "~/composables/usePackageService";
+import { usePackageService } from '~/composables/usePackageService'
 const {
   getSubsPackages,
   updateSubsPackage,
@@ -442,177 +454,185 @@ const {
   createAdsPackage,
   updateAdsPackage,
   deleteAdsPackage,
-} = usePackageService();
+} = usePackageService()
 
 // state
-const isPageLoading = ref(true);
-const isModalOpen = ref(false);
-const isFormModalOpen = ref(false);
-const isAddModalOpen = ref(false);
-const modalData = ref({});
+const isPageLoading = ref(true)
+const isModalOpen = ref(false)
+const isFormModalOpen = ref(false)
+const isAddModalOpen = ref(false)
+const modalData = ref({})
 
 // data
-const packageType = ref("subs");
-const subsData = ref([]);
-const adsData = ref([]);
+const packageType = ref('subs')
+const subsData = ref([])
+const adsData = ref([])
 
 const pageList = ref([
   {
-    name: "Homepage",
-    route: "/",
+    name: 'Homepage',
+    route: '/',
   },
   {
-    name: "Packages",
-    route: "/packages",
+    name: 'Packages',
+    route: '/packages',
   },
   {
-    name: "Facilitator",
-    route: "/facilitators",
+    name: 'Facilitator',
+    route: '/facilitators',
   },
-]);
+])
 
 const subsriptionRules = ref([
   {
     id: 1,
-    name: "Can open a stall on the website according to the tang package they choose",
+    name: 'Can open a stall on the website according to the tang package they choose',
     value: {
       is_stall: true,
     },
   },
   {
     id: 2,
-    name: "Online lias life shop",
+    name: 'Online lias life shop',
     value: {
       is_online_shop: true,
     },
   },
   {
     id: 3,
-    name: "Reviews appear",
+    name: 'Reviews appear',
     value: {
       is_reviewed: true,
     },
   },
   {
     id: 4,
-    name: "Advertised (the shop appears at the top or most recommended)",
+    name: 'Advertised (the shop appears at the top or most recommended)',
     value: {
       is_advertised: true,
     },
   },
   {
     id: 5,
-    name: "Free Shipping",
+    name: 'Free Shipping',
     value: {
       is_free_shipped: true,
     },
   },
-]);
+])
 
 // selected
-const selectedData = ref({});
-const newPackageData = ref({});
+const selectedData = ref({})
+const newPackageData = ref({})
 
 // methods
 const stringToArray = (str) => {
-  return str.match(/"([^"]+)"/g).map((item) => item.replace(/"/g, ""));
-};
+  return str.match(/"([^"]+)"/g).map((item) => item.replace(/"/g, ''))
+}
 
 const formatPrice = (price) => {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-  }).format(price);
-};
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+  }).format(price)
+}
 
 const fetchSubsPackages = async () => {
-  isPageLoading.value = true;
-  const { data } = await getSubsPackages();
+  isPageLoading.value = true
+  const { data } = await getSubsPackages()
 
   subsData.value = data.data.packages.map((item) => ({
     name: item.name,
     desc: stringToArray(item.desc),
     duration: item.duration,
     price: item.price,
-  }));
+  }))
 
-  isPageLoading.value = false;
-};
+  isPageLoading.value = false
+}
 
 const fetchAdsPackages = async () => {
-  isPageLoading.value = true;
-  const { data } = await getAdsPackages();
+  isPageLoading.value = true
+  const { data } = await getAdsPackages()
 
-  console.log(data);
+  console.log(data)
 
   adsData.value = data.data.packages.map((item) => ({
     name: item.name,
     route_json: JSON.parse(item.route_json),
     duration: item.duration,
     price: item.price,
-  }));
+  }))
 
-  isPageLoading.value = false;
-};
+  isPageLoading.value = false
+}
 
 const resolveDuration = (duration) => {
   if (duration > 1) {
-    return duration + " Months";
+    return duration + ' Months'
   } else {
-    return duration + " Month";
+    return duration + ' Month'
   }
-};
+}
 
 const editPackage = (packageData) => {
-  selectedData.value = { ...packageData };
-  isFormModalOpen.value = true;
-};
+  selectedData.value = { ...packageData }
+  isFormModalOpen.value = true
+}
 
 const openAddModal = (type) => {
-  newPackageData.value = { type };
-  isAddModalOpen.value = true;
+  packageType.value = type
+  newPackageData.value = { type }
+  isAddModalOpen.value = true
 
-  if (type === "subs") {
-    newPackageData.value.rule_json = [];
+  if (type === 'subs') {
+    newPackageData.value.rule_json = []
   } else {
-    newPackageData.value.route_json = [];
+    newPackageData.value.route_json = []
   }
-};
+}
 
 const submitForm = async () => {
   // handle form submission logic here
-  console.log("Form submitted with:", selectedData.value);
+  console.log('Form submitted with:', selectedData.value)
 
-  if (selectedData.value.type === "subs") {
-    await updateSubsPackage(selectedData.value);
+  if (selectedData.value.type === 'subs') {
+    await updateSubsPackage(selectedData.value)
   } else {
-    await updateAdsPackage(selectedData.value);
+    await updateAdsPackage(selectedData.value)
   }
 
-  isFormModalOpen.value = false;
-  fetchSubsPackages();
-  fetchAdsPackages();
-};
+  isFormModalOpen.value = false
+  fetchSubsPackages()
+  fetchAdsPackages()
+}
 
 const submitAddForm = async () => {
   // handle add form submission logic here
-  console.log("New Package Data submitted with:", newPackageData.value);
+  // console.log('New Package Data submitted with:', newPackageData.value)
 
-  if (newPackageData.value.type === "subs") {
-    await createSubsPackage(newPackageData.value);
+  if (newPackageData.value.type === 'subs') {
+    const convertedRules = subsriptionRules.value.filter((rule) =>
+      newPackageData.value.rule_json.includes(rule.id)
+    )
+
+    newPackageData.value.rule_json = JSON.stringify(convertedRules)
+
+    console.log(newPackageData.value.rule_json)
+    // await createSubsPackage(newPackageData.value)
   } else {
-    await createAdsPackage(newPackageData.value);
+    await createAdsPackage(newPackageData.value)
   }
 
-  isAddModalOpen.value = false;
-  fetchSubsPackages();
-  fetchAdsPackages();
-};
+  isAddModalOpen.value = false
+  fetchSubsPackages()
+  fetchAdsPackages()
+}
 
 onMounted(() => {
-  isPageLoading.value = false;
+  isPageLoading.value = false
 
-  fetchSubsPackages();
-  fetchAdsPackages();
-});
+  fetchSubsPackages()
+  fetchAdsPackages()
+})
 </script>
