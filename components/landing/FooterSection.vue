@@ -18,11 +18,11 @@
                 >Order Status</nuxt-link
               >
             </li>
-            <li>
+            <!-- <li>
               <nuxt-link href="#" class="text-gray-500 hover:text-primary"
                 >Delivery</nuxt-link
               >
-            </li>
+            </li> -->
           </ul>
         </div>
         <div>
