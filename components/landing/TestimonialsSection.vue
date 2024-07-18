@@ -59,7 +59,7 @@ export default {
     },
   },
   async mounted() {
-    await fetch('https://randomuser.me/api/?nat=id&randomapi=&results=3')
+    await fetch('https://randomuser.me/api/?nat=id&randomapi=&results=1')
       .then((response) => response.json())
       .then((data) => {
         this.testimonials = data.results.map((user) => {

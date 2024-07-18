@@ -28,20 +28,21 @@
 </template>
 
 <script>
-import companyLogo from '~/assets/images/partners/company-1.png'
+// import companyLogo from '~/assets/images/partners/company-1.png'
+import companyLogo from '~/assets/images/partners/HPI.png'
 
 export default {
   data() {
     return {
       partnerLogos: [
         { id: 1, src: companyLogo, alt: 'Partner Logo 1' },
-        { id: 2, src: companyLogo, alt: 'Partner Logo 2' },
-        { id: 3, src: companyLogo, alt: 'Partner Logo 3' },
-        { id: 4, src: companyLogo, alt: 'Partner Logo 4' },
-        { id: 5, src: companyLogo, alt: 'Partner Logo 5' },
-        { id: 6, src: companyLogo, alt: 'Partner Logo 6' },
-        { id: 7, src: companyLogo, alt: 'Partner Logo 7' },
-        { id: 8, src: companyLogo, alt: 'Partner Logo 8' },
+        // { id: 2, src: companyLogo, alt: 'Partner Logo 2' },
+        // { id: 3, src: companyLogo, alt: 'Partner Logo 3' },
+        // { id: 4, src: companyLogo, alt: 'Partner Logo 4' },
+        // { id: 5, src: companyLogo, alt: 'Partner Logo 5' },
+        // { id: 6, src: companyLogo, alt: 'Partner Logo 6' },
+        // { id: 7, src: companyLogo, alt: 'Partner Logo 7' },
+        // { id: 8, src: companyLogo, alt: 'Partner Logo 8' },
       ],
     }
   },

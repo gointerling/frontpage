@@ -6,7 +6,7 @@
       <StatsSection />
       <TranslatorSearchSection />
       <WelcomeSection />
-      <!-- <PartnerLogosSection /> -->
+      <PartnerLogosSection />
       <FacilitatorsSection class="my-20" />
       <TestimonialsSection />
       <FooterSection />

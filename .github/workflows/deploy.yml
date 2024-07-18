@@ -36,5 +36,6 @@ jobs:
         server: ${{ secrets.GOINTERLING_FTP_SERVER }}
         username: ${{ secrets.GOINTERLING_FTP_USERNAME }}
         password: ${{ secrets.GOINTERLING_FTP_PASSWORD }}
+        server-dir: ${{ secrets.GOINTERLING_FTP_SERVER_PATH }}
         port: 21
         protocol: ftps
