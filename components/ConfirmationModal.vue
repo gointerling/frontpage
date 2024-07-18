@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch } from "vue";
 
 // define props
 const props = defineProps({
@@ -43,42 +43,41 @@ const props = defineProps({
   data: {
     type: Object,
     default: () => ({
-      title: 'Modal Title',
-      content: 'Modal Content',
-      confirmText: 'Confirm',
-      cancelText: 'Cancel',
+      title: "Modal Title",
+      content: "Modal Content",
+      confirmText: "Confirm",
+      cancelText: "Cancel",
       callback: () => {},
     }),
   },
-})
+});
 
 // emit event to update the prop value
-const emit = defineEmits(['update:isOpen'])
+const emit = defineEmits(["update:isOpen"]);
 
 // internal state to handle the modal visibility
-const internalIsOpen = ref(props.isOpen)
+const internalIsOpen = ref(props.isOpen);
 
 // watch for changes in the prop to update the internal state
 watch(
   () => props.isOpen,
   (newVal) => {
-    internalIsOpen.value = newVal
+    internalIsOpen.value = newVal;
   }
-)
+);
 
 // watch for changes in the internal state to emit the event
 watch(internalIsOpen, (newVal) => {
-  emit('update:isOpen', newVal)
-})
+  emit("update:isOpen", newVal);
+});
 
 // methods for handling confirmation and cancellation
 const confirm = () => {
-  props.data.callback(true)
-  internalIsOpen.value = false
-}
+  props.data.callback(true);
+  internalIsOpen.value = false;
+};
 
 const cancel = () => {
-  props.data.callback(false)
-  internalIsOpen.value = false
-}
+  internalIsOpen.value = false;
+};
 </script>
