@@ -941,19 +941,11 @@ const triggerFileInput = () => {
   fileInput.value.click()
 }
 
-const compressFile = async () => {
-  // compress file max 1MB
-  
-}
-
 // handle file change
 const onFileChange = async (event) => {
   const file = event.target.files[0]
 
   if (file) {
-    // compress file max 1MB
-    const compressedFile = await compressFile(file, 1024)
-
     // toast upload progress
     toast.add({
       title: 'Uploading...',
@@ -963,10 +955,7 @@ const onFileChange = async (event) => {
     })
 
     try {
-      const response = await uploadFile(
-        compressedFile,
-        `profile_picture_${file.name}`
-      )
+      const response = await uploadFile(file, `profile_picture_${file.name}`)
 
       payload.value.photo = response.data.data.fileRecord.url
       photoWarning.value =
