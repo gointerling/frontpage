@@ -144,17 +144,17 @@
                 </h6>
 
                 <span class="font-thin text-primary text-sm">
-                  Gointering Account
+                  {{ transferBank.bank_account_name }}
                 </span>
                 <h6
-                  class="font-bold text-primary text-md text-xl py-2 flex gap-2 items-center"
+                  class="font-bold text-primary text-md text-xl py-2 flex gap-2 items-center uppercase"
                 >
-                  {{ order.merchant.bank_account }} (BCA)
+                  {{ transferBank.bank_account }} ({{ transferBank.bank }})
                   <UButton
                     size="xs"
                     variant="outline"
                     color="blue"
-                    @click="copyToClipboard(order.merchant.bank_account)"
+                    @click="copyToClipboard(transferBank.bank_account)"
                     class=""
                   >
                     <nuxt-icon name="copy" class="text-lg" />
@@ -403,6 +403,7 @@ import { useSkillService } from '~/composables/useSkillService'
 import { useFileService } from '~/composables/useFileService'
 import { useMasterDataService } from '~/composables/useMasterDataService'
 import { useOrderService } from '~/composables/useOrderService'
+import { useSettingService } from '~/composables/useSettingService'
 
 const {
   getMyMerchants,
@@ -410,11 +411,13 @@ const {
   getMyMerchantServices,
   updateMyService,
 } = useMerchantService()
+
 const { updateMyProfile, updateMyPassword } = useUserService()
 const { getSkills } = useSkillService()
 const { uploadFile } = useFileService()
 const { getLanguages } = useMasterDataService()
 const { getDetailOrder, updateMyOrder } = useOrderService()
+const { getSettingBank } = useSettingService()
 
 // navs
 const navs = [
@@ -455,6 +458,11 @@ const user = ref({
   is_facilitator: false,
 })
 
+const transferBank = ref({
+  bank_name: '',
+  bank_account: '',
+  bank_account_name: '',
+})
 const orders = ref([])
 const commentlimit = ref(3)
 const comments = ref([])
@@ -754,11 +762,24 @@ const updateProofOfPayment = async (value) => {
   }
 }
 
+const fetchSettingBank = async () => {
+  try {
+    const { data } = await getSettingBank()
+
+    transferBank.value = data.data.setting
+  } catch (error) {
+    console.error('Error fetching bank data:', error)
+  } finally {
+    isPageLoading.value = false
+  }
+}
+
 onMounted(async () => {
   // fetch user data
   if (useCookie('token').value) {
     await fetchUser()
     await fetchDetailOrder()
+    await fetchSettingBank()
   }
   isPageLoading.value = false
 
