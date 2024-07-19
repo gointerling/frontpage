@@ -2,7 +2,7 @@
   <div class="bg-white py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <h6 class="py-4 text-primary text-2xl font-semibold">
-        Find 300+ Facilitators for The Language Translator You Need
+        Find Facilitators for The Language Translator You Need
       </h6>
       <div class="flex justify-center gap-3 w-100">
         <input

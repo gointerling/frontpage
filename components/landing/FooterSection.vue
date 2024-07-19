@@ -72,7 +72,7 @@
           </ul>
         </div>
         <div class="col-span-1 sm:col-span-2 lg:col-span-1">
-          <h3 class="text-lg text-primary font-bold mb-4">Social Medias</h3>
+          <h3 class="text-lg text-primary font-bold mb-4">Social Media</h3>
           <div class="flex gap-3 mb-6">
             <nuxt-link href="https://instagram.com/gointerling"
               ><nuxt-icon

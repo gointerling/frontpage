@@ -65,11 +65,11 @@ export default {
         this.testimonials = data.results.map((user) => {
           return {
             id: user.login.uuid,
-            avatar: user.picture.large,
-            name: `${user.name.first} ${user.name.last}`,
-            role: this.randomRole(),
+            avatar: "https://dev-api.gointerling.com/storage/uploads/J7tIS7PmhTJ876xyDXIwJqRgExQgAQW5sL0XEfc5.jpg",
+            name: 'Dr. Else Liliani, S.S., M.Hum.',
+            role: 'Wakil Dekan Akademik, Kemahasiswaan dan Alumni FBSB UNY',
             icon: 'quotation',
-            text: 'Gointerling offers high-quality professional translators for seamless communication in any language. Their professional translators are certified and recognized as experts in their specific fields, ensuring top-quality services and reliable results.',
+            text: 'Saya merekomendasikan gointerling bagi siapa saja ingin memerlukan peluang kerja di bidang penerjemahan dan interpretasi. Gointerling sangat cocok bagi mahasiswa yang ingin mendapatkan penghasilan tambahan karena fitur tarif jasanya ditentukan sendiri oleh pengguna. Selain itu, fasilitator akan mendapatkan reward sesuai dengan ekspektasi tarif pada jasanya. Menarik, kan? Segera bergabung dengan gointerling!',
           }
         })
       })
