@@ -67,7 +67,7 @@ export default {
             id: user.login.uuid,
             avatar: "https://dev-api.gointerling.com/storage/uploads/J7tIS7PmhTJ876xyDXIwJqRgExQgAQW5sL0XEfc5.jpg",
             name: 'Dr. Else Liliani, S.S., M.Hum.',
-            role: 'Wakil Dekan Akademik, Kemahasiswaan dan Alumni',
+            role: 'Wakil Dekan Akademik, Kemahasiswaan dan Alumni FBSB UNY',
             icon: 'quotation',
             text: 'Saya merekomendasikan gointerling bagi siapa saja ingin memerlukan peluang kerja di bidang penerjemahan dan interpretasi. Gointerling sangat cocok bagi mahasiswa yang ingin mendapatkan penghasilan tambahan karena fitur tarif jasanya ditentukan sendiri oleh pengguna. Selain itu, fasilitator akan mendapatkan reward sesuai dengan ekspektasi tarif pada jasanya. Menarik, kan? Segera bergabung dengan gointerling!',
           }
