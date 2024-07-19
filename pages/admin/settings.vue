@@ -76,7 +76,7 @@
               <UFormGroup label="Bank Account">
                 <UInput
                   placeholder="Fill Bank Account"
-                  type="number"
+                  type="text"
                   v-model="payload.bank_account"
                 />
               </UFormGroup>

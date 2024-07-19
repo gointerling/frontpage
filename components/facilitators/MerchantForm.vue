@@ -50,7 +50,7 @@
           </u-form-group>
           <u-form-group name="bank_account" label="No Rekening" class="mb-2">
             <u-input
-              type="number"
+              type="text"
               v-model="bank_account"
               required
               placeholder="Masukkan No Rekening"
