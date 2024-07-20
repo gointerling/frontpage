@@ -92,7 +92,12 @@
                       </span>
 
                       <span class="truncate">
-                        Penayangan di {{ getShowArray(adsPackage.route_json) }}
+                        Penayangan di
+                        {{
+                          adsPackage.route_json
+                            .map((route) => route.name)
+                            .join(", ")
+                        }}
                       </span>
                     </div>
                   </div>
@@ -102,9 +107,9 @@
             <div
               class="flex flex-col sm:flex-row gap-4 items-start sm:items-center"
             >
-              <span class="flex-grow font-medium text-left sm:text-right"
-                >Upload Image</span
-              >
+              <span class="flex-grow font-medium text-left sm:text-right">
+                Upload Image
+              </span>
 
               <FileUploadInline
                 class="w-full sm:w-10/12"
