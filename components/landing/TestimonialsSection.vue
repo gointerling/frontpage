@@ -1,9 +1,7 @@
 <template>
   <div class="py-8 sm:py-12 md:py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
-      >
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         <div
           v-for="(testimonial, index) in testimonials"
           :key="testimonial.id"
@@ -59,20 +57,22 @@ export default {
     },
   },
   async mounted() {
-    await fetch('https://randomuser.me/api/?nat=id&randomapi=&results=1')
-      .then((response) => response.json())
-      .then((data) => {
-        this.testimonials = data.results.map((user) => {
-          return {
-            id: user.login.uuid,
-            avatar: "https://dev-api.gointerling.com/storage/uploads/J7tIS7PmhTJ876xyDXIwJqRgExQgAQW5sL0XEfc5.jpg",
-            name: 'Dr. Else Liliani, S.S., M.Hum.',
-            role: 'Wakil Dekan Akademik, Kemahasiswaan dan Alumni FBSB UNY',
-            icon: 'quotation',
-            text: 'Saya merekomendasikan gointerling bagi siapa saja ingin memerlukan peluang kerja di bidang penerjemahan dan interpretasi. Gointerling sangat cocok bagi mahasiswa yang ingin mendapatkan penghasilan tambahan karena fitur tarif jasanya ditentukan sendiri oleh pengguna. Selain itu, fasilitator akan mendapatkan reward sesuai dengan ekspektasi tarif pada jasanya. Menarik, kan? Segera bergabung dengan gointerling!',
-          }
-        })
-      })
+    this.testimonials = [
+      {
+        id: '1',
+        avatar: "https://dev-api.gointerling.com/storage/uploads/J7tIS7PmhTJ876xyDXIwJqRgExQgAQW5sL0XEfc5.jpg",
+        name: 'Dr. Else Liliani, S.S., M.Hum.',
+        role: 'Wakil Dekan Akademik, Kemahasiswaan dan Alumni FBSB UNY',
+        text: 'Saya merekomendasikan gointerling bagi siapa saja ingin memerlukan peluang kerja di bidang penerjemahan dan interpretasi. Gointerling sangat cocok bagi mahasiswa yang ingin mendapatkan penghasilan tambahan karena fitur tarif jasanya ditentukan sendiri oleh pengguna. Selain itu, fasilitator akan mendapatkan reward sesuai dengan ekspektasi tarif pada jasanya. Menarik, kan? Segera bergabung dengan gointerling!',
+      },
+      {
+        id: '2',
+        avatar: "https://dev-api.gointerling.com/storage/uploads/TgLdTh1ovC0llreuHp5OgskSeGOIU046DHffqE5E.jpg",
+        name: 'Siwi Karmadi Kurniasih, S.Pd., M.Hum.',
+        role: 'Translation Lecture English Education Departemen Yogyakarta State University',
+        text: 'When you seek a suitable job that allows you to choose your salary and manage working hours yourself, gointerling is the place. Gointerling is also a convenient place to get translation services. It offers good choices of professional translators and interpreters.',
+      },
+    ]
   },
 }
 </script>

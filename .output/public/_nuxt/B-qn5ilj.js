@@ -1,1 +1,0 @@
-import{z as n}from"./XjqdB_R7.js";const r=()=>{const{$axios:t}=n();return{getSetting(){return t.get("/settings")},getSettingBank(){return t.get("/settings/bank")},updateSetting(e){return t.put("/settings",e)}}};export{r as u};
