@@ -72,6 +72,13 @@ export default {
         role: 'Translation Lecture English Education Departemen Yogyakarta State University',
         text: 'When you seek a suitable job that allows you to choose your salary and manage working hours yourself, gointerling is the place. Gointerling is also a convenient place to get translation services. It offers good choices of professional translators and interpreters.',
       },
+      {
+        id: '3',
+        avatar: "https://dev-api.gointerling.com/storage/uploads/kgvXEokjGja8tzDqy26ta5nW5xJwtK6cR8M3a0On.jpg",
+        name: 'Hilda Dian Nova Novitasari, S.Pd., M.Pd.',
+        role: "Traductrice Chargée de cours d'enseignement du français à l'université d'État de Yogyakarta.",
+        text: 'Gointerling est une solution idéale pour les étudiants qui souhaitent développer leur carrière tout en restant concentrés sur leurs études, surtout ceux spécialisés en traduction. Cette plateforme leur permet de commencer une carrière en tant que traducteurs indépendants sans perturber leurs cours. Avec une variété de fonctionnalités adaptées aux compétences et aux préférences de chaque utilisateur, Gointerling est, à mon avis, fortement recommandée!',
+      },
     ]
   },
 }
