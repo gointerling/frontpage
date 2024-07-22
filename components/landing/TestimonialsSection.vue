@@ -1,30 +1,32 @@
 <template>
   <div class="py-8 sm:py-12 md:py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-        <div
-          v-for="(testimonial, index) in testimonials"
-          :key="testimonial.id"
-          class="rounded-2xl shadow-md p-6 sm:p-8 cursor-pointer transition-all duration-300 hover:shadow-lg"
-          :class="index === 0 ? 'bg-[#E4F1F7]' : 'bg-white'"
-        >
-          <nuxt-icon name="quotation" class="text-xl sm:text-2xl" filled />
-          <p class="text-primary py-3 sm:py-4 text-sm sm:text-base leading-6">
-            {{ testimonial.text }}
-          </p>
-          <div class="flex items-center">
-            <img
-              :src="testimonial.avatar"
-              alt="User Avatar"
-              class="w-10 h-10 sm:w-12 sm:h-12 rounded-full mr-3 sm:mr-4"
-            />
-            <div>
-              <span class="text-primary font-semibold text-sm sm:text-base">
-                {{ testimonial.name }}
-              </span>
-              <p class="text-xs sm:text-sm text-primary">
-                {{ testimonial.role }}
-              </p>
+      <div class="carousel-container">
+        <div class="carousel" :style="carouselStyle">
+          <div
+            v-for="(testimonial, index) in testimonials"
+            :key="testimonial.id"
+            class="carousel-item rounded-2xl shadow-md p-6 sm:p-8 cursor-pointer transition-all duration-300 hover:shadow-lg"
+            :class="index === 0 ? 'bg-[#E4F1F7]' : 'bg-white'"
+          >
+            <nuxt-icon name="quotation" class="text-xl sm:text-2xl" filled />
+            <p class="text-primary py-3 sm:py-4 text-sm sm:text-base leading-6">
+              {{ testimonial.text }}
+            </p>
+            <div class="flex items-center">
+              <img
+                :src="testimonial.avatar"
+                alt="User Avatar"
+                class="w-10 h-10 sm:w-12 sm:h-12 rounded-full mr-3 sm:mr-4"
+              />
+              <div>
+                <span class="text-primary font-semibold text-sm sm:text-base">
+                  {{ testimonial.name }}
+                </span>
+                <p class="text-xs sm:text-sm text-primary">
+                  {{ testimonial.role }}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -37,49 +39,80 @@
 export default {
   data() {
     return {
-      testimonials: [],
-      pickedRole: [],
+      currentIndex: 0,
+      interval: null,
+      testimonials: [
+        {
+          id: '1',
+          avatar: "https://dev-api.gointerling.com/storage/uploads/J7tIS7PmhTJ876xyDXIwJqRgExQgAQW5sL0XEfc5.jpg",
+          name: 'Dr. Else Liliani, S.S., M.Hum.',
+          role: 'Wakil Dekan Akademik, Kemahasiswaan dan Alumni FBSB UNY',
+          text: 'Saya merekomendasikan gointerling bagi siapa saja ingin memerlukan peluang kerja di bidang penerjemahan dan interpretasi. Gointerling sangat cocok bagi mahasiswa yang ingin mendapatkan penghasilan tambahan karena fitur tarif jasanya ditentukan sendiri oleh pengguna. Selain itu, fasilitator akan mendapatkan reward sesuai dengan ekspektasi tarif pada jasanya. Menarik, kan? Segera bergabung dengan gointerling!',
+        },
+        {
+          id: '2',
+          avatar: 'https://dev-api.gointerling.com/storage/uploads/TgLdTh1ovC0llreuHp5OgskSeGOIU046DHffqE5E.jpg', 
+          name: 'Siwi Karmadi Kurniasih, S.Pd., M.Hum.',
+          role: 'Translation Lecture English Education Departemen Yogyakarta State University',
+          text: 'When you seek a suitable job that allows you to choose your salary and manage working hours yourself, gointerling is the place. Gointerling is also a convenient place to get translation services. It offers good choices of professional translators and interpreters.',
+        },
+        {
+          id: '3',
+          avatar: 'https://dev-api.gointerling.com/storage/uploads/kgvXEokjGja8tzDqy26ta5nW5xJwtK6cR8M3a0On.jpg', 
+          name: 'Hilda Dian Nova Novitasari, S.Pd., M.Pd.',
+          role: "Traductrice Chargée de cours d'enseignement du français à l'université d'État de Yogyakarta.",
+          text: 'Gointerling est une solution idéale pour les étudiants qui souhaitent développer leur carrière tout en restant concentrés sur leurs études, surtout ceux spécialisés en traduction. Cette plateforme leur permet de commencer une carrière en tant que traducteurs indépendants sans perturber leurs cours. Avec une variété de fonctionnalités adaptées aux compétences et aux préférences de chaque utilisateur, Gointerling est, à mon avis, fortement recommandée!',
+        },
+        {
+          id: '4',
+          avatar: 'https://dev-api.gointerling.com/storage/uploads/RCNuhNZzN2RrFLk9huWpjA7SxF5NgQywlFh5sh4a.jpg', 
+          name: 'Royen Lodewyk Pardede (Roy)',
+          role: 'Ketua DPD HPI DIY',
+          text: 'Saya merekomendasikan platform gointerling ini bagi anak muda yang ingin memanfaatkan bahasa asing mereka untuk karir mereka dibidang penerjemahan atau interpretasi, ini berbasis digital yang seharusnya anak muda sudah familiar, di platform ini semua orang dapat membangun branding diri masing masing sesuai dengan kemampuan dan juga ekspetasi mereka.',
+        },
+      ],
     }
   },
-  methods: {
-    randomRole() {
-      const roles = [
-        'Professional Translator',
-        'Certified Interpreter',
-        'Student',
-      ]
-      let role = roles[Math.floor(Math.random() * roles.length)]
-      if (this.pickedRole.includes(role)) {
-        return this.randomRole()
+  computed: {
+    carouselStyle() {
+      return {
+        transform: `translateX(-${this.currentIndex * 100}%)`,
+        transition: 'transform 1s ease-in-out', // Adjust this for slide speed
       }
-      this.pickedRole.push(role)
-      return role
     },
   },
-  async mounted() {
-    this.testimonials = [
-      {
-        id: '1',
-        avatar: "https://dev-api.gointerling.com/storage/uploads/J7tIS7PmhTJ876xyDXIwJqRgExQgAQW5sL0XEfc5.jpg",
-        name: 'Dr. Else Liliani, S.S., M.Hum.',
-        role: 'Wakil Dekan Akademik, Kemahasiswaan dan Alumni FBSB UNY',
-        text: 'Saya merekomendasikan gointerling bagi siapa saja ingin memerlukan peluang kerja di bidang penerjemahan dan interpretasi. Gointerling sangat cocok bagi mahasiswa yang ingin mendapatkan penghasilan tambahan karena fitur tarif jasanya ditentukan sendiri oleh pengguna. Selain itu, fasilitator akan mendapatkan reward sesuai dengan ekspektasi tarif pada jasanya. Menarik, kan? Segera bergabung dengan gointerling!',
-      },
-      {
-        id: '2',
-        avatar: "https://dev-api.gointerling.com/storage/uploads/TgLdTh1ovC0llreuHp5OgskSeGOIU046DHffqE5E.jpg",
-        name: 'Siwi Karmadi Kurniasih, S.Pd., M.Hum.',
-        role: 'Translation Lecture English Education Departemen Yogyakarta State University',
-        text: 'When you seek a suitable job that allows you to choose your salary and manage working hours yourself, gointerling is the place. Gointerling is also a convenient place to get translation services. It offers good choices of professional translators and interpreters.',
-      },
-      {
-        id: '3',
-        avatar: "https://dev-api.gointerling.com/storage/uploads/kgvXEokjGja8tzDqy26ta5nW5xJwtK6cR8M3a0On.jpg",
-        name: 'Hilda Dian Nova Novitasari, S.Pd., M.Pd.',
-        role: "Traductrice Chargée de cours d'enseignement du français à l'université d'État de Yogyakarta.",
-        text: 'Gointerling est une solution idéale pour les étudiants qui souhaitent développer leur carrière tout en restant concentrés sur leurs études, surtout ceux spécialisés en traduction. Cette plateforme leur permet de commencer une carrière en tant que traducteurs indépendants sans perturber leurs cours. Avec une variété de fonctionnalités adaptées aux compétences et aux préférences de chaque utilisateur, Gointerling est, à mon avis, fortement recommandée!',
-      },
-    ]
+  methods: {
+    nextSlide() {
+      this.currentIndex = (this.currentIndex + 1) % this.testimonials.length
+    },
+    startAutoSlide() {
+      this.interval = setInterval(this.nextSlide, 3000) // Auto-slide every 3 seconds
+    },
+    stopAutoSlide() {
+      clearInterval(this.interval)
+    },
+  },
+  mounted() {
+    this.startAutoSlide()
+  },
+  beforeDestroy() {
+    this.stopAutoSlide()
   },
 }
 </script>
+
+<style>
+.carousel-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.carousel {
+  display: flex;
+}
+
+.carousel-item {
+  min-width: 100%;
+  box-sizing: border-box;
+}
+</style>
