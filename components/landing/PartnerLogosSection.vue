@@ -5,7 +5,10 @@
         Partner Collaboration
       </h6>
       <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 sm:gap-6 lg:gap-8"
+        :class="{
+          'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 sm:gap-6 lg:gap-8': partnerLogos.length > 1,
+          'flex justify-center': partnerLogos.length === 1
+        }"
       >
         <div
           v-for="logo in partnerLogos"
