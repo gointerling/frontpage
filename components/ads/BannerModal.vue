@@ -1,7 +1,7 @@
 <template>
   <UModal
     v-model="internalIsOpen"
-    prevent-close
+    :prevent-close="isMobileScreen ? false : true"
     class="w-full h-full max-w-6xl max-h-4xl"
     :ui="{
       width: 'w-full sm:max-w-4xl',
@@ -45,11 +45,11 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch } from "vue";
 
 // services
-import { useAdvertisementService } from '~/composables/useAdvertisementService'
-const { getDisplayAds } = useAdvertisementService()
+import { useAdvertisementService } from "~/composables/useAdvertisementService";
+const { getDisplayAds } = useAdvertisementService();
 
 // define props
 const props = defineProps({
@@ -68,53 +68,57 @@ const props = defineProps({
   //     callback: () => {},
   //   }),
   // },
-})
+});
 
 // emit event to update the prop value
-const emit = defineEmits(['update:isOpen'])
+const emit = defineEmits(["update:isOpen"]);
 
 // internal state to handle the modal visibility
-const internalIsOpen = ref(props.isOpen)
+const internalIsOpen = ref(props.isOpen);
+const isMobileScreen = ref(false);
 
 // watch for changes in the prop to update the internal state
 watch(
   () => props.isOpen,
   (newVal) => {
-    internalIsOpen.value = newVal
+    internalIsOpen.value = newVal;
   }
-)
+);
 
 // watch for changes in the internal state to emit the event
 watch(internalIsOpen, (newVal) => {
-  emit('update:isOpen', newVal)
-})
+  emit("update:isOpen", newVal);
+});
 
 const cancel = () => {
-  internalIsOpen.value = false
+  internalIsOpen.value = false;
 
   // emit event to update the prop value
-}
+};
 
-const ads = ref()
+const ads = ref();
 
 const fetchAds = async () => {
   try {
-    const { data } = await getDisplayAds()
+    const { data } = await getDisplayAds();
 
-    ads.value = data.data.selectedAdvertisement
-    internalIsOpen.value = true
+    ads.value = data.data.selectedAdvertisement;
+    internalIsOpen.value = true;
   } catch (err) {
-    console.log(err)
+    console.log(err);
 
     // hide banner
-    internalIsOpen.value = false
+    internalIsOpen.value = false;
   }
-}
+};
 
 // mounted
 onMounted(async () => {
-  await fetchAds()
-})
+  await fetchAds();
+
+  // check if the screen is mobile
+  isMobileScreen.value = window.innerWidth < 768;
+});
 </script>
 
 <style scoped>
