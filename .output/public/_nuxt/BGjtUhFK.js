@@ -1,0 +1,1 @@
+import{z as o}from"./D89oQIZo.js";const r=()=>{const{$axios:t}=o();return{uploadFile(a,n){const e=new FormData;return e.append("file",a),e.append("file_name",n),t.post("/files",e)},uploadAdsFile(a,n){const e=new FormData;return e.append("file",a),e.append("file_name",n),t.post("/files/ads",e)},deleteFile(a){return t.delete(`/files/${a}`)}}};export{r as u};

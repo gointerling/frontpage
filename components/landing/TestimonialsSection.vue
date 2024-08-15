@@ -1,33 +1,55 @@
 <template>
-  <div class="py-8 sm:py-12 md:py-16 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="carousel-container">
-        <div class="carousel" :style="carouselStyle">
-          <div
-            v-for="(testimonial, index) in testimonials"
-            :key="testimonial.id"
-            class="carousel-item rounded-2xl shadow-md p-6 sm:p-8 cursor-pointer transition-all duration-300 hover:shadow-lg"
-            :class="index === 0 ? 'bg-[#E4F1F7]' : 'bg-white'"
-          >
-            <nuxt-icon name="quotation" class="text-xl sm:text-2xl" filled />
-            <p class="text-primary py-3 sm:py-4 text-sm sm:text-base leading-6">
-              {{ testimonial.text }}
-            </p>
-            <div class="flex items-center">
-              <img
-                :src="testimonial.avatar"
-                alt="User Avatar"
-                class="w-10 h-10 sm:w-12 sm:h-12 rounded-full mr-3 sm:mr-4"
-              />
-              <div>
-                <span class="text-primary font-semibold text-sm sm:text-base">
-                  {{ testimonial.name }}
-                </span>
-                <p class="text-xs sm:text-sm text-primary">
-                  {{ testimonial.role }}
-                </p>
+  <div>
+    <!-- Existing Testimonial Carousel -->
+    <div class="py-8 sm:py-12 md:py-16 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="carousel-container">
+          <div class="carousel" :style="carouselStyle">
+            <div
+              v-for="(testimonial, index) in testimonials"
+              :key="testimonial.id"
+              class="carousel-item rounded-2xl shadow-md p-6 sm:p-8 cursor-pointer transition-all duration-300 hover:shadow-lg"
+              :class="index === 0 ? 'bg-[#E4F1F7]' : 'bg-white'"
+            >
+              <nuxt-icon name="quotation" class="text-xl sm:text-2xl" filled />
+              <p class="text-primary py-3 sm:py-4 text-sm sm:text-base leading-6">
+                {{ testimonial.text }}
+              </p>
+              <div class="flex items-center">
+                <img
+                  :src="testimonial.avatar"
+                  alt="User Avatar"
+                  class="w-10 h-10 sm:w-12 sm:h-12 rounded-full mr-3 sm:mr-4"
+                />
+                <div>
+                  <span class="text-primary font-semibold text-sm sm:text-base">
+                    {{ testimonial.name }}
+                  </span>
+                  <p class="text-xs sm:text-sm text-primary">
+                    {{ testimonial.role }}
+                  </p>
+                </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- General Questions Section (FAQ) -->
+    <div class="py-8 sm:py-12 md:py-16 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold text-center mb-6">General Question</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div 
+            v-for="(question, index) in questions" 
+            :key="index" 
+            class="p-4 border rounded-lg hover:bg-gray-100 transition duration-300 cursor-pointer"
+          >
+            <a :href="question.link" class="text-lg font-semibold text-gray-800">
+              {{ question.text }}
+            </a>
+            <nuxt-icon name="chevron-right" class="float-right" />
           </div>
         </div>
       </div>
@@ -71,13 +93,22 @@ export default {
           text: 'Saya merekomendasikan platform gointerling ini bagi anak muda yang ingin memanfaatkan bahasa asing mereka untuk karir mereka dibidang penerjemahan atau interpretasi, ini berbasis digital yang seharusnya anak muda sudah familiar, di platform ini semua orang dapat membangun branding diri masing masing sesuai dengan kemampuan dan juga ekspetasi mereka.',
         },
       ],
+      questions: [
+        { text: 'Bagaimana cara bergabung dengan gointerling?', link: '#' },
+        { text: 'Bagaimana cara mendaftar fasilitator?', link: '#' },
+        { text: 'Bagaimana cara menjadi user?', link: '#' },
+        { text: 'Bagaimana mencari sesuai kategori atau keinginan?', link: '#' },
+        { text: 'Bagaimana cara membayar?', link: '#' },
+        // { text: 'Apa saja syarat verifikasi rekening bank dan bagaimana caranya?', link: '#' },
+        // { text: 'Apakah saya boleh mendaftar lebih dari 1 program Kampus Merdeka dalam periode yang sama?', link: '#' },
+      ],
     }
   },
   computed: {
     carouselStyle() {
       return {
         transform: `translateX(-${this.currentIndex * 100}%)`,
-        transition: 'transform 1s ease-in-out', // Adjust this for slide speed
+        transition: 'transform 1s ease-in-out',
       }
     },
   },
