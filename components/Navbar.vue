@@ -129,8 +129,8 @@
               @click="toggleNotification"
               :class="
                 isNotificationOpen
-                  ? 'bg-primary text-white p-2 rounded-full'
-                  : 'p-2'
+                  ? 'bg-primary text-white p-2 rounded-full relative'
+                  : 'p-2 relative'
               "
             >
               <nuxt-icon
@@ -138,6 +138,14 @@
                 class="text-2xl"
                 :class="isNotificationOpen ? 'text-white' : 'text-primary'"
               />
+
+              <!-- Badge for showing the number of notifications -->
+              <span
+                v-if="unopenedNotifications.length > 0"
+                class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-accent rounded-full"
+              >
+                {{ unopenedNotifications.length }}
+              </span>
             </button>
             <button
               @click="toggleDropdown"
@@ -255,22 +263,42 @@
         class="flex justify-between px-4 items-center border-b border-gray-200"
       >
         <span class="uppercase text-primary font-semibold">Notifications</span>
-        <UButton variant="link" color="red">Mark all as read</UButton>
+        <UButton variant="link" color="red" @click="markAllNotification()">
+          Mark all as read
+        </UButton>
       </div>
       <button
-        class="w-full flex justify-start gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-200"
-        href="#"
+        v-for="notification in notifications"
+        class="w-full flex justify-start gap-2 align-middle items-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-200"
+        :class="!notification.is_read ? 'bg-gray-100' : 'bg-white'"
+        :key="notification.id"
+        @click="
+          clickNotification(notification.id, notification.notification_link)
+        "
       >
-        Your order has been received and is now being processed. Thank you for
-        choosing Gointering!
+        <!-- circle tailwind -->
+        <nuxt-icon
+          v-if="!notification.is_read"
+          name="circle-badge"
+          class="text-accent text-xs mt-1"
+        />
+        <div class="flex flex-col items-start">
+          <span class="text-left">
+            {{ notification.notification }}
+          </span>
+
+          <span class="text-xs text-gray-400 mt-1">
+            {{ calculateTime(notification.created_at) }}
+          </span>
+        </div>
       </button>
-      <button
-        class="w-full flex justify-start gap-2 align-middle items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-200"
-        href="#"
+
+      <div
+        v-if="notifications.length === 0"
+        class="flex justify-center items-center h-12"
       >
-        Your order has been received and is now being processed. Thank you for
-        choosing Gointering!
-      </button>
+        <span class="text-gray-400">No notifications</span>
+      </div>
     </div>
 
     <!-- Dropdown -->
@@ -336,11 +364,15 @@
 </template>
 
 <script setup>
+import { useNotificationService } from "~/composables/useNotificationService";
+const { getMyNotifications, markAsRead, markAllAsRead } =
+  useNotificationService();
+
 // components
-const toast = useToast()
+const toast = useToast();
 
 // router
-const router = useRouter()
+const router = useRouter();
 
 // props
 const props = defineProps({
@@ -348,86 +380,154 @@ const props = defineProps({
     type: Object,
     default: null,
   },
-})
+});
+
+// data
+const notifications = ref([]);
+
+// computed
+const unopenedNotifications = computed(() => {
+  return notifications.value.filter((notification) => !notification.is_read);
+});
 
 // state
-const open = ref(false)
-const isNotificationOpen = ref(false)
-const isMobileMenuOpen = ref(false)
-const isMobileView = ref(false)
+const open = ref(false);
+const isNotificationOpen = ref(false);
+const isMobileMenuOpen = ref(false);
+const isMobileView = ref(false);
 
 // emits
-const emit = defineEmits(['update'])
+const emit = defineEmits(["update"]);
 
 // methods
 const navigateTo = (path) => {
-  router.push(path)
+  router.push(path);
 
-  console.log('path', path)
-}
+  console.log("path", path);
+};
 
 const toggleNotification = () => {
-  isNotificationOpen.value = !isNotificationOpen.value
+  isNotificationOpen.value = !isNotificationOpen.value;
 
   // close the mobile menu
-  isMobileMenuOpen.value = false
+  isMobileMenuOpen.value = false;
 
   // close the user dropdown
-  open.value = false
-}
+  open.value = false;
+};
 
 const toggleDropdown = () => {
-  open.value = !open.value
+  open.value = !open.value;
 
   // close the notification dropdown
-  isNotificationOpen.value = false
-}
+  isNotificationOpen.value = false;
+};
 
 const toggleMobileMenu = () => {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
 
   // close the user dropdown
-  open.value = false
+  open.value = false;
 
   // close the notification dropdown
-  isNotificationOpen.value = false
-}
+  isNotificationOpen.value = false;
+};
 
 const signOut = () => {
-  const token = useCookie('token')
-  token.value = null
+  const token = useCookie("token");
+  token.value = null;
 
-  open.value = false
+  open.value = false;
 
   // rebuild the component by emitting an event
-  emit('logout')
+  emit("logout");
 
   // toast
   toast.add({
-    title: 'Success!',
-    color: 'green',
-    icon: 'i-heroicons-check-circle',
-    description: 'Successfully signed out!',
-  })
+    title: "Success!",
+    color: "green",
+    icon: "i-heroicons-check-circle",
+    description: "Successfully signed out!",
+  });
 
   // redirect if not on the home page
-  if (router.currentRoute.value.name !== 'index') {
+  if (router.currentRoute.value.name !== "index") {
     router.push({
-      name: 'auth-login',
-    })
+      name: "auth-login",
+    });
   }
-}
+};
+
+const markAllNotification = async () => {
+  try {
+    // mark all as read
+    await markAllAsRead();
+
+    // get notifications
+    getNotifications();
+  } catch (error) {
+    console.log("error", error);
+  }
+};
+
+const clickNotification = (id, link) => {
+  // mark as read
+  markAsRead(id);
+
+  // navigate to the link
+  router.push(link);
+};
 
 // watch for screen size
 const checkScreenSize = () => {
-  isMobileView.value = window.innerWidth < 900
-}
+  isMobileView.value = window.innerWidth < 900;
+};
+
+const getNotifications = async () => {
+  try {
+    const response = await getMyNotifications({
+      page: 1,
+      limit: 5,
+    });
+
+    notifications.value = response.data.data.notifications;
+  } catch (error) {
+    console.log("error", error);
+  }
+};
+
+const calculateTime = (time) => {
+  // calculate the time difference using javascript
+  const date = new Date(time);
+  const now = new Date();
+
+  const diff = now - date;
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (days > 0) {
+    return `${days}d ago`;
+  } else if (hours > 0) {
+    return `${hours}h ago`;
+  } else if (minutes > 0) {
+    return `${minutes}m ago`;
+  } else {
+    return `${seconds}s ago`;
+  }
+
+  return "";
+};
 
 // on mount
 onMounted(() => {
-  checkScreenSize()
-  window.addEventListener('resize', checkScreenSize)
-})
+  checkScreenSize();
+  window.addEventListener("resize", checkScreenSize);
+
+  // get notifications
+  getNotifications();
+});
 </script>
 
 <style>

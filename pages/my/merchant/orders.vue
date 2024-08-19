@@ -161,7 +161,7 @@
                         'Accept Order',
                         'Cancel',
                         () => {
-                          updateUserStatus(row.user.id, 'waitingpaid')
+                          updateUserStatus(row.user.id, 'waitingpaid');
                         }
                       )
                     "
@@ -227,63 +227,67 @@
   </div>
 </template>
 <script setup>
-import ConfirmationModal from '~/components/ConfirmationModal.vue'
-import CommentSidebar from '~/components/facilitators/CommentSidebar.vue'
-import UploadResultSidebar from '~/components/facilitators/UploadResultSidebar.vue'
+import ConfirmationModal from "~/components/ConfirmationModal.vue";
+import CommentSidebar from "~/components/facilitators/CommentSidebar.vue";
+import UploadResultSidebar from "~/components/facilitators/UploadResultSidebar.vue";
 
-import { useDebounceFn } from '@vueuse/core'
+import { useDebounceFn } from "@vueuse/core";
 
-import { ref, computed, onMounted } from 'vue'
-import { useMerchantService } from '~/composables/useMerchantService'
-import { useOrderService } from '~/composables/useOrderService'
+import { ref, computed, onMounted } from "vue";
+import { useMerchantService } from "~/composables/useMerchantService";
+import { useOrderService } from "~/composables/useOrderService";
 
-const { getMerchants, updateMerchantStatus } = useMerchantService()
-const { getMyMerchantOrders } = useOrderService()
+const { getMerchants, updateMerchantStatus } = useMerchantService();
+const { getMyMerchantOrders } = useOrderService();
 
 // components
-const toast = useToast()
+const toast = useToast();
+
+// router
+const router = useRouter();
+const route = useRoute();
 
 definePageMeta({
   layout: false,
-})
+});
 
 // state
-const isTableLoading = ref(true)
-const isModalOpen = ref(false)
-const isCommentModalOpen = ref(false)
-const isUploadFileModalOpen = ref(false)
+const isTableLoading = ref(true);
+const isModalOpen = ref(false);
+const isCommentModalOpen = ref(false);
+const isUploadFileModalOpen = ref(false);
 const modalData = ref({
-  title: '',
-  message: '',
+  title: "",
+  message: "",
   callback: null,
-})
+});
 
 // data
-const pageTitle = 'Order List'
-const facilitators = ref([])
-const orders = ref([])
+const pageTitle = "Order List";
+const facilitators = ref([]);
+const orders = ref([]);
 const selectedStatus = ref({
-  label: 'All',
-  value: 'all',
-})
-const selectedOrder = ref(null)
-const searchQuery = ref('')
-const page = ref(1)
+  label: "All",
+  value: "all",
+});
+const selectedOrder = ref(null);
+const searchQuery = ref("");
+const page = ref(1);
 const paginationsData = ref({
   page: 1,
   totalPage: 1,
   totalItems: 0,
   itemsPerPage: 10,
-})
+});
 
 const statusList = [
-  { label: 'All', value: 'all', color: 'gray' },
-  { label: 'Completed', value: 'completed', color: 'orange' },
-  { label: 'Paid', value: 'paid', color: 'blue' },
-  { label: 'Pending', value: 'pending', color: 'orange' },
-  { label: 'Waiting Payment', value: 'waitingpaid', color: 'orange' },
-  { label: 'Failed', value: 'failed', color: 'orange' },
-]
+  { label: "All", value: "all", color: "gray" },
+  { label: "Completed", value: "completed", color: "orange" },
+  { label: "Paid", value: "paid", color: "blue" },
+  { label: "Pending", value: "pending", color: "orange" },
+  { label: "Waiting Payment", value: "waitingpaid", color: "orange" },
+  { label: "Failed", value: "failed", color: "orange" },
+];
 
 const fetchMerchantOrders = async () => {
   try {
@@ -291,7 +295,7 @@ const fetchMerchantOrders = async () => {
       page: page.value,
       per_page: paginationsData.value.itemsPerPage,
       order_status:
-        selectedStatus.value.value === 'all' ? '' : selectedStatus.value.value,
+        selectedStatus.value.value === "all" ? "" : selectedStatus.value.value,
       search: searchQuery.value,
     }).then((response) => {
       orders.value = response.data.data.orders.data.map((order, index) => ({
@@ -307,7 +311,7 @@ const fetchMerchantOrders = async () => {
           fullname: order.user.fullname,
           email: order.user.email,
         },
-        'order date': formatDate(order.created_at, 'dd MMM yyyy'),
+        "order date": formatDate(order.created_at, "dd MMM yyyy"),
         estimated: `${order.service.time_estimated} ${order.service.time_estimated_unit}`,
         languages: {
           language_source: order.language_source,
@@ -328,103 +332,107 @@ const fetchMerchantOrders = async () => {
           result_file_url: order.result_file_url,
           meet_url: order.meet_url,
         },
-      }))
-    })
+      }));
+    });
   } catch (error) {
-    console.error('Error fetching merchant orders:', error)
+    console.error("Error fetching merchant orders:", error);
   } finally {
-    isTableLoading.value = false
+    isTableLoading.value = false;
   }
-}
+};
 
 // Watcher to fetch data when page changes
-watch(page, fetchMerchantOrders)
+watch(page, fetchMerchantOrders);
 
 watch(
   selectedStatus,
   () => {
-    fetchMerchantOrders()
+    fetchMerchantOrders();
   },
   {
     deep: true,
   }
-)
+);
 
 watch(
   searchQuery,
   useDebounceFn(() => {
-    fetchMerchantOrders()
+    fetchMerchantOrders();
   }, 300)
-)
+);
 
 // Filter facilitators based on search query
 const filterMerchantOrder = () => {
-  fetchMerchantOrders(page.value, selectedStatus.value.value, searchQuery.value)
-}
+  fetchMerchantOrders(
+    page.value,
+    selectedStatus.value.value,
+    searchQuery.value
+  );
+};
 
 // Open link in new tab
 const openLink = (url) => {
   // Open link in new tab
-  window.open(url, '_blank')
-}
+  window.open(url, "_blank");
+};
 
 const formatPrice = (price) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-  }).format(price)
-}
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+  }).format(price);
+};
 
 const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('id-ID', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
+  return new Date(date).toLocaleDateString("id-ID", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
 
 const checkIfJSON = (data) => {
   try {
-    return JSON.parse(data)
+    return JSON.parse(data);
   } catch (error) {
-    return data
+    return data;
   }
-}
+};
 
 const handleRefresh = (updatedData) => {
-  selectedOrder.value = updatedData
-  console.log('Refreshed data:', selectedOrder)
-}
+  selectedOrder.value = updatedData;
+  console.log("Refreshed data:", selectedOrder);
+};
 
 const hideModal = () => {
-  isCommentModalOpen.value = false
-  isUploadFileModalOpen.value = false
+  isCommentModalOpen.value = false;
+  isUploadFileModalOpen.value = false;
 
   // Refresh data
-  fetchMerchantOrders()
-}
+  fetchMerchantOrders();
+};
 
 const copyToClipboard = (text) => {
-  navigator.clipboard.writeText(text)
+  navigator.clipboard.writeText(text);
 
   // Show toast
   toast.add({
-    title: 'Copied!',
-    color: 'green',
-    icon: 'i-heroicons-check-circle',
-    description: 'No Rekening copied to clipboard!',
-  })
-}
+    title: "Copied!",
+    color: "green",
+    icon: "i-heroicons-check-circle",
+    description: "No Rekening copied to clipboard!",
+  });
+};
 
 const resolveStatusColor = (status) => {
-  if (status === 'verified') {
-    return 'blue'
-  } else if (status === 'pending') {
-    return 'orange'
+  if (status === "verified") {
+    return "blue";
+  } else if (status === "pending") {
+    return "orange";
   } else {
-    return 'gray'
+    return "gray";
   }
-}
+};
 
 const displayConfirmationModal = (
   title,
@@ -439,64 +447,69 @@ const displayConfirmationModal = (
     confirmText,
     cancelText,
     callback,
-  }
-  isModalOpen.value = true
-}
+  };
+  isModalOpen.value = true;
+};
 
 const displayCommentModal = (data) => {
-  selectedOrder.value = data
+  selectedOrder.value = data;
 
-  isCommentModalOpen.value = true
-}
+  isCommentModalOpen.value = true;
+};
 
 const displayUploadFileModal = (data) => {
-  selectedOrder.value = data
+  selectedOrder.value = data;
 
-  isUploadFileModalOpen.value = true
-}
+  isUploadFileModalOpen.value = true;
+};
 
 const resolveOrderStatus = (status) => {
   switch (status) {
-    case 'completed':
+    case "completed":
       return {
-        color: 'green',
-        text: 'Completed',
-      }
+        color: "green",
+        text: "Completed",
+      };
 
-    case 'paid':
+    case "paid":
       return {
-        color: 'blue',
-        text: 'In Progress',
-      }
+        color: "blue",
+        text: "In Progress",
+      };
 
-    case 'pending':
+    case "pending":
       return {
-        color: 'violet',
-        text: 'Pending',
-      }
+        color: "violet",
+        text: "Pending",
+      };
 
-    case 'waitingpaid':
+    case "waitingpaid":
       return {
-        color: 'orange',
-        text: 'Waiting',
-      }
+        color: "orange",
+        text: "Waiting",
+      };
 
-    case 'failed':
+    case "failed":
       return {
-        color: 'red',
-        text: 'Failed',
-      }
+        color: "red",
+        text: "Failed",
+      };
 
     default:
       return {
-        color: 'gray',
-        text: 'Unknown',
-      }
+        color: "gray",
+        text: "Unknown",
+      };
   }
-}
+};
 
 // Mounted lifecycle hook
 onMounted(() => {
-  fetchMerchantOrders()
-})
+  // check if have url params detail_id then fetch data
+  const detailId = route.query.detail_id;
+
+  if (detailId) searchQuery.value = detailId;
+
+  fetchMerchantOrders();
+});
 </script>

@@ -81,10 +81,5 @@ export const useOrderService = () => {
     updateMerchantOrder(id, payload) {
       return $axios.put(`/orders/${id}`, payload)
     }
-
-
-
-    
-    
   }
 }
