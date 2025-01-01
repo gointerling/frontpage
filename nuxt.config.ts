@@ -18,6 +18,7 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxtjs/color-mode',
     'nuxt-vue3-google-signin',
+    '@pinia/nuxt',
   ],
   postcss: {
     plugins: {
@@ -30,7 +31,11 @@ export default defineNuxtConfig({
       Poppins: [400, 500, 600, 700], // Define the font weights you need
     },
   },
-  plugins: ['~/plugins/axios.js'],
+  plugins: [
+    '~/plugins/supabase.ts',
+    '~/plugins/axios.js',
+    '~/plugins/pinia.js',
+   ],
   googleSignIn: {
     // ENV
     clientId: process.env.VITE_GOOGLE_CLIENT_ID,

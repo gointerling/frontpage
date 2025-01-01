@@ -64,6 +64,9 @@
               :class="isNotificationOpen ? 'text-white' : 'text-primary'"
             />
           </button>
+          <button @click="toggleChat">
+            <nuxt-icon name="chat" class="text-2xl" filled />
+          </button>
 
           <button
             @click="toggleMobileMenu"
@@ -147,9 +150,12 @@
                 {{ unopenedNotifications.length }}
               </span>
             </button>
+            <button @click="toggleChat">
+              <nuxt-icon name="chat" class="text-2xl" filled />
+            </button>
             <button
               @click="toggleDropdown"
-              class="flex items-center text-sm font-medium text-gray-900 rounded-full focus:outline-none focus:shadow-outline"
+              class="flex items-center text-sm font-medium text-gray-900 rounded-full focus:outline-none focus:shadow-outline ml-4"
             >
               <UAvatar
                 :alt="user?.fullname"
@@ -360,19 +366,29 @@
         Sign out
       </button>
     </div>
+
+    <Chat :is-chat-show="chatStore.isChatOpen" />
   </div>
 </template>
 
 <script setup>
-import { useNotificationService } from "~/composables/useNotificationService";
+import Chat from '~/components/Chat.vue'
+import { useNotificationService } from '~/composables/useNotificationService'
 const { getMyNotifications, markAsRead, markAllAsRead } =
-  useNotificationService();
+  useNotificationService()
+
+import { useChatStore } from '~/stores/chat'
+const chatStore = useChatStore()
+
+const toggleChat = () => {
+  chatStore.toggleChat()
+}
 
 // components
-const toast = useToast();
+const toast = useToast()
 
 // router
-const router = useRouter();
+const router = useRouter()
 
 // props
 const props = defineProps({
@@ -380,154 +396,154 @@ const props = defineProps({
     type: Object,
     default: null,
   },
-});
+})
 
 // data
-const notifications = ref([]);
+const notifications = ref([])
 
 // computed
 const unopenedNotifications = computed(() => {
-  return notifications.value.filter((notification) => !notification.is_read);
-});
+  return notifications.value.filter((notification) => !notification.is_read)
+})
 
 // state
-const open = ref(false);
-const isNotificationOpen = ref(false);
-const isMobileMenuOpen = ref(false);
-const isMobileView = ref(false);
+const open = ref(false)
+const isNotificationOpen = ref(false)
+const isMobileMenuOpen = ref(false)
+const isMobileView = ref(false)
 
 // emits
-const emit = defineEmits(["update"]);
+const emit = defineEmits(['update'])
 
 // methods
 const navigateTo = (path) => {
-  router.push(path);
+  router.push(path)
 
-  console.log("path", path);
-};
+  console.log('path', path)
+}
 
 const toggleNotification = () => {
-  isNotificationOpen.value = !isNotificationOpen.value;
+  isNotificationOpen.value = !isNotificationOpen.value
 
   // close the mobile menu
-  isMobileMenuOpen.value = false;
+  isMobileMenuOpen.value = false
 
   // close the user dropdown
-  open.value = false;
-};
+  open.value = false
+}
 
 const toggleDropdown = () => {
-  open.value = !open.value;
+  open.value = !open.value
 
   // close the notification dropdown
-  isNotificationOpen.value = false;
-};
+  isNotificationOpen.value = false
+}
 
 const toggleMobileMenu = () => {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
 
   // close the user dropdown
-  open.value = false;
+  open.value = false
 
   // close the notification dropdown
-  isNotificationOpen.value = false;
-};
+  isNotificationOpen.value = false
+}
 
 const signOut = () => {
-  const token = useCookie("token");
-  token.value = null;
+  const token = useCookie('token')
+  token.value = null
 
-  open.value = false;
+  open.value = false
 
   // rebuild the component by emitting an event
-  emit("logout");
+  emit('logout')
 
   // toast
   toast.add({
-    title: "Success!",
-    color: "green",
-    icon: "i-heroicons-check-circle",
-    description: "Successfully signed out!",
-  });
+    title: 'Success!',
+    color: 'green',
+    icon: 'i-heroicons-check-circle',
+    description: 'Successfully signed out!',
+  })
 
   // redirect if not on the home page
-  if (router.currentRoute.value.name !== "index") {
+  if (router.currentRoute.value.name !== 'index') {
     router.push({
-      name: "auth-login",
-    });
+      name: 'auth-login',
+    })
   }
-};
+}
 
 const markAllNotification = async () => {
   try {
     // mark all as read
-    await markAllAsRead();
+    await markAllAsRead()
 
     // get notifications
-    getNotifications();
+    getNotifications()
   } catch (error) {
-    console.log("error", error);
+    console.log('error', error)
   }
-};
+}
 
 const clickNotification = (id, link) => {
   // mark as read
-  markAsRead(id);
+  markAsRead(id)
 
   // navigate to the link
-  router.push(link);
-};
+  router.push(link)
+}
 
 // watch for screen size
 const checkScreenSize = () => {
-  isMobileView.value = window.innerWidth < 900;
-};
+  isMobileView.value = window.innerWidth < 900
+}
 
 const getNotifications = async () => {
   try {
     const response = await getMyNotifications({
       page: 1,
       limit: 5,
-    });
+    })
 
-    notifications.value = response.data.data.notifications;
+    notifications.value = response.data.data.notifications
   } catch (error) {
-    console.log("error", error);
+    console.log('error', error)
   }
-};
+}
 
 const calculateTime = (time) => {
   // calculate the time difference using javascript
-  const date = new Date(time);
-  const now = new Date();
+  const date = new Date(time)
+  const now = new Date()
 
-  const diff = now - date;
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
+  const diff = now - date
+  const seconds = Math.floor(diff / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
 
   if (days > 0) {
-    return `${days}d ago`;
+    return `${days}d ago`
   } else if (hours > 0) {
-    return `${hours}h ago`;
+    return `${hours}h ago`
   } else if (minutes > 0) {
-    return `${minutes}m ago`;
+    return `${minutes}m ago`
   } else {
-    return `${seconds}s ago`;
+    return `${seconds}s ago`
   }
 
-  return "";
-};
+  return ''
+}
 
 // on mount
 onMounted(() => {
-  checkScreenSize();
-  window.addEventListener("resize", checkScreenSize);
+  checkScreenSize()
+  window.addEventListener('resize', checkScreenSize)
 
   // get notifications
-  getNotifications();
-});
+  getNotifications()
+})
 </script>
 
 <style>
