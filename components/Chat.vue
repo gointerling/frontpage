@@ -331,6 +331,13 @@ const fetchContacts = async () => {
     })
     localStorage.setItem('chat-cache', JSON.stringify(contactList.value))
 
+    // set unread count
+    const unreadCount = contactList.value.reduce((acc, contact) => {
+      return acc + contact.recipient_unread_count
+    }, 0)
+
+    chatStore.unreadMessages = unreadCount
+
     isLoadingContacts.value = false
   }
 }

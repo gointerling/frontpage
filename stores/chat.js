@@ -8,6 +8,7 @@ export const useChatStore = defineStore('chat', {
     isChatLoading: false,
     owner: null,
     recipient: null,
+    unreadMessages: 0,
   }),
   actions: {
     toggleChat() {

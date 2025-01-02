@@ -83,6 +83,12 @@
       @click="chatStore.toggleChat"
     >
       <nuxt-icon name="chat" class="text-2xl"></nuxt-icon>
+      <span
+        v-if="chatStore.unreadMessages > 0"
+        class="absolute top-2 right-8 bg-red-600 text-white text-xs px-2 ml-1 rounded-full z-20"
+      >
+        {{ chatStore.unreadMessages > 10 ? 'New' : chatStore.unreadMessages }}
+      </span>
     </button>
   </div>
 </template>

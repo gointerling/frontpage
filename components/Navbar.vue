@@ -66,6 +66,14 @@
           </button>
           <button @click="toggleChat">
             <nuxt-icon name="chat" class="text-2xl" filled />
+            <span
+              v-if="chatStore.unreadMessages > 0"
+              class="absolute top-4 bg-red-600 text-white text-xs px-2 ml-1 rounded-full z-20"
+            >
+              {{
+                chatStore.unreadMessages > 10 ? '' : chatStore.unreadMessages
+              }}
+            </span>
           </button>
 
           <button
@@ -152,6 +160,16 @@
             </button>
             <button @click="toggleChat">
               <nuxt-icon name="chat" class="text-2xl" filled />
+              <span
+                v-if="chatStore.unreadMessages > 0"
+                class="absolute top-4 bg-red-600 text-white text-xs px-2 ml-1 rounded-full z-20"
+              >
+                {{
+                  chatStore.unreadMessages > 10
+                    ? 'New'
+                    : chatStore.unreadMessages
+                }}
+              </span>
             </button>
             <button
               @click="toggleDropdown"
@@ -472,6 +490,9 @@ const signOut = () => {
       name: 'auth-login',
     })
   }
+
+  // close chat
+  chatStore.closeChat()
 }
 
 const markAllNotification = async () => {
