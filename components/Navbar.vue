@@ -500,6 +500,11 @@ const checkScreenSize = () => {
 }
 
 const getNotifications = async () => {
+  // if not logged in, return
+  if (!props.user) {
+    return
+  }
+
   try {
     const response = await getMyNotifications({
       page: 1,

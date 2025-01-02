@@ -68,6 +68,17 @@
 
     <!-- Loader -->
     <PageLoader v-else />
+
+    <Chat :is-chat-show="chatStore.isChatOpen" />
+
+    <!-- Chat Button Absolute -->
+    <button
+      v-show="!chatStore.isChatOpen"
+      class="absolute bottom-5 right-5 p-4 flex gap-2 align-middle items-center text-sm bg-primary text-accent hover:bg-blue-900 rounded-full"
+      @click="chatStore.toggleChat"
+    >
+      <nuxt-icon name="chat" class="text-2xl"></nuxt-icon>
+    </button>
   </div>
 </template>
 
@@ -75,6 +86,10 @@
 // components
 import SideDrawer from '~/components/admin/SideDrawer.vue'
 import PageLoader from '~/components/PageLoader.vue'
+
+// store
+import { useChatStore } from '~/stores/chat'
+const chatStore = useChatStore()
 
 // imports
 import { ref, onMounted } from 'vue'
