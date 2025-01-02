@@ -225,7 +225,8 @@ const startChat = async () => {
     photo: props.data.merchants[0].users[0].photo,
   }
 
-  console.log('Start chat:', owner, recipient)
+  chatStore.openChat()
+  chatStore.isChatLoading = true
 
   // Add chat contact for owner
   const { data: ownerContact, error: errorOwnerContact } = await $supabase
@@ -415,8 +416,9 @@ const startChat = async () => {
   }
 
   // Open chat that already exists on navbar component
-  chatStore.openChat()
+
   chatStore.setChatRecipient(recipient)
   chatStore.setChatOwner(owner)
+  chatStore.isChatLoading = false
 }
 </script>

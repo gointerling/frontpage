@@ -3,9 +3,21 @@
     v-show="isChatShow"
     class="fixed bottom-5 right-5 flex items-end space-x-2"
   >
+    <!-- Chat Button Loading Animation -->
+    <div>
+      <div
+        v-show="chatStore.isChatLoading && chatStore.isChatOpen"
+        class="absolute bottom-5 right-5 px-4 pb-2 flex gap-2 align-middle items-center text-sm bg-primary text-accent hover:bg-blue-900 rounded-full"
+      >
+        <span class="text-xl text-white dot-animation">.</span>
+        <span class="text-xl text-white dot-animation">.</span>
+        <span class="text-xl text-white dot-animation">.</span>
+      </div>
+    </div>
+
     <!-- Chat Windows -->
     <div
-      v-if="selectedContact"
+      v-if="!chatStore.isChatLoading && selectedContact"
       class="w-full border rounded-lg flex flex-col font-sans"
     >
       <div
@@ -25,10 +37,9 @@
               size="xl"
               :alt="selectedContact.recipient_name"
               :src="selectedContact.recipient_picture"
-              imgClass="w-10 h-10 rounded-full mr-3"
+              imgClass="rounded-full object-cover"
             />
-
-            <div>
+            <div class="ml-1">
               <span class="block font-bold">{{
                 selectedContact.recipient_name
               }}</span>
@@ -103,7 +114,10 @@
     </div>
 
     <!-- Chat Contact List -->
-    <div v-else class="w-full border rounded-lg flex flex-col font-sans">
+    <div
+      v-if="!chatStore.isChatLoading && !selectedContact"
+      class="w-full border rounded-lg flex flex-col font-sans"
+    >
       <div
         class="flex justify-between items-center p-3 bg-primary rounded-t-md"
       >
@@ -344,8 +358,6 @@ const fetchMessages = async () => {
 
     // if selected contact is not empty, update the contact list to mark the messages as read
     if (selectedContact.value) {
-      console.log('mark as open')
-
       const contacts = contactList.value.map((contact) => {
         if (contact.recipient_id === selectedContact.value.recipient_id) {
           return {
@@ -378,8 +390,6 @@ const sendMessage = async () => {
     console.log('Message is empty, not sending.')
     return
   }
-
-  console.log('tambah 1')
 
   const message = {
     message: newMessage.value,
@@ -485,7 +495,34 @@ const closeChat = () => {
   chatStore.closeChat()
 }
 
-const backChat = () => {
+const backChat = async () => {
+  // refresh contact last chat and unread count
+  const contacts = contactList.value.map((contact) => {
+    if (contact.recipient_id === selectedContact.value.recipient_id) {
+      return {
+        ...contact,
+        recipient_last_chat: messages.value[messages.value.length - 1].message,
+        recipient_last_chat_datetime:
+          messages.value[messages.value.length - 1].created_at,
+        recipient_is_open: true,
+        recipient_unread_count: 0,
+      }
+    }
+    return contact
+  })
+
+  const { error } = await $supabase
+    .from('contacts')
+    .update({
+      contacts,
+    })
+    .eq('owner_id', chatOwnerId)
+
+  if (error) {
+    console.error('Error updating contact:', error)
+  }
+
+  // close chat
   selectedContact.value = null
 }
 
@@ -540,7 +577,6 @@ const subscribeToContacts = () => {
         filter: `owner_id=eq.${chatOwnerId}`,
       },
       (payload) => {
-        console.log('Contacts table change:', payload)
         fetchContacts() // Refresh contact list
       }
     )
@@ -558,7 +594,6 @@ const subscribeToChats = () => {
         table: 'chats',
       },
       (payload) => {
-        console.log('Chats table change:', payload)
         fetchMessages() // Refresh messages if the recipient or sender matches
       }
     )
@@ -594,3 +629,27 @@ onUnmounted(() => {
   }
 })
 </script>
+
+<style scoped>
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.dot-animation {
+  animation: blink 1.4s infinite;
+}
+
+.dot-animation:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot-animation:nth-child(3) {
+  animation-delay: 0.4s;
+}
+</style>

@@ -5,6 +5,7 @@ import { defineStore } from 'pinia';
 export const useChatStore = defineStore('chat', {
   state: () => ({
     isChatOpen: false,
+    isChatLoading: false,
     owner: null,
     recipient: null,
   }),
