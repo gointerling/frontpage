@@ -351,7 +351,7 @@ const fetchMessages = async () => {
         `and(sender_id.eq.${chatOwnerId},recipient_id.eq.${selectedContact.value.recipient_id}),` +
           `and(sender_id.eq.${selectedContact.value.recipient_id},recipient_id.eq.${chatOwnerId})`
       )
-      .order('created_at', { ascending: true })
+      .order('id', { ascending: true })
 
     if (error) throw error
     messages.value = data || []
