@@ -18,7 +18,6 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxtjs/color-mode',
     'nuxt-vue3-google-signin',
-    '@pinia/nuxt',
   ],
   postcss: {
     plugins: {

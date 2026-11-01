@@ -3,7 +3,7 @@ import {  useCookie, navigateTo } from 'nuxt/app'
 import axios from 'axios'
 
 // from env VITE_APP_API_URL
-const baseURL = import.meta.env.VITE_APP_API_URL
+const baseURL = import.meta.env.VITE_APP_API_URL || '/api'
 
 export default defineNuxtPlugin((nuxtApp) => {
   const axiosInstance = axios.create({

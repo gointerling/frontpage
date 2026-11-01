@@ -319,7 +319,7 @@ const handleLogin = async () => {
         title: 'Uh Oh!',
         color: 'red',
         icon: 'i-heroicons-exclamation-triangle',
-        description: err.response.data.error,
+        description: err?.response?.data?.error || err?.response?.data?.message || err?.message || 'Login failed',
       })
 
       loading.value = false
@@ -356,7 +356,7 @@ const handleRegister = async () => {
         title: 'Uh Oh!',
         color: 'red',
         icon: 'i-heroicons-exclamation-triangle',
-        description: getFirstErrorMessage(err.response.data.error),
+        description: getFirstErrorMessage(err?.response?.data?.error) || err?.response?.data?.message || err?.message || 'Registration failed',
       })
     })
 }
@@ -406,7 +406,7 @@ const handleGoogleVerify = async (token) => {
         title: 'Uh Oh!',
         color: 'red',
         icon: 'i-heroicons-exclamation-triangle',
-        description: err.response.data.error,
+        description: err?.response?.data?.error || err?.response?.data?.message || err?.message || 'Google login failed',
       })
 
       loading.value = false

@@ -1,7 +1,8 @@
 <template>
   <UModal
+    v-if="ads && internalIsOpen"
     v-model="internalIsOpen"
-    :prevent-close="isMobileScreen ? false : true"
+    :prevent-close="false"
     class="w-full h-full max-w-6xl max-h-4xl"
     :ui="{
       width: 'w-full sm:max-w-4xl',
@@ -15,7 +16,7 @@
       }"
     >
       <img
-        :src="ads.image_url"
+        :src="ads?.image_url"
         alt=""
         class="w-full h-full object-cover rounded-lg max-h-[500px]"
       />
@@ -31,10 +32,10 @@
           <div class="flex flex-col justify-center items-end h-full">
             <div class="h-full flex flex-col items-end justify-center pb-6">
               <h6 class="text-white text-xl font-bold text-right pb-4">
-                {{ ads.tagline }}
+                {{ ads?.tagline }}
               </h6>
               <p class="text-white text-sm max-w-sm text-right">
-                {{ ads.description }}
+                {{ ads?.description }}
               </p>
             </div>
           </div>
@@ -45,7 +46,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 
 // services
 import { useAdvertisementService } from "~/composables/useAdvertisementService";
@@ -57,17 +58,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  // data: {
-  //   type: Object,
-  //   default: () => ({
-  //     title: 'Ads Title',
-  //     content:
-  //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non metus et eros consectetur dapibus. Nulla facilisi. Maecenas ac libero nec justo feugiat varius. Cras at turpis non nisi bibendum fermentum. Integer non orci libero.',
-  //     confirmText: 'Confirm',
-  //     cancelText: 'Cancel',
-  //     callback: () => {},
-  //   }),
-  // },
 });
 
 // emit event to update the prop value
@@ -92,22 +82,24 @@ watch(internalIsOpen, (newVal) => {
 
 const cancel = () => {
   internalIsOpen.value = false;
-
-  // emit event to update the prop value
 };
 
-const ads = ref();
+const ads = ref(null);
 
 const fetchAds = async () => {
   try {
     const { data } = await getDisplayAds();
 
-    ads.value = data.data.selectedAdvertisement;
-    internalIsOpen.value = true;
+    if (data?.data?.selectedAdvertisement?.image_url) {
+      ads.value = data.data.selectedAdvertisement;
+      internalIsOpen.value = true;
+    } else {
+      ads.value = null;
+      internalIsOpen.value = false;
+    }
   } catch (err) {
     console.log(err);
-
-    // hide banner
+    ads.value = null;
     internalIsOpen.value = false;
   }
 };
